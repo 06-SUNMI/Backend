@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 # 본인이 설정한 값을 여기서 채워넣습니다.
 # 리전, 버킷 이름, CodeDeploy 앱 이름, CodeDeploy 배포 그룹 이름
@@ -33,7 +36,7 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '11'
-    
+
     # build 단계 에러 방지
     - name: Run chmod to make gradlew executable
       run: chmod +x ./gradlew
@@ -43,7 +46,7 @@ jobs:
       uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
       with:
         arguments: clean build -x test
-        
+
     # Gradle test를 실행한다
     - name: Test with Gradle
       run: ./gradlew --info test
