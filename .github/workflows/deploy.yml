@@ -3,10 +3,10 @@ name: Deploy to Amazon EC2
 on:
   push:
     branches:
-      #- master
+      - master
   pull_request:
     branches:
-      #- master
+      - master
 
 # 본인이 설정한 값을 여기서 채워넣습니다.
 # 리전, 버킷 이름, CodeDeploy 앱 이름, CodeDeploy 배포 그룹 이름
@@ -36,6 +36,15 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '11'
+
+    # MySQL 세팅
+    - name: Setup MySQL
+      uses: samin/mysql-action@v1
+      with:
+        character set server: 'utf8'
+        mysql database: 'jdbc:mysql://localhost:3306/test?characterEncoding=UTF-8&serverTimezone=UTC'
+        mysql user: 'root'
+        mysql password: '1234'
 
     # build 단계 에러 방지
     - name: Run chmod to make gradlew executable
