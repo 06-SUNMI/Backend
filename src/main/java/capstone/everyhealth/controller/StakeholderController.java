@@ -3,5 +3,5 @@ package capstone.everyhealth.controller;
 import org.springframework.stereotype.Controller;
 
 @Controller
-public class ReportController {
+public class StakeholderController {
 }
