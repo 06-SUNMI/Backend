@@ -41,7 +41,6 @@ jobs:
     - name: Setup MySQL
       uses: samin/mysql-action@v1
       with:
-        character set server: 'utf8'
         mysql database: 'jdbc:mysql://localhost:3306/test?characterEncoding=UTF-8&serverTimezone=UTC'
         mysql user: 'root'
         mysql password: '1234'
