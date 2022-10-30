@@ -1,4 +1,4 @@
-package test221007.test1007;
+package capstone.everyhealth;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

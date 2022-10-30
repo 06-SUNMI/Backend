@@ -1,4 +1,4 @@
-package test221007.test1007;
+package capstone.everyhealth;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
