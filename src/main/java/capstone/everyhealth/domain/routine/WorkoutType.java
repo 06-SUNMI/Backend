@@ -10,7 +10,8 @@ import java.io.Serializable;
 @Getter
 public class WorkoutType implements Serializable {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
     @Id
@@ -19,6 +20,4 @@ public class WorkoutType implements Serializable {
     private WorkoutTarget target;
 
     private WorkoutTypeEnum type;
-
-    // 타입 m <ㅡ> 1 타겟
 }

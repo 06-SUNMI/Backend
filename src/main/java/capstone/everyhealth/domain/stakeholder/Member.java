@@ -7,9 +7,10 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-public class User {
+public class Member {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
     @Column(name = "social_account_num_id")

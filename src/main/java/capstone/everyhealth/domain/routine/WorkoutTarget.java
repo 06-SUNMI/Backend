@@ -9,7 +9,8 @@ import javax.persistence.*;
 @Getter
 public class WorkoutTarget {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
     private WorkoutTargetEnum target;

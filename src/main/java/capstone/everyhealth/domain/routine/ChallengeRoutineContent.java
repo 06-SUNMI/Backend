@@ -17,6 +17,6 @@ public class ChallengeRoutineContent implements Serializable {
     @JoinColumn(name = "routine_id")
     private ChallengeRoutine challengeRoutine;
 
-    private int set;
+    private int sets;
     private int time;
 }

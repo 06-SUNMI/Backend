@@ -1,7 +1,7 @@
 package capstone.everyhealth.domain.challenge;
 
 import lombok.Getter;
-import capstone.everyhealth.domain.stakeholder.User;
+import capstone.everyhealth.domain.stakeholder.Member;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
 @Getter
 public class Transaction {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
@@ -18,8 +19,8 @@ public class Transaction {
     private Challenge challenge;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     private LocalDateTime date;
     private String content;

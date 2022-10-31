@@ -7,16 +7,14 @@ import java.io.Serializable;
 
 @Entity
 @Getter
-public class UserRoutineContent implements Serializable{
+public class MemberRoutineContent implements Serializable{
 
     @Id
     @ManyToOne
     @JoinColumn(name = "routine_id")
-    private UserRoutine userRoutine;
+    private MemberRoutine memberRoutine;
 
-    private int set;
+    private int sets;
     private int time;
-    //@ColumnDefault(value = "false")
-    // default로 boolean 설정 방법 찾기
     private boolean isChecked;
 }

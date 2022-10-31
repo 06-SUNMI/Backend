@@ -8,7 +8,8 @@ import javax.persistence.*;
 @Getter
 public class SnsComment {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
