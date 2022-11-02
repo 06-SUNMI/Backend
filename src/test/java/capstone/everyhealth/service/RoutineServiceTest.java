@@ -61,20 +61,20 @@ class RoutineServiceTest {
     private MemberRoutineContent getSecondContent(Workout secondWorkout, Workout workout) {
         return MemberRoutineContent.builder()
                 .workout(secondWorkout)
-                .count(null)
+                .numCount(null)
                 .weight(null)
-                .set(null)
-                .time(120)
+                .numSet(null)
+                .numTime(120)
                 .build();
     }
 
     private MemberRoutineContent getFirstContent(Workout firstWorkout, Workout workout) {
         return MemberRoutineContent.builder()
                 .workout(firstWorkout)
-                .count(10)
+                .numCount(10)
                 .weight(100)
-                .set(2)
-                .time(null)
+                .numSet(2)
+                .numTime(null)
                 .build();
     }
 
