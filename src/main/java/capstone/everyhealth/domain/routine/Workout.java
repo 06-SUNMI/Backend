@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class Workout {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private String type;

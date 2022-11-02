@@ -54,9 +54,9 @@ public class RoutineController {
             MemberRoutineContent content = MemberRoutineContent.builder()
                     .workout(workout)
                     .weight(dto.getWeightList().get(idx))
-                    .count(dto.getCountList().get(idx))
-                    .set(dto.getSetList().get(idx))
-                    .time(dto.getTimeList().get(idx))
+                    .numCount(dto.getCountList().get(idx))
+                    .numSet(dto.getSetList().get(idx))
+                    .numTime(dto.getTimeList().get(idx))
                     .build();
 
             contentList.add(content);

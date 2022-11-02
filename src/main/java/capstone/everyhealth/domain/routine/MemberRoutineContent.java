@@ -14,7 +14,7 @@ import java.io.Serializable;
 public class MemberRoutineContent {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
@@ -26,8 +26,8 @@ public class MemberRoutineContent {
     private Workout workout;
 
     private Integer weight;
-    private Integer count;
-    private Integer set;
-    private Integer time;
+    private Integer numCount;
+    private Integer numSet;
+    private Integer numTime;
     private boolean isChecked;
 }
