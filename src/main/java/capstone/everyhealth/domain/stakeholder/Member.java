@@ -1,12 +1,15 @@
 package capstone.everyhealth.domain.stakeholder;
 
-import lombok.Getter;
+import lombok.*;
 import capstone.everyhealth.domain.enums.LoginType;
 
 import javax.persistence.*;
 
 @Entity
-@Getter
+@Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Member {
 
     @Id

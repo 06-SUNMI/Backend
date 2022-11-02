@@ -1,22 +1,30 @@
 package capstone.everyhealth.domain.routine;
 
-import lombok.Getter;
+import lombok.*;
 import capstone.everyhealth.domain.stakeholder.Member;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
+@ToString
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MemberRoutine {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
-    private LocalDateTime date;
+    @OneToMany(mappedBy = "memberRoutine")
+    private List<MemberRoutineContent> routineContentList;
+
+    private String date;
 }
