@@ -8,7 +8,7 @@ import org.springframework.core.io.ClassPathResource;
 @Configuration
 public class ApplicationDevProperties {
 
-    @Bean(name = "dev")
+    /*@Bean(name = "dev")
     public PropertiesFactoryBean propertiesFactoryBean() throws Exception{
 
         PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
@@ -17,5 +17,5 @@ public class ApplicationDevProperties {
         propertiesFactoryBean.setLocation(classPathResource);
 
         return propertiesFactoryBean;
-    }
+    }*/
 }

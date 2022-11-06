@@ -17,7 +17,7 @@ import javax.persistence.EntityManager;
 @Slf4j
 public class InitDb {
 
-    @Value("${spring.profiles.active}")
+    /*@Value("${spring.profiles.active}")
     private String mode;
     @Value("#{dev['spring.jpa.hibernate.ddl-auto']}")
     private String ddl;
@@ -68,5 +68,5 @@ public class InitDb {
                 em.persist(member);
             }
         }
-    }
+    }*/
 }
