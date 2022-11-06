@@ -1,22 +1,37 @@
 package capstone.everyhealth.domain.routine;
 
-import lombok.Getter;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.*;
 import capstone.everyhealth.domain.stakeholder.Member;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MemberRoutine {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
-    private LocalDateTime date;
+    @OneToMany(mappedBy = "memberRoutine", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberRoutineContent> memberRoutineContentList = new ArrayList<>();
+
+    private String routineRegisterdate;
+
+    public void addMemberRoutineContent(MemberRoutineContent memberRoutineContent){
+        memberRoutineContentList.add(memberRoutineContent);
+        memberRoutineContent.changeMemberRoutine(this);
+    }
 }

@@ -32,8 +32,8 @@ public class SwaggerConfig {
     }
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("fantoo_api_test 프로젝트")
-                .description("API 호출 테스트용도.")
+                .title("Every Health API")
+                .description("API 명세")
                 .version("1.0.0")
                 .termsOfServiceUrl("")
 //                .contact()
