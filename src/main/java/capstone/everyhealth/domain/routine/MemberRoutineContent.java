@@ -7,14 +7,13 @@ import java.io.Serializable;
 
 @Entity
 @Getter
-@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemberRoutineContent {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -25,9 +24,18 @@ public class MemberRoutineContent {
     @JoinColumn(name = "workout_id")
     private Workout workout;
 
-    private Integer weight;
-    private Integer numCount;
-    private Integer numSet;
-    private Integer numTime;
-    private boolean isChecked;
+    private Integer memberRoutineWorkoutWeight;
+    private Integer memberRoutineWorkoutCount;
+    private Integer memberRoutineWorkoutSet;
+    private Integer memberRoutineWorkoutTime;
+    private boolean memberRoutineIsChecked;
+
+    public void changeMemberRoutine(MemberRoutine memberRoutine) {
+        this.memberRoutine = memberRoutine;
+    }
+
+    public void addMemberRoutine(MemberRoutine memberRoutine){
+        this.memberRoutine = memberRoutine;
+        this.memberRoutine.getMemberRoutineContentList().add(this);
+    }
 }

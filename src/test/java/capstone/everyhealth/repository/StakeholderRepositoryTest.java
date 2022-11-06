@@ -2,6 +2,7 @@ package capstone.everyhealth.repository;
 
 import capstone.everyhealth.domain.stakeholder.Member;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @ActiveProfiles("test")
@@ -22,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 class StakeholderRepositoryTest {
 
+    /*
     @Autowired
     StakeholderRepository stakeholderRepository;
 
@@ -46,4 +49,6 @@ class StakeholderRepositoryTest {
         // then
         assertEquals(foundMember.get().getId(), savedMember.getId());
     }
+
+     */
 }
