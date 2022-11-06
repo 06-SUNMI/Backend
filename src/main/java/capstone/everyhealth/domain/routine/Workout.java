@@ -14,9 +14,12 @@ import javax.persistence.*;
 public class Workout {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String type;
-    private String target;
+    @Enumerated(EnumType.STRING)
+    private WorkoutName workoutName;
+
+    @Enumerated(EnumType.STRING)
+    private WorkoutTarget workoutTarget;
 }
