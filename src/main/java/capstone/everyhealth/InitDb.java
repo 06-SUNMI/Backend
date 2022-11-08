@@ -27,11 +27,14 @@ public class InitDb {
     public void init() {
 
         log.info("mode : {}", mode);
+        log.info("mode : {}", mode);
         log.info("ddl : {}", ddl);
 
         if (mode.equals("dev") && ddl.equals("create")) {
             log.info("CREATED");
             initService.dbInit();
+        }
+        //initService.dbInit();
         }
     }
 
@@ -43,8 +46,6 @@ public class InitDb {
         private final EntityManager em;
 
         public void dbInit() {
-
-            saveMember();
             saveWorkout();
         }
 
@@ -60,6 +61,7 @@ public class InitDb {
                 em.persist(workout);
             }
         }
+    }
 
         public void saveMember() {
 
