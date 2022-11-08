@@ -1,6 +1,7 @@
 package capstone.everyhealth.service;
 
 import capstone.everyhealth.domain.stakeholder.Member;
+import capstone.everyhealth.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
