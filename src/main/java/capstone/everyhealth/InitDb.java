@@ -17,22 +17,23 @@ import javax.persistence.EntityManager;
 @Slf4j
 public class InitDb {
 
-    @Value("${spring.profiles.active}")
+    /*@Value("${spring.profiles.active}")
     private String mode;
     @Value("#{dev['spring.jpa.hibernate.ddl-auto']}")
-    private String ddl;
+    private String ddl;*/
     private final InitService initService;
 
     @PostConstruct
     public void init() {
 
-        log.info("mode : {}", mode);
+        /*log.info("mode : {}", mode);
         log.info("ddl : {}", ddl);
 
         if (mode.equals("dev") && ddl.equals("create")) {
             log.info("CREATED");
             initService.dbInit();
-        }
+        }*/
+        //initService.dbInit();
     }
 
     @Component

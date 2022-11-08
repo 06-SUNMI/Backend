@@ -1,9 +1,12 @@
 package capstone.everyhealth.controller;
 
+import capstone.everyhealth.controller.dto.WorkoutDataResponse;
 import capstone.everyhealth.domain.routine.Workout;
 import capstone.everyhealth.domain.routine.WorkoutName;
 import capstone.everyhealth.domain.routine.WorkoutTarget;
 import capstone.everyhealth.service.WorkoutService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,10 +18,18 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Api(
+        tags={"운동 정보 API"}
+
+)
 public class WorkoutController {
 
     private final WorkoutService workoutService;
 
+    @ApiOperation(
+            value="운동 정보 가져오기",
+            notes="운동 정보를 부위 별 리스트로 가져온다."
+    )
     @GetMapping("/workout-data")
     public WorkoutDataResponse getWorkoutData() {
 

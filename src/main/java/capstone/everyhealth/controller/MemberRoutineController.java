@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @Slf4j
-@Api(tags = {"멤버 루틴 컨트롤러"})
+@Api(tags = {"멤버 루틴 API"})
 public class MemberRoutineController {
     private final MemberRoutineService routineService;
     private final WorkoutService workoutService;
@@ -28,9 +28,9 @@ public class MemberRoutineController {
     @ApiOperation(
             value = "루틴 등록하기",
             notes = "사용자가 만든 루틴을 등록한다.\n"
-                    + "루틴 등록 날짜와 루틴 상세 내용을 보내면 루틴 저장이 완료된다."
+                    + "루틴 등록 날짜와 루틴 상세 내용을 보내면 루틴 저장이 완료된다.\n"
+            +"저장된 루틴의 id 값을 반환하여 이를 통해 해당 루틴의 상세 정보를 확인할 수 있다.\n"
     )
-    @ResponseBody
     @PostMapping("/members/{memberId}/routines")
     public Long registerMemberRoutine(@ApiParam(value = "사용자의 id값", example = "1") @PathVariable Long memberId, @ApiParam(value = "루틴에 추가한 운동 정보 목록과 등록 날짜") @RequestBody MemberRoutineRegisterRequest memberRoutineRegisterRequest) {
 
@@ -47,7 +47,6 @@ public class MemberRoutineController {
                     + "\n루틴 정보서 routineId를 이용하여 해당 루틴에 대한 상세 정보 조회가 가능하다."
                     + "\nroutineRegisterDate는 화면 표시에 필요한 정보이다."
     )
-    @ResponseBody
     @GetMapping("/members/{memberId}/routines")
     public MemberRoutineFindAllResponse findAllRoutines(@ApiParam(/*name = "member_id",*/ value = "사용자의 id값", example = "1") @PathVariable Long memberId) {
 
@@ -60,7 +59,6 @@ public class MemberRoutineController {
             value = "특정 루틴 상세 조회하기",
             notes = "사용자가 특정 루틴을 누르면 그 루틴에 대한 상세 정보를 전달한다."
     )
-    @ResponseBody
     @GetMapping("/routines/{routineId}")
     public MemberRoutineFindByRoutineId findRoutineByRoutineId(@ApiParam(value = "루틴의 id값", example = "1") @PathVariable Long routineId) {
 
@@ -74,7 +72,6 @@ public class MemberRoutineController {
             value = "루틴 수정하기",
             notes = "사용자가 등록한 특정 루틴을 수정한다."
     )
-    @ResponseBody
     @PutMapping("/routines/{routineId}")
     public void update(@ApiParam(value = "루틴의 id값", example = "1") @PathVariable Long routineId, @ApiParam(value="수정 후 운동 목록") @RequestBody MemberRoutineUpdateRequest memberRoutineUpdateRequest) {
 
@@ -88,7 +85,6 @@ public class MemberRoutineController {
             value = "루틴 삭제하기",
             notes = "사용자가 등록한 특정 루틴을 삭제한다."
     )
-    @ResponseBody
     @DeleteMapping("/routines/{routineId}")
     public void delete(@ApiParam(value = "루틴의 id값", example = "1") @PathVariable Long routineId) {
 
