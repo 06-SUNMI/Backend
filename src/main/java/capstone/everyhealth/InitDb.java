@@ -16,17 +16,17 @@ import javax.persistence.EntityManager;
 @RequiredArgsConstructor
 @Slf4j
 public class InitDb {
-    /*
-    @Value("#{prd['spring.profiles.active']}")
+
+    @Value("${spring.profiles.active}")
     private String mode;
-    @Value("#{prd['spring.jpa.hibernate.ddl-auto']}")
+    @Value("#{dev['spring.jpa.hibernate.ddl-auto']}")
     private String ddl;
     private final InitService initService;
 
     @PostConstruct
     public void init() {
 
-        //log.info("mode : {}", mode);
+        log.info("mode : {}", mode);
         log.info("ddl : {}", ddl);
 
         if (mode.equals("dev") && ddl.equals("create")) {
@@ -43,8 +43,6 @@ public class InitDb {
         private final EntityManager em;
 
         public void dbInit() {
-
-            saveMember();
             saveWorkout();
         }
 
@@ -60,13 +58,5 @@ public class InitDb {
                 em.persist(workout);
             }
         }
-
-        public void saveMember() {
-
-            for (int i = 0; i < 4; i++) {
-                Member member = new Member();
-                em.persist(member);
-            }
-        }
-    }*/
+    }
 }

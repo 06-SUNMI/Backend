@@ -5,6 +5,7 @@ import capstone.everyhealth.domain.routine.*;
 import capstone.everyhealth.service.MemberRoutineService;
 import capstone.everyhealth.service.StakeholderService;
 import capstone.everyhealth.service.WorkoutService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @Slf4j
+@Api(tags = {"멤버 루틴 컨트롤러"})
 public class MemberRoutineController {
     private final MemberRoutineService routineService;
     private final WorkoutService workoutService;
