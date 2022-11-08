@@ -1,7 +1,7 @@
 spring:
   profiles:
     # 개발 : dev  실서비스 : prd  테스트 : test
-    active: prd
+    active: dev
 
 ---
 

@@ -7,7 +7,6 @@ import capstone.everyhealth.repository.MemberRoutineContentRepository;
 import capstone.everyhealth.repository.MemberRoutineRepository;
 import capstone.everyhealth.repository.StakeholderRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,11 +15,10 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-@Slf4j
 public class MemberRoutineService {
     private final MemberRoutineRepository routineRepository;
     private final StakeholderRepository stakeholderRepository;
-    private final MemberRoutineContentRepository routineContentRepository;
+
 
     @Transactional
     public Long save(MemberRoutine routine) {
