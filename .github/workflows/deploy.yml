@@ -37,7 +37,13 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
 
-
+    ## create application.properties
+    - name: make application.properties
+      run: |
+        cd ./src/main/resources
+        touch ./application.properties
+        echo "${{ secrets.PROPERTIES }}" > ./application.properties
+      shell: bash
 
     # build 단계 에러 방지
     - name: Run chmod to make gradlew executable

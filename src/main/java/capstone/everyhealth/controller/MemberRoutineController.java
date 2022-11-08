@@ -47,6 +47,7 @@ public class MemberRoutineController {
                     + "\n루틴 정보서 routineId를 이용하여 해당 루틴에 대한 상세 정보 조회가 가능하다."
                     + "\nroutineRegisterDate는 화면 표시에 필요한 정보이다."
     )
+    @ResponseBody
     @GetMapping("/members/{memberId}/routines")
     public MemberRoutineFindAllResponse findAllRoutines(@ApiParam(/*name = "member_id",*/ value = "사용자의 id값", example = "1") @PathVariable Long memberId) {
 
@@ -59,6 +60,7 @@ public class MemberRoutineController {
             value = "특정 루틴 상세 조회하기",
             notes = "사용자가 특정 루틴을 누르면 그 루틴에 대한 상세 정보를 전달한다."
     )
+    @ResponseBody
     @GetMapping("/routines/{routineId}")
     public MemberRoutineFindByRoutineId findRoutineByRoutineId(@ApiParam(value = "루틴의 id값", example = "1") @PathVariable Long routineId) {
 
@@ -72,6 +74,7 @@ public class MemberRoutineController {
             value = "루틴 수정하기",
             notes = "사용자가 등록한 특정 루틴을 수정한다."
     )
+    @ResponseBody
     @PutMapping("/routines/{routineId}")
     public void update(@ApiParam(value = "루틴의 id값", example = "1") @PathVariable Long routineId, @ApiParam(value="수정 후 운동 목록") @RequestBody MemberRoutineUpdateRequest memberRoutineUpdateRequest) {
 
@@ -85,6 +88,7 @@ public class MemberRoutineController {
             value = "루틴 삭제하기",
             notes = "사용자가 등록한 특정 루틴을 삭제한다."
     )
+    @ResponseBody
     @DeleteMapping("/routines/{routineId}")
     public void delete(@ApiParam(value = "루틴의 id값", example = "1") @PathVariable Long routineId) {
 

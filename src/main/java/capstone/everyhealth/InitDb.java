@@ -20,20 +20,22 @@ public class InitDb {
     /*@Value("${spring.profiles.active}")
     private String mode;
     @Value("#{dev['spring.jpa.hibernate.ddl-auto']}")
-    private String ddl;*/
+    private String ddl;
     private final InitService initService;
 
     @PostConstruct
     public void init() {
 
-        /*log.info("mode : {}", mode);
+        log.info("mode : {}", mode);
+        log.info("mode : {}", mode);
         log.info("ddl : {}", ddl);
 
         if (mode.equals("dev") && ddl.equals("create")) {
             log.info("CREATED");
             initService.dbInit();
-        }*/
+        }
         //initService.dbInit();
+        }
     }
 
     @Component
@@ -60,4 +62,13 @@ public class InitDb {
             }
         }
     }
+
+        public void saveMember() {
+
+            for (int i = 0; i < 4; i++) {
+                Member member = new Member();
+                em.persist(member);
+            }
+        }
+    }*/
 }
