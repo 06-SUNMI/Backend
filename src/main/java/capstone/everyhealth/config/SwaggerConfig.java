@@ -33,7 +33,7 @@ public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("Every Health API")
-                .description("API 명세")
+                .description("멤버 등록 ㅡ> 루틴 등록 ㅡ> 루틴 조회 / 수정 / 삭제 순으로 진행")
                 .version("1.0.0")
                 .termsOfServiceUrl("")
 //                .contact()

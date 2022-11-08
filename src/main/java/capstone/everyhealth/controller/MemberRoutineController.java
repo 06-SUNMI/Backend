@@ -5,6 +5,7 @@ import capstone.everyhealth.domain.routine.*;
 import capstone.everyhealth.service.MemberRoutineService;
 import capstone.everyhealth.service.StakeholderService;
 import capstone.everyhealth.service.WorkoutService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +16,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @Slf4j
+@Api(tags = {"멤버 루틴 API"})
 public class MemberRoutineController {
     private final MemberRoutineService routineService;
     private final WorkoutService workoutService;
@@ -26,9 +28,9 @@ public class MemberRoutineController {
     @ApiOperation(
             value = "루틴 등록하기",
             notes = "사용자가 만든 루틴을 등록한다.\n"
-                    + "루틴 등록 날짜와 루틴 상세 내용을 보내면 루틴 저장이 완료된다."
+                    + "루틴 등록 날짜와 루틴 상세 내용을 보내면 루틴 저장이 완료된다.\n"
+            +"저장된 루틴의 id 값을 반환하여 이를 통해 해당 루틴의 상세 정보를 확인할 수 있다.\n"
     )
-    @ResponseBody
     @PostMapping("/members/{memberId}/routines")
     public Long registerMemberRoutine(@ApiParam(value = "사용자의 id값", example = "1") @PathVariable Long memberId, @ApiParam(value = "루틴에 추가한 운동 정보 목록과 등록 날짜") @RequestBody MemberRoutineRegisterRequest memberRoutineRegisterRequest) {
 

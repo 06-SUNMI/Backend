@@ -16,13 +16,10 @@ public class Member {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "social_account_num_id")
-    private Long social_id;
-
-    @Enumerated(EnumType.STRING)
-    private LoginType loginType;
-
+    private String socialAccountId;
+    private String loginAt;
     private int height;
     private int weight;
     private String gymName;
+    private String name;
 }
