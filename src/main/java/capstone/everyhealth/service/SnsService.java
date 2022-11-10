@@ -47,4 +47,8 @@ public class SnsService {
         originSnsPost.setImageLink(snsUpdateRequest.getSnsImageLink());
     }
 
+    public List<SnsPost> findAll() {
+        return snsRepository.findAll();
+    }
+
 }

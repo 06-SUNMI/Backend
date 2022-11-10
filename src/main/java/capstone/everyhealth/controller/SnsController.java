@@ -1,5 +1,6 @@
 package capstone.everyhealth.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,10 +62,40 @@ public class SnsController {
         return snsFindResponse;
     }
 
+    @GetMapping("/sns")
+    public List<SnsFindResponse> findAllMembers() {
+
+        List<SnsFindResponse> snsFindResponseList = new ArrayList<>();
+        List<SnsPost> snsPostsList = snsService.findAll();
+
+        log.info("before");
+
+        for (SnsPost snsPost : snsPostsList) {
+
+            SnsFindResponse snsFindResponse = createSnsFindResponse(snsPost);
+            snsFindResponseList.add(snsFindResponse);
+        }
+
+        log.info("after");
+
+        return snsFindResponseList;
+    }
+
     @PutMapping("/sns/{snsId}")
     public void update(@RequestBody SnsUpdateRequest snsUpdateRequest, @PathVariable Long snsId) {
 
          snsService.update(snsUpdateRequest,snsId);
+    }
+
+    private SnsFindResponse createSnsFindResponse(SnsPost snsPost) {
+        SnsFindResponse snsFindResponse = SnsFindResponse.builder()
+        .memberId(snsPost.getId())
+        .snsContent(snsPost.getContent())
+        .snsImageLink(snsPost.getImageLink())
+        .snsVideoLink(snsPost.getVideoLink())
+        .build();
+
+        return snsFindResponse;
     }
 
 }
