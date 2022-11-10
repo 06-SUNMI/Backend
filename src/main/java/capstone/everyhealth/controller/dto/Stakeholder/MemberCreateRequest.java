@@ -1,4 +1,4 @@
-package capstone.everyhealth.controller.dto;
+package capstone.everyhealth.controller.dto.Stakeholder;
 
 import capstone.everyhealth.domain.enums.LoginType;
 import io.swagger.annotations.ApiModelProperty;

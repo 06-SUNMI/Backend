@@ -1,4 +1,4 @@
-package capstone.everyhealth.controller.dto;
+package capstone.everyhealth.controller.dto.MemberRoutine;
 
 import capstone.everyhealth.domain.routine.WorkoutName;
 import lombok.Data;

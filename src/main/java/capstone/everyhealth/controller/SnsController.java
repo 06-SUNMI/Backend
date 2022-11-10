@@ -7,9 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import capstone.everyhealth.controller.dto.SnsFindResponse;
-import capstone.everyhealth.controller.dto.SnsPostRequest;
-import capstone.everyhealth.controller.dto.SnsUpdateRequest;
+import capstone.everyhealth.controller.dto.Sns.SnsPostRequest;
 import capstone.everyhealth.domain.sns.SnsPost;
 import capstone.everyhealth.domain.stakeholder.Member;
 import capstone.everyhealth.service.MemberService;
@@ -42,12 +40,11 @@ public class SnsController {
 
         Member member = memberService.findMemberById(userId);
 
-        SnsPost snsPost = SnsPost.builder().member(member).content(snsPostRequest.getSnsContent())
-                .videoLink(snsPostRequest.getSnsVideoLink()).imageLink(snsPostRequest.getSnsImageLink()).build();
+        SnsPost snsPost = SnsPost.builder().member(member).content(snsPostRequest.getSnsContent()).videoLink(snsPostRequest.getSnsVideoLink()).imageLink(snsPostRequest.getSnsImageLink()).build();
 
         return snsService.save(snsPost);
     }
-
+    
     @GetMapping("/sns/{snsId}")
 
     public SnsFindResponse findOne(@PathVariable Long snsId) {

@@ -11,5 +11,4 @@ import capstone.everyhealth.domain.stakeholder.Member;
 public interface MemberRepository extends JpaRepository<Member,Long>{
 
     List<Member> findAllByName(String userName);
-
 }

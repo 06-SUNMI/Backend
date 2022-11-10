@@ -1,7 +1,11 @@
 package capstone.everyhealth.repository;
 
+import capstone.everyhealth.domain.challenge.Challenge;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ChallengeRepository {
+public interface ChallengeRepository extends JpaRepository<Challenge, Long> {
+
+
 }

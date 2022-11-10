@@ -1,4 +1,4 @@
-package capstone.everyhealth.controller.dto;
+package capstone.everyhealth.controller.dto.Sns;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
