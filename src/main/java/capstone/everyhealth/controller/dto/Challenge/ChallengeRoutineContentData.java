@@ -1,4 +1,4 @@
-package capstone.everyhealth.controller.dto;
+package capstone.everyhealth.controller.dto.Challenge;
 
 import capstone.everyhealth.domain.routine.WorkoutName;
 import io.swagger.annotations.ApiModelProperty;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberRoutineContentData {
+public class ChallengeRoutineContentData {
 
     @ApiModelProperty(value = "운동 이름",example = "PUSH_UP")
     private WorkoutName memberRoutineWorkoutName;

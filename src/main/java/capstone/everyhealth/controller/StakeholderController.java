@@ -1,7 +1,7 @@
 package capstone.everyhealth.controller;
 
-import capstone.everyhealth.controller.dto.MemberCreateRequest;
-import capstone.everyhealth.controller.dto.MemberFindResponse;
+import capstone.everyhealth.controller.dto.Stakeholder.MemberCreateRequest;
+import capstone.everyhealth.controller.dto.Stakeholder.MemberFindResponse;
 import capstone.everyhealth.domain.stakeholder.Member;
 import capstone.everyhealth.service.MemberService;
 import io.swagger.annotations.Api;

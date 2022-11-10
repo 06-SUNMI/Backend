@@ -1,16 +1,15 @@
 package capstone.everyhealth.controller;
 
-import capstone.everyhealth.controller.dto.*;
+import capstone.everyhealth.controller.dto.MemberRoutine.*;
 import capstone.everyhealth.domain.routine.*;
 import capstone.everyhealth.service.MemberRoutineService;
-import capstone.everyhealth.service.StakeholderService;
+import capstone.everyhealth.service.MemberService;
 import capstone.everyhealth.service.WorkoutService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -23,13 +22,13 @@ import java.util.List;
 public class MemberRoutineController {
     private final MemberRoutineService routineService;
     private final WorkoutService workoutService;
-    private final StakeholderService stakeholderService;
+    private final MemberService memberService;
 
     @ApiOperation(
             value = "루틴 등록하기",
             notes = "사용자가 만든 루틴을 등록한다.\n"
-                    + "루틴 등록 날짜와 루틴 상세 내용을 보내면 루틴 저장이 완료된다.\n"
-            +"저장된 루틴의 id 값을 반환하여 이를 통해 해당 루틴의 상세 정보를 확인할 수 있다.\n"
+                    + "사용자의 id(ex) 15.xxx.xxx.xxx:8080/members/1/routines)와 루틴 등록 날짜와 루틴 상세 내용을 보내면 루틴 저장이 완료된다.\n"
+                    + "저장된 루틴의 id 값을 반환하여 이를 통해 해당 루틴의 상세 정보를 확인할 수 있다.\n"
     )
     @PostMapping("/members/{memberId}/routines")
     public Long registerMemberRoutine(@ApiParam(value = "사용자의 id값", example = "1") @PathVariable Long memberId, @ApiParam(value = "루틴에 추가한 운동 정보 목록과 등록 날짜") @RequestBody MemberRoutineRegisterRequest memberRoutineRegisterRequest) {
@@ -76,7 +75,7 @@ public class MemberRoutineController {
     )
     @ResponseBody
     @PutMapping("/routines/{routineId}")
-    public void update(@ApiParam(value = "루틴의 id값", example = "1") @PathVariable Long routineId, @ApiParam(value="수정 후 운동 목록") @RequestBody MemberRoutineUpdateRequest memberRoutineUpdateRequest) {
+    public void update(@ApiParam(value = "루틴의 id값", example = "1") @PathVariable Long routineId, @ApiParam(value = "수정 후 운동 목록") @RequestBody MemberRoutineUpdateRequest memberRoutineUpdateRequest) {
 
         List<MemberRoutineContent> memberRoutineContentList = new ArrayList<>();
 
@@ -95,16 +94,16 @@ public class MemberRoutineController {
         routineService.deleteRoutine(routineId);
     }
 
-    private MemberRoutine createMemberRoutine(Long memberId, MemberRoutineRegisterRequest memberRoutineRegisterRequest) {
+    public MemberRoutine createMemberRoutine(Long memberId, MemberRoutineRegisterRequest memberRoutineRegisterRequest) {
 
         return MemberRoutine.builder()
-                .member(stakeholderService.findById(memberId).get())
+                .member(memberService.findMemberById(memberId))
                 .memberRoutineContentList(new ArrayList<>())
                 .routineRegisterdate(memberRoutineRegisterRequest.getRoutineRegisterdate())
                 .build();
     }
 
-    private void createMemberRoutineContentList(MemberRoutineRegisterRequest memberRoutineRegisterRequest, MemberRoutine memberRoutine) {
+    public void createMemberRoutineContentList(MemberRoutineRegisterRequest memberRoutineRegisterRequest, MemberRoutine memberRoutine) {
 
         for (MemberRoutineWorkoutContent memberRoutineWorkoutContent : memberRoutineRegisterRequest.getMemberRoutineWorkoutContentList()) {
 
@@ -117,7 +116,7 @@ public class MemberRoutineController {
         }
     }
 
-    private MemberRoutineContent createMemberRoutineContent(MemberRoutineWorkoutContent memberRoutineWorkoutContent, Workout workout) {
+    public MemberRoutineContent createMemberRoutineContent(MemberRoutineWorkoutContent memberRoutineWorkoutContent, Workout workout) {
         return MemberRoutineContent.builder()
                 .workout(workout)
                 .memberRoutineWorkoutCount(memberRoutineWorkoutContent.getMemberRoutineWorkoutCount())
