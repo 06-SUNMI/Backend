@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import capstone.everyhealth.controller.dto.SnsUpdateRequest;
+import capstone.everyhealth.controller.dto.Sns.SnsUpdateRequest;
 import capstone.everyhealth.domain.sns.SnsPost;
 import capstone.everyhealth.domain.stakeholder.Member;
 import capstone.everyhealth.repository.MemberRepository;

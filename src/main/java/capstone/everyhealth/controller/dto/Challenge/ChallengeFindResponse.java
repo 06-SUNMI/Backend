@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ChallengeFindResponse {
 
+    private Long challengeId;
     private String name;
     private String startDate;
     private String endDate;
