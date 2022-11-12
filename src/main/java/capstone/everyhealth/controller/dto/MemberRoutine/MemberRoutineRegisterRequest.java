@@ -1,10 +1,9 @@
-package capstone.everyhealth.controller.dto;
+package capstone.everyhealth.controller.dto.MemberRoutine;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 

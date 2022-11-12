@@ -3,9 +3,9 @@ package capstone.everyhealth.service;
 import capstone.everyhealth.domain.routine.MemberRoutine;
 import capstone.everyhealth.domain.routine.MemberRoutineContent;
 import capstone.everyhealth.domain.stakeholder.Member;
+import capstone.everyhealth.repository.MemberRepository;
 import capstone.everyhealth.repository.MemberRoutineContentRepository;
 import capstone.everyhealth.repository.MemberRoutineRepository;
-import capstone.everyhealth.repository.StakeholderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,17 +19,18 @@ import java.util.List;
 @Slf4j
 public class MemberRoutineService {
     private final MemberRoutineRepository routineRepository;
-    private final StakeholderRepository stakeholderRepository;
-    private final MemberRoutineContentRepository routineContentRepository;
+    private final MemberRepository memberRepository;
+
 
     @Transactional
     public Long save(MemberRoutine routine) {
+
         return routineRepository.save(routine).getId();
     }
 
     public List<MemberRoutine> findAllRoutines(Long memberId) {
 
-        Member member = stakeholderRepository.findById(memberId).get();
+        Member member = memberRepository.findById(memberId).get();
 
         return routineRepository.findByMember(member);
     }
@@ -42,10 +43,6 @@ public class MemberRoutineService {
     public void updateRoutine(Long routineId, List<MemberRoutineContent> memberRoutineContentList) {
 
         MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
-
-//        for (MemberRoutineContent memberRoutineContent : memberRoutine.getMemberRoutineContentList()) {
-//            routineContentRepository.delete(memberRoutineContent);
-//        }
 
         memberRoutine.getMemberRoutineContentList().clear();
 

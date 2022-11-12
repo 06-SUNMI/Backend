@@ -1,11 +1,8 @@
-package capstone.everyhealth.controller.dto;
+package capstone.everyhealth.controller.dto.MemberRoutine;
 
 import capstone.everyhealth.domain.routine.MemberRoutine;
 import capstone.everyhealth.domain.routine.MemberRoutineContent;
-import capstone.everyhealth.domain.routine.WorkoutName;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

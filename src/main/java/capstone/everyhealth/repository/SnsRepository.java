@@ -1,7 +1,10 @@
 package capstone.everyhealth.repository;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public class SnsRepository {
+import capstone.everyhealth.domain.sns.SnsPost;
+
+public interface SnsRepository extends JpaRepository<SnsPost, Long>{
+
+    
 }

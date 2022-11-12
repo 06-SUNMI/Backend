@@ -1,24 +1,31 @@
 package capstone.everyhealth.domain.challenge;
 
-import lombok.Getter;
+import capstone.everyhealth.controller.dto.Challenge.ChallengePostOrUpdateRequest;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Getter
+@Data
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Challenge {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChallengeRoutine> challengeRoutineList = new ArrayList<>();
+
     private String name;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private String startDate;
+    private String endDate;
     private int participationFee;
     private int participationNum;
     private String preparations;

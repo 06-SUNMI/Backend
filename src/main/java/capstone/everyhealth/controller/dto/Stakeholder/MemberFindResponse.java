@@ -1,4 +1,4 @@
-package capstone.everyhealth.controller.dto;
+package capstone.everyhealth.controller.dto.Stakeholder;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
