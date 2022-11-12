@@ -46,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 public class MemberRoutineTest {
 
-    @Autowired
+    /*@Autowired
     private MockMvc mvc;
 
     @Autowired
@@ -135,5 +135,5 @@ public class MemberRoutineTest {
         memberRoutineWorkoutContent2.setMemberRoutineWorkoutSet(null);
         memberRoutineWorkoutContent2.setMemberRoutineWorkoutTime(100);
         memberRoutineWorkoutContent2.setMemberRoutineWorkoutWeight(null);
-    }
+    }*/
 }
