@@ -1,4 +1,4 @@
-package capstone.everyhealth.controller.dto;
+package capstone.everyhealth.controller.dto.Sns;
 
 import capstone.everyhealth.domain.stakeholder.Member;
 import lombok.AllArgsConstructor;

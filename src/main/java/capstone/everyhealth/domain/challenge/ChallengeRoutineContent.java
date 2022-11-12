@@ -2,18 +2,18 @@ package capstone.everyhealth.domain.challenge;
 
 import capstone.everyhealth.domain.challenge.ChallengeRoutine;
 import capstone.everyhealth.domain.routine.Workout;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Slf4j
 public class ChallengeRoutineContent {
 
     @Id
@@ -28,9 +28,6 @@ public class ChallengeRoutineContent {
     @JoinColumn(name = "workout_id")
     private Workout workout;
 
-    private int progressWeek;
-    private String progressDayOfWeek;
-
     private Integer challengeRoutineWorkoutWeight;
     private Integer challengeRoutineWorkoutCount;
     private Integer challengeRoutineWorkoutSet;
@@ -41,7 +38,10 @@ public class ChallengeRoutineContent {
     }
 
     public void addChallengeRoutine(ChallengeRoutine challengeRoutine){
+        log.info("aaaa");
         this.challengeRoutine = challengeRoutine;
+        log.info("bbbb");
         this.challengeRoutine.getChallengeRoutineContentList().add(this);
+        log.info("cccc");
     }
 }

@@ -10,13 +10,14 @@ import java.util.List;
 
 @Entity
 @Data
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Challenge {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -29,15 +30,4 @@ public class Challenge {
     private int participationNum;
     private String preparations;
     private int numPerWeek;
-
-    public void updateContent(ChallengePostOrUpdateRequest challengePostOrUpdateRequest) {
-
-        name = challengePostOrUpdateRequest.getChallengeName();
-        startDate = challengePostOrUpdateRequest.getChallengeStartDate();
-        endDate = challengePostOrUpdateRequest.getChallengeEndDate();
-        participationFee = challengePostOrUpdateRequest.getChallengeParticipationFee();
-        participationNum = challengePostOrUpdateRequest.getChallengeParticipationNum();
-        preparations = challengePostOrUpdateRequest.getChallengePreparations();
-        numPerWeek = challengePostOrUpdateRequest.getChallengeNumPerWeek();
-    }
 }

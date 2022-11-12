@@ -3,6 +3,8 @@ package capstone.everyhealth.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import capstone.everyhealth.controller.dto.Sns.SnsFindResponse;
+import capstone.everyhealth.controller.dto.Sns.SnsUpdateRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,7 +46,7 @@ public class SnsController {
 
         return snsService.save(snsPost);
     }
-    
+
     @GetMapping("/sns/{snsId}")
 
     public SnsFindResponse findOne(@PathVariable Long snsId) {

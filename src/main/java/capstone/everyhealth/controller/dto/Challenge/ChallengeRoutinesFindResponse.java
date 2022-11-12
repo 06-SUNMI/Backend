@@ -13,10 +13,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChallengeRoutineData {
+public class ChallengeRoutinesFindResponse {
 
-    @ApiModelProperty(value = "챌린지 주차",example = "1")
-    private int ChallengeProgressWeek;
-
-    private List<ChallengeRoutineContentData> challengeRoutineContentDataList = new ArrayList<>();
+    private List<ChallengeRoutineData> challengeRoutineDataList = new ArrayList<>();
 }
