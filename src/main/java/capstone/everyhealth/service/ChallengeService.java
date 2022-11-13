@@ -4,13 +4,12 @@ import capstone.everyhealth.domain.challenge.Challenge;
 import capstone.everyhealth.domain.challenge.ChallengeRoutine;
 import capstone.everyhealth.domain.challenge.ChallengeRoutineContent;
 import capstone.everyhealth.repository.ChallengeRepository;
+import capstone.everyhealth.repository.MemberRoutineRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -20,6 +19,7 @@ import java.util.List;
 public class ChallengeService {
 
     private final ChallengeRepository challengeRepository;
+    private final MemberRoutineRepository memberRoutineRepository;
 
     @Transactional
     public Long save(Challenge challenge) {
@@ -59,6 +59,21 @@ public class ChallengeService {
         return challengeId;
     }
 
+    @Transactional
+    public void delete(Long challengeId) {
+        challengeRepository.deleteById(challengeId);
+    }
+
+    @Transactional
+    public void participate(Long memberId, Long challengeId) {
+
+        Challenge challenge = challengeRepository.findById(challengeId).get();
+
+        for(ChallengeRoutine challengeRoutine:challenge.getChallengeRoutineList()){
+
+        }
+    }
+
     public void updateExceptChallengeRoutineList(Challenge prevChallenge, Challenge challenge) {
 
         prevChallenge.setName(challenge.getName());
@@ -81,13 +96,5 @@ public class ChallengeService {
         }
 
         prevChallenge.getChallengeRoutineList().clear();
-    }
-
-    @Transactional
-    public void delete(Long challengeId) {
-        challengeRepository.deleteById(challengeId);
-    }
-
-    public void participate(Long memberId, Long challengeId) {
     }
 }

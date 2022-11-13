@@ -131,15 +131,18 @@ public class ChallengeController {
     }
 
     @ApiOperation(
-            value = "== 미완 == 챌린지 참가 by Member",
-            notes = "챌린지에 참가하여 해당 챌린지의 루틴을 개인 루틴에 저장한다."
+            value = "(미완)챌린지 참가 by Member",
+            notes = "챌린지에 참가하여 해당 챌린지의 루틴을 개인 루틴에 저장한다.\n"
+                    + "참가 성공 시 챌린지 id를 반환한다."
     )
     @Transactional
     @PostMapping("/members/{memberId}/challenges/{challengeId}")
     public Long participate(@ApiParam(value = "멤버 id값", example = "1") @PathVariable Long memberId,
                             @ApiParam(value = "챌린지 id값", example = "1") @PathVariable Long challengeId) {
 
-        return 1L;
+        challengeService.participate(memberId, challengeId);
+
+        return challengeId;
     }
 
     private void setupRelation(Challenge challenge) {
@@ -210,7 +213,6 @@ public class ChallengeController {
         }
 
         return Challenge.builder()
-                .participationNum(challengePostRequest.getChallengeParticipationNum())
                 .endDate(challengePostRequest.getChallengeEndDate())
                 .startDate(challengePostRequest.getChallengeStartDate())
                 .name(challengePostRequest.getChallengeName())
