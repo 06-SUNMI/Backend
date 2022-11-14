@@ -13,7 +13,15 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChallengeRoutinesFindResponse {
+public class ChallengeFindDetailResponse {
 
+    private Long challengeId;
+    private String name;
+    private String startDate;
+    private String endDate;
+    private int participationFee;
+    private int participationNum;
+    private String preparations;
+    private int numPerWeek;
     private List<ChallengeRoutineData> challengeRoutineDataList = new ArrayList<>();
 }

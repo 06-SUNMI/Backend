@@ -16,7 +16,10 @@ import java.util.List;
 public class ChallengeRoutineData {
 
     @ApiModelProperty(value = "챌린지 주차",example = "1")
-    private int ChallengeProgressWeek;
+    private int challengeProgressWeek;
+
+    @ApiModelProperty(value = "챌린지 루틴 id",example = "1")
+    private Long challengeRoutineId;
 
     private List<ChallengeRoutineContentData> challengeRoutineContentDataList = new ArrayList<>();
 }

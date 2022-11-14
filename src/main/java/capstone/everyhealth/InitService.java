@@ -30,5 +30,8 @@ public class InitService {
 
             em.persist(workout);
         }
+
+        em.close();
     }
+
 }
