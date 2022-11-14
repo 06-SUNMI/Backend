@@ -5,6 +5,8 @@ import java.util.List;
 
 import capstone.everyhealth.controller.dto.Sns.SnsFindResponse;
 import capstone.everyhealth.controller.dto.Sns.SnsUpdateRequest;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,7 +44,8 @@ public class SnsController {
 
         Member member = memberService.findMemberById(userId);
 
-        SnsPost snsPost = SnsPost.builder().member(member).content(snsPostRequest.getSnsContent()).videoLink(snsPostRequest.getSnsVideoLink()).imageLink(snsPostRequest.getSnsImageLink()).build();
+        SnsPost snsPost = SnsPost.builder().member(member).content(snsPostRequest.getSnsContent())
+                .videoLink(snsPostRequest.getSnsVideoLink()).imageLink(snsPostRequest.getSnsImageLink()).build();
 
         return snsService.save(snsPost);
     }
@@ -83,18 +86,31 @@ public class SnsController {
     @PutMapping("/sns/{snsId}")
     public void update(@RequestBody SnsUpdateRequest snsUpdateRequest, @PathVariable Long snsId) {
 
-         snsService.update(snsUpdateRequest,snsId);
+        snsService.update(snsUpdateRequest, snsId);
     }
 
     private SnsFindResponse createSnsFindResponse(SnsPost snsPost) {
         SnsFindResponse snsFindResponse = SnsFindResponse.builder()
-        .memberId(snsPost.getId())
-        .snsContent(snsPost.getContent())
-        .snsImageLink(snsPost.getImageLink())
-        .snsVideoLink(snsPost.getVideoLink())
-        .build();
+                .memberId(snsPost.getId())
+                .snsContent(snsPost.getContent())
+                .snsImageLink(snsPost.getImageLink())
+                .snsVideoLink(snsPost.getVideoLink())
+                .build();
 
         return snsFindResponse;
     }
 
+    @PostMapping("/sns/follow/{followingMemberId}/{followedMemberId}")
+    public Long follow(@PathVariable Long followingMemberId, @PathVariable Long followedMemberId) {
+
+        return snsService.follow(followedMemberId, followingMemberId);
+
+    }
+
+    @DeleteMapping("/sns/follow/{followingMemberId}/{followedMemberId}")
+    public void unFollow(@PathVariable Long followingMemberId, @PathVariable Long followedMemberId) {
+
+        snsService.unFollow(followedMemberId, followingMemberId);
+
+    }
 }
