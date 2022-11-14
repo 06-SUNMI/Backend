@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -69,7 +70,7 @@ public class MemberRoutineController {
         return memberRoutineFindByRoutineId;
     }
 
-    @ApiOperation(
+    /*@ApiOperation(
             value = "루틴 수정하기",
             notes = "사용자가 등록한 특정 루틴을 수정한다."
     )
@@ -81,7 +82,47 @@ public class MemberRoutineController {
 
         addMemberRoutineContent(memberRoutineUpdateRequest, memberRoutineContentList);
         routineService.updateRoutine(routineId, memberRoutineContentList);
+    }*/
+
+    @ApiOperation(
+            value = "루틴 운동 추가하기",
+            notes = "사용자가 등록한 특정 루틴에서 루틴 상세 내용(운동명, 운동 시간 등...)을 추가한다."
+    )
+    @ResponseBody
+    @PostMapping("/routines/{routineId}/routine-content")
+    public Long addRoutineWorkout(@ApiParam(value = "루틴 id 값", example = "1") @PathVariable Long routineId,
+                                  @ApiParam(value = "추가 할 운동 내용") @RequestBody MemberRoutineWorkoutContent memberRoutineWorkoutContent) {
+
+        Workout workout = workoutService.findByWorkoutName(memberRoutineWorkoutContent.getMemberRoutineWorkoutName());
+        MemberRoutineContent memberRoutineContent = createMemberRoutineContent(memberRoutineWorkoutContent, workout);
+
+        return routineService.addWorkout(routineId, memberRoutineContent);
     }
+
+    @ApiOperation(
+            value = "루틴 운동 삭제하기",
+            notes = "사용자가 등록한 특정 루틴에서 루틴 상세 내용(운동명, 운동 시간 등...)을 삭제한다."
+    )
+    @ResponseBody
+    @DeleteMapping("/routines/{routineId}/routine-content/{routineContentId}")
+    public void deleteRoutineWorkout(@ApiParam(value = "루틴 id 값", example = "1") @PathVariable Long routineId,
+                                     @ApiParam(value = "삭제 할 운동 내용 id(상세 조회 쪽의 반환 값 중memberRoutineContentId)", example = "1") @PathVariable Long routineContentId) {
+        routineService.deleteWorkout(routineId, routineContentId);
+    }
+
+    @ApiOperation(
+            value = "루틴 운동 내용 수정하기",
+            notes = "사용자가 등록한 특정 루틴에서 루틴 상세 내용(운동명, 운동 시간 등...)을 수정한다."
+    )
+    @ResponseBody
+    @PutMapping("/routines/{routineId}/routine-content/{routineContentId}")
+    public void updateRoutineWorkout(@ApiParam(value = "루틴 id 값", example = "1") @PathVariable Long routineId,
+                                     @ApiParam(value = "수정 할 운동 내용 id(상세 조회 쪽의 반환 값 중 memberRoutineContentId)", example = "1") @PathVariable Long routineContentId,
+                                     @ApiParam(value = "수정 할 운동 내용") @RequestBody MemberRoutineWorkoutContent memberRoutineWorkoutContent) {
+
+        routineService.updateWorkout(routineId, routineContentId, memberRoutineWorkoutContent);
+    }
+
 
     @ApiOperation(
             value = "루틴 삭제하기",

@@ -1,21 +1,25 @@
 package capstone.everyhealth.domain.challenge;
 
-import lombok.Getter;
+import lombok.*;
 import capstone.everyhealth.domain.stakeholder.Member;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Entity
 @Getter
-public class ChallengeParticipant implements Serializable {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ChallengeParticipant {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne
     @JoinColumn(name = "challenge_id")
     private Challenge challenge;
 
-    @Id
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
