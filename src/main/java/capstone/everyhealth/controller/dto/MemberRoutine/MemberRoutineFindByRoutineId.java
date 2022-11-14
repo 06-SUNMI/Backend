@@ -28,7 +28,7 @@ public class MemberRoutineFindByRoutineId {
                     + "\"memberRoutineWorkoutCount\":10,"
                     + "\"memberRoutineWorkoutSet\":2,"
                     + "\"memberRoutineWorkoutTime\":null"
-                    +"}"
+                    + "}"
                     + "]"
     )
     private MemberRoutineData memberRoutineData;
@@ -48,6 +48,7 @@ public class MemberRoutineFindByRoutineId {
 
     private MemberRoutineContentData createMemberRoutineContentData(MemberRoutineContent memberRoutineContent) {
         return MemberRoutineContentData.builder()
+                .memberRoutineContentId(memberRoutineContent.getId())
                 .memberRoutineWorkoutCount(memberRoutineContent.getMemberRoutineWorkoutCount())
                 .memberRoutineWorkoutSet(memberRoutineContent.getMemberRoutineWorkoutSet())
                 .memberRoutineWorkoutTime(memberRoutineContent.getMemberRoutineWorkoutTime())
@@ -63,6 +64,7 @@ public class MemberRoutineFindByRoutineId {
                 value = "루틴에 등록한 운동들 상세 내용",
                 example = "["
                         + "{"
+                        + "\"memberRoutineContentId\": 1,"
                         + "\"memberRoutineWorkoutName\": \"PUSH_UP\","
                         + "\"memberRoutineWorkoutWeight\": null,"
                         + "\"memberRoutineWorkoutCount\": 20,"
@@ -70,12 +72,13 @@ public class MemberRoutineFindByRoutineId {
                         + "\"memberRoutineWorkoutTime\": null"
                         + "},"
                         + "{"
+                        + "\"memberRoutineContentId\": 2,"
                         + "\"memberRoutineWorkoutName\":\"CHEST_PRESS_MACHINE\","
                         + "\"memberRoutineWorkoutWeight\":100,"
                         + "\"memberRoutineWorkoutCount\":10,"
                         + "\"memberRoutineWorkoutSet\":2,"
                         + "\"memberRoutineWorkoutTime\":null"
-                        +"}"
+                        + "}"
                         + "]"
         )
         private List<MemberRoutineContentData> memberRoutineContentList = new ArrayList<>();

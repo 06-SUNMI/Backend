@@ -1,15 +1,22 @@
 package capstone.everyhealth.service;
 
+import capstone.everyhealth.controller.dto.Challenge.ChallengeRoutineCopyToParticipantData;
+import capstone.everyhealth.controller.dto.Challenge.ChallengeRoutineCopyToParticipantRequest;
 import capstone.everyhealth.domain.challenge.Challenge;
+import capstone.everyhealth.domain.challenge.ChallengeParticipant;
 import capstone.everyhealth.domain.challenge.ChallengeRoutine;
 import capstone.everyhealth.domain.challenge.ChallengeRoutineContent;
-import capstone.everyhealth.repository.ChallengeRepository;
-import capstone.everyhealth.repository.MemberRoutineRepository;
+import capstone.everyhealth.domain.routine.MemberRoutine;
+import capstone.everyhealth.domain.routine.MemberRoutineContent;
+import capstone.everyhealth.domain.stakeholder.Member;
+import capstone.everyhealth.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PutMapping;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,7 +26,10 @@ import java.util.List;
 public class ChallengeService {
 
     private final ChallengeRepository challengeRepository;
+    private final MemberRepository memberRepository;
+    private final ChallengeRoutineRepository challengeRoutineRepository;
     private final MemberRoutineRepository memberRoutineRepository;
+    private final ChallengeParticipantRepository challengeParticipantRepository;
 
     @Transactional
     public Long save(Challenge challenge) {
@@ -35,7 +45,7 @@ public class ChallengeService {
         return challengeRepository.findById(challengeId).get();
     }
 
-    @Transactional
+    /*@Transactional
     public Long update(Challenge challenge, Long challengeId) {
 
         Challenge prevChallenge = challengeRepository.findById(challengeId).get();
@@ -57,7 +67,7 @@ public class ChallengeService {
         challenge.getChallengeRoutineList().clear();
 
         return challengeId;
-    }
+    }*/
 
     @Transactional
     public void delete(Long challengeId) {
@@ -65,13 +75,55 @@ public class ChallengeService {
     }
 
     @Transactional
-    public void participate(Long memberId, Long challengeId) {
+    public void participate(Long memberId, Long challengeId, ChallengeRoutineCopyToParticipantRequest challengeRoutineCopyToParticipantRequest) {
 
+        Member member = memberRepository.findById(memberId).get();
         Challenge challenge = challengeRepository.findById(challengeId).get();
 
-        for(ChallengeRoutine challengeRoutine:challenge.getChallengeRoutineList()){
+        for (ChallengeRoutineCopyToParticipantData challengeRoutineCopyToParticipantData : challengeRoutineCopyToParticipantRequest.getChallengeRoutineCopyToParticipantDataList()) {
 
+            ChallengeRoutine challengeRoutine = challengeRoutineRepository.findById(challengeRoutineCopyToParticipantData.getRoutineId()).get();
+            MemberRoutine memberRoutine = createMemberRoutine(member, challengeRoutineCopyToParticipantData);
+
+            for (ChallengeRoutineContent challengeRoutineContent : challengeRoutine.getChallengeRoutineContentList()) {
+
+                MemberRoutineContent memberRoutineContent = createMemberRoutineContent(memberRoutine, challengeRoutineContent);
+                memberRoutine.getMemberRoutineContentList().add(memberRoutineContent);
+            }
+
+            memberRoutineRepository.save(memberRoutine);
         }
+
+        challenge.setParticipationNum(challenge.getParticipationNum() + 1);
+
+        ChallengeParticipant challengeParticipant = createChallengeParticipant(member, challenge);
+        challengeParticipantRepository.save(challengeParticipant);
+    }
+
+    private ChallengeParticipant createChallengeParticipant(Member member, Challenge challenge) {
+        return ChallengeParticipant.builder()
+                .challenge(challenge)
+                .member(member)
+                .build();
+    }
+
+    private MemberRoutine createMemberRoutine(Member member, ChallengeRoutineCopyToParticipantData challengeRoutineCopyToParticipantData) {
+        return MemberRoutine.builder()
+                .member(member)
+                .routineRegisterdate(challengeRoutineCopyToParticipantData.getChallengeRoutineProgressDate())
+                .memberRoutineContentList(new ArrayList<>())
+                .build();
+    }
+
+    private MemberRoutineContent createMemberRoutineContent(MemberRoutine memberRoutine, ChallengeRoutineContent challengeRoutineContent) {
+        return MemberRoutineContent.builder()
+                .workout(challengeRoutineContent.getWorkout())
+                .memberRoutineWorkoutSet(challengeRoutineContent.getChallengeRoutineWorkoutSet())
+                .memberRoutineWorkoutCount(challengeRoutineContent.getChallengeRoutineWorkoutCount())
+                .memberRoutineWorkoutTime(challengeRoutineContent.getChallengeRoutineWorkoutTime())
+                .memberRoutineWorkoutWeight(challengeRoutineContent.getChallengeRoutineWorkoutWeight())
+                .memberRoutine(memberRoutine)
+                .build();
     }
 
     public void updateExceptChallengeRoutineList(Challenge prevChallenge, Challenge challenge) {
