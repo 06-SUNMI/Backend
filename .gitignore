@@ -24,6 +24,7 @@ application-dev.properties
 application-prd.properties
 application-test.properties
 
+
 .idea
 *.iws
 *.iml
@@ -41,3 +42,4 @@ out/
 
 ### VS Code ###
 .vscode/
+application.properties
