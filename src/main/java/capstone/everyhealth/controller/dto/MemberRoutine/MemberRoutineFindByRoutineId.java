@@ -47,7 +47,7 @@ public class MemberRoutineFindByRoutineId {
     }
 
     private MemberRoutineContentData createMemberRoutineContentData(MemberRoutineContent memberRoutineContent) {
-        return MemberRoutineContentData.builder()
+        MemberRoutineContentData memberRoutineContentData = MemberRoutineContentData.builder()
                 .memberRoutineContentId(memberRoutineContent.getId())
                 .memberRoutineWorkoutCount(memberRoutineContent.getMemberRoutineWorkoutCount())
                 .memberRoutineWorkoutSet(memberRoutineContent.getMemberRoutineWorkoutSet())
@@ -55,6 +55,10 @@ public class MemberRoutineFindByRoutineId {
                 .memberRoutineWorkoutWeight(memberRoutineContent.getMemberRoutineWorkoutWeight())
                 .memberRoutineWorkoutName(memberRoutineContent.getWorkout().getWorkoutName())
                 .build();
+
+        memberRoutineContentData.setMemberRoutineIsChecked(memberRoutineContent.isMemberRoutineIsChecked());
+
+        return memberRoutineContentData;
     }
 
     @Data

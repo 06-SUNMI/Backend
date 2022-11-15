@@ -12,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,9 +30,22 @@ public class MemberRoutine {
     private List<MemberRoutineContent> memberRoutineContentList = new ArrayList<>();
 
     private String routineRegisterdate;
+    private int progressRate;
 
-    public void addMemberRoutineContent(MemberRoutineContent memberRoutineContent){
+    public void addMemberRoutineContent(MemberRoutineContent memberRoutineContent) {
         memberRoutineContentList.add(memberRoutineContent);
         memberRoutineContent.changeMemberRoutine(this);
+    }
+
+    public void calculateAndSetProgressRate(MemberRoutine memberRoutine) {
+        int RoutineContentNum = memberRoutine.getMemberRoutineContentList().size();
+        int checkedRoutineContentCount = 0;
+
+        for (MemberRoutineContent memberRoutineContent : memberRoutine.getMemberRoutineContentList()) {
+            checkedRoutineContentCount = memberRoutineContent.isMemberRoutineIsChecked() ? checkedRoutineContentCount + 1 : checkedRoutineContentCount;
+        }
+
+        this.progressRate = 100 * checkedRoutineContentCount / RoutineContentNum;
+
     }
 }

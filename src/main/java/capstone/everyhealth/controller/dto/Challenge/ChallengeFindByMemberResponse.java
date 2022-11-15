@@ -5,13 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChallengeFindResponse {
+public class ChallengeFindByMemberResponse {
 
     private Long challengeId;
     private String name;
@@ -20,4 +18,5 @@ public class ChallengeFindResponse {
     private int participationFee;
     private int participationNum;
     private int numPerWeek;
+    private int progressRate;
 }

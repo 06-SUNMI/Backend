@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -52,6 +51,10 @@ public class MemberRoutineController {
     public MemberRoutineFindAllResponse findAllRoutines(@ApiParam(/*name = "member_id",*/ value = "사용자의 id값", example = "1") @PathVariable Long memberId) {
 
         List<MemberRoutine> memberRoutineList = routineService.findAllRoutines(memberId);
+
+        for (MemberRoutine memberRoutine : memberRoutineList) {
+            memberRoutine.calculateAndSetProgressRate(memberRoutine);
+        }
 
         return new MemberRoutineFindAllResponse(memberRoutineList);
     }
@@ -116,11 +119,10 @@ public class MemberRoutineController {
     )
     @ResponseBody
     @PutMapping("/routines/{routineId}/routine-content/{routineContentId}")
-    public void updateRoutineWorkout(@ApiParam(value = "루틴 id 값", example = "1") @PathVariable Long routineId,
-                                     @ApiParam(value = "수정 할 운동 내용 id(상세 조회 쪽의 반환 값 중 memberRoutineContentId)", example = "1") @PathVariable Long routineContentId,
+    public void updateRoutineWorkout(@ApiParam(value = "수정 할 운동 내용 id(상세 조회 쪽의 반환 값 중 memberRoutineContentId)", example = "1") @PathVariable Long routineContentId,
                                      @ApiParam(value = "수정 할 운동 내용") @RequestBody MemberRoutineWorkoutContent memberRoutineWorkoutContent) {
 
-        routineService.updateWorkout(routineId, routineContentId, memberRoutineWorkoutContent);
+        routineService.updateWorkout(routineContentId, memberRoutineWorkoutContent);
     }
 
 
@@ -133,6 +135,20 @@ public class MemberRoutineController {
     public void delete(@ApiParam(value = "루틴의 id값", example = "1") @PathVariable Long routineId) {
 
         routineService.deleteRoutine(routineId);
+    }
+
+    @ApiOperation(
+            value = "루틴에 등록한 운동들 체크하기",
+            notes = "사용자가 등록한 특정 루틴에서 운동 수행 여부를 체크한다.\n"
+                    + "checkedList에는 체크한 운동의 id ((GET) /routines/{routineId}의 리턴 값 중 memberRoutineContentId)를,\n"
+                    + "uncheckedList에는 체크 해제한 운동의 id를 넣는다.\n"
+                    + "※ 예시의 경우 memberRoutineContentId 1, 2가 미리 등록돼 있어야함"
+    )
+    @ResponseBody
+    @PutMapping("/routines/{routineId}/check")
+    public void updateRoutineContentCheck(@ApiParam(value = "루틴 운동 체크 / 체크 해제 리스트") @RequestBody MemberRoutineContentCheckRequest memberRoutineContentCheckRequest) {
+
+        routineService.updateRoutineContentCheck(memberRoutineContentCheckRequest);
     }
 
     public MemberRoutine createMemberRoutine(Long memberId, MemberRoutineRegisterRequest memberRoutineRegisterRequest) {

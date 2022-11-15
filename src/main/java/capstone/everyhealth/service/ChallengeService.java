@@ -2,22 +2,21 @@ package capstone.everyhealth.service;
 
 import capstone.everyhealth.controller.dto.Challenge.ChallengeRoutineCopyToParticipantData;
 import capstone.everyhealth.controller.dto.Challenge.ChallengeRoutineCopyToParticipantRequest;
-import capstone.everyhealth.domain.challenge.Challenge;
-import capstone.everyhealth.domain.challenge.ChallengeParticipant;
-import capstone.everyhealth.domain.challenge.ChallengeRoutine;
-import capstone.everyhealth.domain.challenge.ChallengeRoutineContent;
+import capstone.everyhealth.domain.challenge.*;
 import capstone.everyhealth.domain.routine.MemberRoutine;
 import capstone.everyhealth.domain.routine.MemberRoutineContent;
 import capstone.everyhealth.domain.stakeholder.Member;
+import capstone.everyhealth.fileupload.service.FileUploadService;
 import capstone.everyhealth.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +29,8 @@ public class ChallengeService {
     private final ChallengeRoutineRepository challengeRoutineRepository;
     private final MemberRoutineRepository memberRoutineRepository;
     private final ChallengeParticipantRepository challengeParticipantRepository;
+    private final FileUploadService fileUploadService;
+    private final ChallengeAuthPostRepository challengeAuthPostRepository;
 
     @Transactional
     public Long save(Challenge challenge) {
@@ -100,6 +101,66 @@ public class ChallengeService {
         challengeParticipantRepository.save(challengeParticipant);
     }
 
+    public Map<Challenge, Integer> findChallengeAndCompletedRoutinesNumMapByMemberId(Long memberId) {
+
+        Member member = memberRepository.findById(memberId).get();
+        List<ChallengeParticipant> challengeParticipantList = challengeParticipantRepository.findByMember(member);
+        Map<Challenge, Integer> challengeAndCompletedRoutinesNumMap = new LinkedHashMap<>();
+
+        for (ChallengeParticipant challengeParticipant : challengeParticipantList) {
+
+            Challenge challenge = challengeParticipant.getChallenge();
+            challengeAndCompletedRoutinesNumMap.put(challenge, challengeParticipant.getCompletedRoutinesNum());
+        }
+
+        return challengeAndCompletedRoutinesNumMap;
+    }
+
+    @Transactional
+    public Long challengeAuthPost(Long challengeRoutineId, Long memberId, MultipartFile challengeAuthPostPhoto) {
+
+        ChallengeRoutine challengeRoutine = challengeRoutineRepository.findById(challengeRoutineId).get();
+        Member member = memberRepository.findById(memberId).get();
+        String challengeAuthPhotoUrl = fileUploadService.uploadImage(challengeAuthPostPhoto);
+
+        ChallengeAuthPost challengeAuthPost = createChallengeAuthPost(challengeRoutine, member, challengeAuthPhotoUrl);
+        Long savedChallengeAuthPostId = challengeAuthPostRepository.save(challengeAuthPost).getId();
+        ChallengeParticipant challengeParticipant = challengeParticipantRepository.findByChallengeAndMember(challengeRoutine.getChallenge(), member);
+
+        challengeParticipant.setCompletedRoutinesNum(challengeParticipant.getCompletedRoutinesNum() + 1);
+
+        return savedChallengeAuthPostId;
+    }
+
+    public List<ChallengeAuthPost> findAllChallengeAuthPost(Long challengeId) {
+
+        Challenge challenge = challengeRepository.findById(challengeId).get();
+        List<Long> challengeRoutineIdList = new ArrayList<>();
+
+        for (ChallengeRoutine challengeRoutine : challenge.getChallengeRoutineList()){
+            challengeRoutineIdList.add(challengeRoutine.getId());
+        }
+
+        return challengeAuthPostRepository.findAllById(challengeRoutineIdList);
+    }
+
+    public ChallengeAuthPost findChallengeAuthPost(Long challengeAuthPostId){
+        return challengeAuthPostRepository.findById(challengeAuthPostId).get();
+    }
+
+    private ChallengeAuthPost createChallengeAuthPost(ChallengeRoutine challengeRoutine, Member member, String challengeAuthPhotoUrl) {
+        return ChallengeAuthPost.builder()
+                .challengeRoutine(challengeRoutine)
+                .member(member)
+                .photoUrl(challengeAuthPhotoUrl)
+                .build();
+    }
+
+    private boolean dateValidaton(LocalDate currentDate) {
+        log.info("localdate - now : {}", LocalDateTime.now());
+        return currentDate.isEqual(LocalDate.now());
+    }
+
     private ChallengeParticipant createChallengeParticipant(Member member, Challenge challenge) {
         return ChallengeParticipant.builder()
                 .challenge(challenge)
@@ -133,7 +194,6 @@ public class ChallengeService {
         prevChallenge.setEndDate(challenge.getEndDate());
         prevChallenge.setParticipationNum(challenge.getParticipationNum());
         prevChallenge.setParticipationFee(challenge.getParticipationFee());
-        prevChallenge.setPreparations(challenge.getPreparations());
         prevChallenge.setNumPerWeek(challenge.getNumPerWeek());
     }
 

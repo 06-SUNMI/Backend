@@ -1,5 +1,6 @@
 package capstone.everyhealth.service;
 
+import capstone.everyhealth.controller.dto.MemberRoutine.MemberRoutineContentCheckRequest;
 import capstone.everyhealth.controller.dto.MemberRoutine.MemberRoutineWorkoutContent;
 import capstone.everyhealth.domain.routine.MemberRoutine;
 import capstone.everyhealth.domain.routine.MemberRoutineContent;
@@ -41,7 +42,10 @@ public class MemberRoutineService {
     }
 
     public MemberRoutine findRoutineByRoutineId(Long routineId) {
-        return routineRepository.findById(routineId).get();
+
+        MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
+
+        return memberRoutine;
     }
 
     /*@Transactional
@@ -87,20 +91,13 @@ public class MemberRoutineService {
     }
 
     @Transactional
-    public void updateWorkout(Long routineId, Long routineContentId, MemberRoutineWorkoutContent memberRoutineWorkoutContent) {
+    public void updateWorkout(Long routineContentId, MemberRoutineWorkoutContent memberRoutineWorkoutContent) {
 
-        MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
+        MemberRoutineContent memberRoutineContent = routineContentRepository.findById(routineContentId).get();
 
-        for (MemberRoutineContent memberRoutineContent : memberRoutine.getMemberRoutineContentList()) {
+        Workout workout = workoutRepository.findByWorkoutName(memberRoutineWorkoutContent.getMemberRoutineWorkoutName());
+        updateWorkoutContent(memberRoutineWorkoutContent, memberRoutineContent, workout);
 
-            if (memberRoutineContent.getId() == routineContentId) {
-
-                Workout workout = workoutRepository.findByWorkoutName(memberRoutineWorkoutContent.getMemberRoutineWorkoutName());
-                updateWorkoutContent(memberRoutineWorkoutContent, memberRoutineContent, workout);
-
-                break;
-            }
-        }
     }
 
     @Transactional
@@ -109,6 +106,22 @@ public class MemberRoutineService {
         MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
 
         routineRepository.deleteById(routineId);
+    }
+
+    @Transactional
+    public void updateRoutineContentCheck(MemberRoutineContentCheckRequest memberRoutineContentCheckRequest) {
+
+        for (Long memberRoutineContentId : memberRoutineContentCheckRequest.getCheckedList()) {
+
+            MemberRoutineContent memberRoutineContent = routineContentRepository.findById(memberRoutineContentId).get();
+            memberRoutineContent.setMemberRoutineIsChecked(true);
+        }
+
+        for (Long memberRoutineContentId : memberRoutineContentCheckRequest.getUncheckedList()) {
+
+            MemberRoutineContent memberRoutineContent = routineContentRepository.findById(memberRoutineContentId).get();
+            memberRoutineContent.setMemberRoutineIsChecked(false);
+        }
     }
 
     private void updateWorkoutContent(MemberRoutineWorkoutContent memberRoutineWorkoutContent, MemberRoutineContent memberRoutineContent, Workout workout) {
