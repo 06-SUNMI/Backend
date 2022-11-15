@@ -19,6 +19,7 @@ bin/
 
 ### IntelliJ IDEA ###
 application.yml
+application.properties
 application-dev.properties
 application-prd.properties
 application-test.properties

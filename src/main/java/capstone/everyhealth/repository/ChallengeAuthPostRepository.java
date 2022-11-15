@@ -1,9 +1,9 @@
 package capstone.everyhealth.repository;
 
-import capstone.everyhealth.domain.routine.MemberRoutineContent;
+import capstone.everyhealth.domain.challenge.ChallengeAuthPost;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface MemberRoutineContentRepository extends JpaRepository<MemberRoutineContent, Long> {
+public interface ChallengeAuthPostRepository extends JpaRepository<ChallengeAuthPost, Long> {
 }
