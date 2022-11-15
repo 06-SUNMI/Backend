@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,4 +24,7 @@ public class ChallengeParticipant {
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @Builder.Default
+    private int completedRoutinesNum = 0;
 }

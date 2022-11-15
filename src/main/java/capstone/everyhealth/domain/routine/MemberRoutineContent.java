@@ -29,7 +29,8 @@ public class MemberRoutineContent {
     private Integer memberRoutineWorkoutCount;
     private Integer memberRoutineWorkoutSet;
     private Integer memberRoutineWorkoutTime;
-    private boolean memberRoutineIsChecked;
+    @Builder.Default
+    private boolean memberRoutineIsChecked = false;
 
     public void changeMemberRoutine(MemberRoutine memberRoutine) {
         this.memberRoutine = memberRoutine;

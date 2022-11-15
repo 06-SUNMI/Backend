@@ -21,7 +21,6 @@ public class ChallengeFindDetailResponse {
     private String endDate;
     private int participationFee;
     private int participationNum;
-    private String preparations;
     private int numPerWeek;
     private List<ChallengeRoutineData> challengeRoutineDataList = new ArrayList<>();
 }

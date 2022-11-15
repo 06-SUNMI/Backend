@@ -25,4 +25,6 @@ public class MemberRoutineContentData {
     private Integer memberRoutineWorkoutSet;
     @ApiModelProperty(value = "운동 시간(분으로? 초로? 정하기)",example = "100")
     private Integer memberRoutineWorkoutTime;
+    @ApiModelProperty(value = "운동 수행 여부(체크 여부)",example = "false")
+    private boolean memberRoutineIsChecked;
 }

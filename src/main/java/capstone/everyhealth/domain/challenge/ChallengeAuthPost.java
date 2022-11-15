@@ -1,26 +1,29 @@
 package capstone.everyhealth.domain.challenge;
 
-import lombok.Getter;
+import lombok.*;
 import capstone.everyhealth.domain.stakeholder.Member;
 
 import javax.persistence.*;
 
 @Entity
-@Getter
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChallengeAuthPost {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "challenge_id")
-    private Challenge challenge;
+    @OneToOne
+    @JoinColumn(name = "challenge_routine_id")
+    private ChallengeRoutine challengeRoutine;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
-    private String photoLink;
+    private String photoUrl;
     private int reportedNum;
 }

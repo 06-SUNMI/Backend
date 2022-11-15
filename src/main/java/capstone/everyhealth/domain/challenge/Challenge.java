@@ -28,6 +28,5 @@ public class Challenge {
     private String endDate;
     private int participationFee;
     private int participationNum;
-    private String preparations;
     private int numPerWeek;
 }

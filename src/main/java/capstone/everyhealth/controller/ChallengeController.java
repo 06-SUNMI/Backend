@@ -1,7 +1,11 @@
 package capstone.everyhealth.controller;
 
 import capstone.everyhealth.controller.dto.Challenge.*;
+import capstone.everyhealth.controller.dto.Challenge.auth.ChallengeFindAllAuthPostData;
+import capstone.everyhealth.controller.dto.Challenge.auth.ChallengeFindAllAuthPostResponse;
+import capstone.everyhealth.controller.dto.Challenge.auth.ChallengeFindAuthPostResponse;
 import capstone.everyhealth.domain.challenge.Challenge;
+import capstone.everyhealth.domain.challenge.ChallengeAuthPost;
 import capstone.everyhealth.domain.challenge.ChallengeRoutine;
 import capstone.everyhealth.domain.challenge.ChallengeRoutineContent;
 import capstone.everyhealth.domain.routine.Workout;
@@ -13,15 +17,15 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Api(tags = {"챌린지 API"})
 @Slf4j
 public class ChallengeController {
@@ -43,7 +47,6 @@ public class ChallengeController {
                     + "ChallengeRoutineContentData 클래스 - 내부에 challengeRoutineWorkoutName부터 challengeRoutineWorkoutTime까지 5개 필드를 가짐\n"
                     + "※ 필드 명 반드시 저거랑 일치해야함, 이 부분 잘 안되면 바로 연락 주세요\n"
     )
-    @Transactional
     @PostMapping("/challenges")
     public Long save(@ApiParam(value = "등록할 챌린지 상세 내용") @RequestBody ChallengePostOrUpdateRequest challengePostOrUpdateRequest) {
 
@@ -124,7 +127,6 @@ public class ChallengeController {
             value = "챌린지 삭제 by Admin",
             notes = "등록한 챌린지를 삭제한다. 반환 값 X"
     )
-    @Transactional
     @DeleteMapping("/challenges/{challengeId}")
     public void delete(@ApiParam(value = "챌린지 id값", example = "1") @PathVariable Long challengeId) {
         challengeService.delete(challengeId);
@@ -135,7 +137,6 @@ public class ChallengeController {
             notes = "챌린지에 참가하여 해당 챌린지의 루틴을 개인 루틴에 저장한다.\n"
                     + "참가 성공 시 챌린지 id를 반환한다."
     )
-    @Transactional
     @PostMapping("/members/{memberId}/challenges/{challengeId}")
     public Long participate(@ApiParam(value = "멤버 id값", example = "1") @PathVariable Long memberId,
                             @ApiParam(value = "챌린지 id값", example = "1") @PathVariable Long challengeId,
@@ -144,6 +145,101 @@ public class ChallengeController {
         challengeService.participate(memberId, challengeId, challengeRoutineCopyToParticipantRequest);
 
         return challengeId;
+    }
+
+    @ApiOperation(
+            value = "자신이 참가한 챌린지 목록 확인 by Member",
+            notes = "멤버 자신이 참여한 챌린지 목록들을 확인한다."
+    )
+    @GetMapping("/challenges/members/{memberId}")
+    public List<ChallengeFindByMemberResponse> findChallengesByMemberId(@ApiParam(value = "멤버의 id 값", example = "1") @PathVariable Long memberId) {
+
+        List<ChallengeFindByMemberResponse> challengeFindByMemberResponseList = new ArrayList<>();
+        Map<Challenge, Integer> challengeAndCompletedRoutinesNumMap = challengeService.findChallengeAndCompletedRoutinesNumMapByMemberId(memberId);
+
+        for (Map.Entry<Challenge, Integer> entry : challengeAndCompletedRoutinesNumMap.entrySet()) {
+
+            ChallengeFindByMemberResponse challengeFindByMemberResponse = createChallengeFindByMemberResponse(entry.getKey());
+            challengeFindByMemberResponse.setProgressRate(calculateProgressRate(entry.getKey(), entry.getValue()));
+            challengeFindByMemberResponseList.add(challengeFindByMemberResponse);
+        }
+
+        return challengeFindByMemberResponseList;
+    }
+
+    @ApiOperation(
+            value = "챌린지 사진 인증 by Member",
+            notes = "멤버 자신이 참여한 챌린지에서의 인증 사진을 올린다.\n"
+                    + "멤버 루틴 조회 ㅡ> 챌린지 인증 버튼 누르기 (챌린지 루틴만 있음) ㅡ> "
+    )
+    @PostMapping("/challenges/auth/challenge-routines/{challengeRoutineId}/members/{memberId}")
+    public Long challengeAuthPost(@ApiParam(value = "챌린지 루틴의 id 값", example = "1") @PathVariable Long challengeRoutineId,
+                                  @ApiParam(value = "멤버의 id 값", example = "1") @PathVariable Long memberId,
+                                  @ApiParam(value = "챌린지 인증 사진 파일") @RequestPart MultipartFile challengeAuthPostPhoto
+            /*@ApiParam(value = "루틴 날짜",example="2022-11-15") @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate currentDate*/) {
+        return challengeService.challengeAuthPost(challengeRoutineId, memberId, challengeAuthPostPhoto);
+    }
+
+    @ApiOperation(
+            value = "챌린지 전체 인증 글 보기 by Member",
+            notes = "멤버 자신이 참여한 챌린지에서 올라온 모든 인증 글을 불러온다."
+    )
+    @GetMapping("/challenges/{challengeId}/auth")
+    public ChallengeFindAllAuthPostResponse findAllChallengeAuthPost(@ApiParam(value = "챌린지 id 값", example = "1") @PathVariable Long challengeId) {
+
+        List<ChallengeAuthPost> challengeAuthPostList = challengeService.findAllChallengeAuthPost(challengeId);
+        List<ChallengeFindAllAuthPostData> challengeFindAllAuthPostDataList = new ArrayList<>();
+
+        for (ChallengeAuthPost challengeAuthPost : challengeAuthPostList) {
+
+            ChallengeFindAllAuthPostData challengeFindAllAuthPostData = createChallengeFindAllAuthPostData(challengeAuthPost);
+            challengeFindAllAuthPostDataList.add(challengeFindAllAuthPostData);
+        }
+
+        return new ChallengeFindAllAuthPostResponse(challengeFindAllAuthPostDataList);
+    }
+
+    @ApiOperation(
+            value = "챌린지 인증 글 상세 보기 by Member",
+            notes = "챌린지 인증 글의 상세 내용을 불러온다."
+    )
+    @GetMapping("/challenges/auth/{challengeAuthPostId}")
+    public ChallengeFindAuthPostResponse findChallengeAuthPost(@ApiParam(value = "챌린지 인증 글 id 값", example = "1") @PathVariable Long challengeAuthPostId) {
+
+        ChallengeAuthPost challengeAuthPost = challengeService.findChallengeAuthPost(challengeAuthPostId);
+        ChallengeFindAuthPostResponse challengeFindAuthPostResponse = createChallengeFindAuthPostResponse(challengeAuthPost);
+
+        return challengeFindAuthPostResponse;
+    }
+
+    private ChallengeFindAuthPostResponse createChallengeFindAuthPostResponse(ChallengeAuthPost challengeAuthPost) {
+        return ChallengeFindAuthPostResponse.builder()
+                .photoUrl(challengeAuthPost.getPhotoUrl())
+                .reportedNum(challengeAuthPost.getReportedNum())
+                .build();
+    }
+
+    private ChallengeFindAllAuthPostData createChallengeFindAllAuthPostData(ChallengeAuthPost challengeAuthPost) {
+        return ChallengeFindAllAuthPostData.builder()
+                .memberId(challengeAuthPost.getMember().getId())
+                .challengeAuthPostId(challengeAuthPost.getId())
+                .build();
+    }
+
+    private int calculateProgressRate(Challenge challenge, Integer completedChallengeRoutineNum) {
+        return 100 * completedChallengeRoutineNum / challenge.getChallengeRoutineList().size();
+    }
+
+    private ChallengeFindByMemberResponse createChallengeFindByMemberResponse(Challenge challenge) {
+        return ChallengeFindByMemberResponse.builder()
+                .challengeId(challenge.getId())
+                .endDate(challenge.getEndDate())
+                .name(challenge.getName())
+                .numPerWeek(challenge.getNumPerWeek())
+                .participationFee(challenge.getParticipationFee())
+                .participationNum(challenge.getParticipationNum())
+                .startDate(challenge.getStartDate())
+                .build();
     }
 
     private void setupRelation(Challenge challenge) {
@@ -164,7 +260,6 @@ public class ChallengeController {
                 .numPerWeek(challenge.getNumPerWeek())
                 .participationNum(challenge.getParticipationNum())
                 .participationFee(challenge.getParticipationFee())
-                .preparations(challenge.getPreparations())
                 .startDate(challenge.getStartDate())
                 .endDate(challenge.getEndDate())
                 .challengeRoutineDataList(challengeRoutineDataList)
@@ -197,7 +292,6 @@ public class ChallengeController {
                 .numPerWeek(challenge.getNumPerWeek())
                 .participationFee(challenge.getParticipationFee())
                 .participationNum(challenge.getParticipationNum())
-                .preparations(challenge.getPreparations())
                 .startDate(challenge.getStartDate())
                 .build();
     }
@@ -228,7 +322,6 @@ public class ChallengeController {
                 .name(challengePostRequest.getChallengeName())
                 .numPerWeek(challengePostRequest.getChallengeNumPerWeek())
                 .participationFee(challengePostRequest.getChallengeParticipationFee())
-                .preparations(challengePostRequest.getChallengePreparations())
                 .challengeRoutineList(challengeRoutineList)
                 .build();
     }

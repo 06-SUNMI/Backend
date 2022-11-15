@@ -28,9 +28,6 @@ public class ChallengePostOrUpdateRequest {
     @ApiModelProperty(value = "챌린지 참가비", example = "30000")
     private int challengeParticipationFee;
 
-    @ApiModelProperty(value = "챌린지 유의 사항", example = "유의 사항 내용")
-    private String challengePreparations;
-
     @ApiModelProperty(value = "주 당 챌린지 참여 횟수", example = "2")
     private int challengeNumPerWeek;
 
