@@ -1,5 +1,7 @@
 package capstone.everyhealth.domain.routine;
 
+import capstone.everyhealth.domain.challenge.ChallengeRoutine;
+import capstone.everyhealth.domain.challenge.ChallengeRoutineContent;
 import lombok.*;
 
 import javax.persistence.*;
@@ -20,6 +22,11 @@ public class MemberRoutineContent {
     @ManyToOne
     @JoinColumn(name = "routine_id")
     private MemberRoutine memberRoutine;
+
+    @OneToOne
+    @JoinColumn(name = "challenge_routine_content_id")
+    private ChallengeRoutineContent challengeRoutineContent;
+
 
     @OneToOne
     @JoinColumn(name = "workout_id")

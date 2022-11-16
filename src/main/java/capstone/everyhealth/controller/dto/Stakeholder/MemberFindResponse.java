@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 public class MemberFindResponse {
 
+    private Long memberId;
     @ApiModelProperty(value = "유저 이름",example = "홍길동")
     private String memberName;
     @ApiModelProperty(value="소셜 로그인 한 곳",example = "카카오")

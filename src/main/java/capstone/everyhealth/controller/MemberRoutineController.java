@@ -138,8 +138,8 @@ public class MemberRoutineController {
     }
 
     @ApiOperation(
-            value = "루틴에 등록한 운동들 체크하기",
-            notes = "사용자가 등록한 특정 루틴에서 운동 수행 여부를 체크한다.\n"
+            value = "루틴에 등록한 운동들 체크 / 체크 해제하기",
+            notes = "사용자가 등록한 특정 루틴에서 운동 수행 여부를 체크 및 체크 해제를 한다.\n"
                     + "checkedList에는 체크한 운동의 id ((GET) /routines/{routineId}의 리턴 값 중 memberRoutineContentId)를,\n"
                     + "uncheckedList에는 체크 해제한 운동의 id를 넣는다.\n"
                     + "※ 예시의 경우 memberRoutineContentId 1, 2가 미리 등록돼 있어야함"

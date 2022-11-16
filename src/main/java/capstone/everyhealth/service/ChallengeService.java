@@ -83,12 +83,13 @@ public class ChallengeService {
 
         for (ChallengeRoutineCopyToParticipantData challengeRoutineCopyToParticipantData : challengeRoutineCopyToParticipantRequest.getChallengeRoutineCopyToParticipantDataList()) {
 
-            ChallengeRoutine challengeRoutine = challengeRoutineRepository.findById(challengeRoutineCopyToParticipantData.getRoutineId()).get();
+            ChallengeRoutine challengeRoutine = challengeRoutineRepository.findById(challengeRoutineCopyToParticipantData.getChallengeRoutineId()).get();
             MemberRoutine memberRoutine = createMemberRoutine(member, challengeRoutineCopyToParticipantData);
 
             for (ChallengeRoutineContent challengeRoutineContent : challengeRoutine.getChallengeRoutineContentList()) {
 
                 MemberRoutineContent memberRoutineContent = createMemberRoutineContent(memberRoutine, challengeRoutineContent);
+                log.info("asdasd = {}",memberRoutineContent.getChallengeRoutineContent());
                 memberRoutine.getMemberRoutineContentList().add(memberRoutineContent);
             }
 
@@ -137,14 +138,14 @@ public class ChallengeService {
         Challenge challenge = challengeRepository.findById(challengeId).get();
         List<Long> challengeRoutineIdList = new ArrayList<>();
 
-        for (ChallengeRoutine challengeRoutine : challenge.getChallengeRoutineList()){
+        for (ChallengeRoutine challengeRoutine : challenge.getChallengeRoutineList()) {
             challengeRoutineIdList.add(challengeRoutine.getId());
         }
 
         return challengeAuthPostRepository.findAllById(challengeRoutineIdList);
     }
 
-    public ChallengeAuthPost findChallengeAuthPost(Long challengeAuthPostId){
+    public ChallengeAuthPost findChallengeAuthPost(Long challengeAuthPostId) {
         return challengeAuthPostRepository.findById(challengeAuthPostId).get();
     }
 
@@ -169,10 +170,13 @@ public class ChallengeService {
     }
 
     private MemberRoutine createMemberRoutine(Member member, ChallengeRoutineCopyToParticipantData challengeRoutineCopyToParticipantData) {
+        ChallengeRoutine challengeRoutine = challengeRoutineRepository.findById(challengeRoutineCopyToParticipantData.getChallengeRoutineId()).get();
+
         return MemberRoutine.builder()
                 .member(member)
                 .routineRegisterdate(challengeRoutineCopyToParticipantData.getChallengeRoutineProgressDate())
                 .memberRoutineContentList(new ArrayList<>())
+                .challengeRoutine(challengeRoutine)
                 .build();
     }
 
@@ -184,6 +188,7 @@ public class ChallengeService {
                 .memberRoutineWorkoutTime(challengeRoutineContent.getChallengeRoutineWorkoutTime())
                 .memberRoutineWorkoutWeight(challengeRoutineContent.getChallengeRoutineWorkoutWeight())
                 .memberRoutine(memberRoutine)
+                .challengeRoutineContent(challengeRoutineContent)
                 .build();
     }
 

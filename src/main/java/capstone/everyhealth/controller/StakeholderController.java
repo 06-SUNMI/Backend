@@ -83,6 +83,7 @@ public class StakeholderController {
 
     private MemberFindResponse createMemberFindResponse(Member member) {
         return MemberFindResponse.builder()
+                .memberId(member.getId())
                 .loginAt(member.getLoginAt())
                 .memberHeight(member.getHeight())
                 .memberName(member.getName())

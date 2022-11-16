@@ -15,4 +15,5 @@ public class MemberRoutineData {
     private Long routineId;
     @ApiModelProperty(value = "루틴 등록 날짜", example = "2022-11-23")
     private String routineRegisterDate;
+
 }
