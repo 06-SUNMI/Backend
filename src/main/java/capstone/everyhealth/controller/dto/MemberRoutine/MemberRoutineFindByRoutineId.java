@@ -54,8 +54,11 @@ public class MemberRoutineFindByRoutineId {
                 .memberRoutineWorkoutTime(memberRoutineContent.getMemberRoutineWorkoutTime())
                 .memberRoutineWorkoutWeight(memberRoutineContent.getMemberRoutineWorkoutWeight())
                 .memberRoutineWorkoutName(memberRoutineContent.getWorkout().getWorkoutName())
-                .challengeRoutineContentId(memberRoutineContent.getChallengeRoutineContent().getId())
                 .build();
+
+        if (memberRoutineContent.getChallengeRoutineContent() != null) {
+            memberRoutineContentData.setChallengeRoutineContentId(memberRoutineContent.getChallengeRoutineContent().getId());
+        }
 
         memberRoutineContentData.setMemberRoutineIsChecked(memberRoutineContent.isMemberRoutineIsChecked());
 
