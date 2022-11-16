@@ -1,5 +1,7 @@
 package capstone.everyhealth.domain.routine;
 
+import capstone.everyhealth.domain.challenge.Challenge;
+import capstone.everyhealth.domain.challenge.ChallengeRoutine;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import capstone.everyhealth.domain.stakeholder.Member;
@@ -28,6 +30,10 @@ public class MemberRoutine {
 
     @OneToMany(mappedBy = "memberRoutine", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberRoutineContent> memberRoutineContentList = new ArrayList<>();
+
+    @OneToOne
+    @JoinColumn(name = "challenge_routine_id")
+    private ChallengeRoutine challengeRoutine;
 
     private String routineRegisterdate;
     private int progressRate;
