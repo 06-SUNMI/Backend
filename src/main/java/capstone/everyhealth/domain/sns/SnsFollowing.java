@@ -3,11 +3,11 @@ package capstone.everyhealth.domain.sns;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import capstone.everyhealth.domain.stakeholder.Member;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Entity
 @Data

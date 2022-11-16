@@ -23,8 +23,8 @@ public class MemberService {
         return memberRepository.findAll();
     }
 
-    public Member findMemberById(Long memberId) {
-        return memberRepository.findById(memberId).get();
+    public Member findMemberById(Long member_id) {
+        return memberRepository.findById(member_id).get();
     }
 
     @Transactional
