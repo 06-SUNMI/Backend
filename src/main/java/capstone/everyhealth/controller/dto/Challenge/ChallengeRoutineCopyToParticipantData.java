@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChallengeRoutineCopyToParticipantData {
 
-    private Long routineId;
+    private Long challengeRoutineId;
     private String challengeRoutineProgressDate;
 }

@@ -130,5 +130,6 @@ public class MemberRoutineService {
         memberRoutineContent.setMemberRoutineWorkoutTime(memberRoutineWorkoutContent.getMemberRoutineWorkoutTime());
         memberRoutineContent.setMemberRoutineWorkoutWeight(memberRoutineWorkoutContent.getMemberRoutineWorkoutWeight());
         memberRoutineContent.setWorkout(workout);
+        memberRoutineContent.setMemberRoutineIsChecked(false);
     }
 }
