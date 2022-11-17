@@ -145,10 +145,6 @@ public class ChallengeService {
         return challengeAuthPostRepository.findAllById(challengeRoutineIdList);
     }
 
-    public ChallengeAuthPost findChallengeAuthPost(Long challengeAuthPostId) {
-        return challengeAuthPostRepository.findById(challengeAuthPostId).get();
-    }
-
     private ChallengeAuthPost createChallengeAuthPost(ChallengeRoutine challengeRoutine, Member member, String challengeAuthPhotoUrl) {
         return ChallengeAuthPost.builder()
                 .challengeRoutine(challengeRoutine)

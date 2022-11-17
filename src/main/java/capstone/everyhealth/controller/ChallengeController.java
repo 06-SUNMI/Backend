@@ -3,7 +3,6 @@ package capstone.everyhealth.controller;
 import capstone.everyhealth.controller.dto.Challenge.*;
 import capstone.everyhealth.controller.dto.Challenge.auth.ChallengeFindAllAuthPostData;
 import capstone.everyhealth.controller.dto.Challenge.auth.ChallengeFindAllAuthPostResponse;
-import capstone.everyhealth.controller.dto.Challenge.auth.ChallengeFindAuthPostResponse;
 import capstone.everyhealth.domain.challenge.Challenge;
 import capstone.everyhealth.domain.challenge.ChallengeAuthPost;
 import capstone.everyhealth.domain.challenge.ChallengeRoutine;
@@ -199,30 +198,12 @@ public class ChallengeController {
         return new ChallengeFindAllAuthPostResponse(challengeFindAllAuthPostDataList);
     }
 
-    @ApiOperation(
-            value = "챌린지 인증 글 상세 보기 by Member",
-            notes = "챌린지 인증 글의 상세 내용을 불러온다."
-    )
-    @GetMapping("/challenges/auth/{challengeAuthPostId}")
-    public ChallengeFindAuthPostResponse findChallengeAuthPost(@ApiParam(value = "챌린지 인증 글 id 값", example = "1") @PathVariable Long challengeAuthPostId) {
-
-        ChallengeAuthPost challengeAuthPost = challengeService.findChallengeAuthPost(challengeAuthPostId);
-        ChallengeFindAuthPostResponse challengeFindAuthPostResponse = createChallengeFindAuthPostResponse(challengeAuthPost);
-
-        return challengeFindAuthPostResponse;
-    }
-
-    private ChallengeFindAuthPostResponse createChallengeFindAuthPostResponse(ChallengeAuthPost challengeAuthPost) {
-        return ChallengeFindAuthPostResponse.builder()
-                .photoUrl(challengeAuthPost.getPhotoUrl())
-                .reportedNum(challengeAuthPost.getReportedNum())
-                .build();
-    }
 
     private ChallengeFindAllAuthPostData createChallengeFindAllAuthPostData(ChallengeAuthPost challengeAuthPost) {
         return ChallengeFindAllAuthPostData.builder()
                 .memberId(challengeAuthPost.getMember().getId())
                 .challengeAuthPostId(challengeAuthPost.getId())
+                .photoUrl(challengeAuthPost.getPhotoUrl())
                 .build();
     }
 
