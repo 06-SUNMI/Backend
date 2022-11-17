@@ -28,4 +28,6 @@ public class SnsPost {
     private String imageLink;
     private String videoLink;
     private String content;
+
+    private int likes;
 }
