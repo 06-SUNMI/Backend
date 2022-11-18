@@ -123,27 +123,28 @@ public class ChallengeController {
 
 
     @ApiOperation(
-            value = "챌린지 삭제 by Admin",
+            value = "챌린지 삭제 by Admin (중간 발표 이후 수정 예정)",
             notes = "등록한 챌린지를 삭제한다. 반환 값 X"
     )
     @DeleteMapping("/challenges/{challengeId}")
-    public void delete(@ApiParam(value = "챌린지 id값", example = "1") @PathVariable Long challengeId) {
-        challengeService.delete(challengeId);
+    public String delete(@ApiParam(value = "챌린지 id값", example = "1") @PathVariable Long challengeId) {
+        return "중간 발표 이후 수정 예정";
+        //challengeService.delete(challengeId);
     }
 
     @ApiOperation(
             value = "챌린지 참가 by Member",
-            notes = "챌린지에 참가하여 해당 챌린지의 루틴을 개인 루틴에 저장한다.\n"
-                    + "참가 성공 시 챌린지 id를 반환한다."
+            notes = "챌린지에 참가하여 해당 챌린지의 루틴을 개인 루틴에 저장한다.\n\n"
+                    + "중복 참여 시 -3 반환\n"
+                    + "등록한 날짜가 해당 주 범위에서 벗어날 시 -2 반환\n"
+                    + "등록한 날짜 수가 챌린지 루틴 수와 다를 시 -1 반환\n"
     )
     @PostMapping("/members/{memberId}/challenges/{challengeId}")
-    public Long participate(@ApiParam(value = "멤버 id값", example = "1") @PathVariable Long memberId,
+    public int participate(@ApiParam(value = "멤버 id값", example = "1") @PathVariable Long memberId,
                             @ApiParam(value = "챌린지 id값", example = "1") @PathVariable Long challengeId,
-                            @ApiParam(value = "유저가 등록한 챌린지 루틴 별 수행 날짜") @RequestBody ChallengeRoutineCopyToParticipantRequest challengeRoutineCopyToParticipantRequest) {
+                            @ApiParam(value = "유저가 등록한 챌린지 루틴 별 수행 날짜", example = "[\"2022-11-06\", \"2022-11-12\", \"2022-11-13\", \"2022-11-19\"]") @RequestBody List<String> challengeRoutineProgressDateList) {
 
-        challengeService.participate(memberId, challengeId, challengeRoutineCopyToParticipantRequest);
-
-        return challengeId;
+        return challengeService.participate(memberId, challengeId, challengeRoutineProgressDateList);
     }
 
     @ApiOperation(
@@ -168,8 +169,9 @@ public class ChallengeController {
 
     @ApiOperation(
             value = "챌린지 사진 인증 by Member",
-            notes = "멤버 자신이 참여한 챌린지에서의 인증 사진을 올린다.\n"
-                    + "챌린지 인증 글 id 값을 반환하고 날짜가 맞지 않으면 -1을 반환한다."
+            notes = "멤버 자신이 참여한 챌린지에서의 인증 사진을 올린다.\n\n"
+                    + "중복 루틴 등록 시 -2 반환\n"
+            +"인증 날짜가 아닐 시 -1 반환"
     )
     @PostMapping("/challenges/auth/challenge-routines/{challengeRoutineId}/member-routines/{memberRoutineId}")
     public Long challengeAuthPost(@ApiParam(value = "챌린지 루틴의 id 값", example = "1") @PathVariable Long challengeRoutineId,

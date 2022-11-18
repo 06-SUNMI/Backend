@@ -1,6 +1,5 @@
 package capstone.everyhealth.service;
 
-import capstone.everyhealth.controller.dto.MemberRoutine.MemberRoutineContentCheckRequest;
 import capstone.everyhealth.controller.dto.MemberRoutine.MemberRoutineWorkoutContent;
 import capstone.everyhealth.domain.routine.MemberRoutine;
 import capstone.everyhealth.domain.routine.MemberRoutineContent;
@@ -63,6 +62,11 @@ public class MemberRoutineService {
     @Transactional
     public Long addWorkout(Long routineId, MemberRoutineContent memberRoutineContent) {
 
+        MemberRoutine savedMemberRoutine = routineRepository.findById(routineId).get();
+        if (validateIsRoutineFromChallenge(savedMemberRoutine)) {
+            return -1L;
+        }
+
         MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
 
         memberRoutine.getMemberRoutineContentList().add(memberRoutineContent);
@@ -70,11 +74,18 @@ public class MemberRoutineService {
 
         Long memberRoutineContentId = routineContentRepository.save(memberRoutineContent).getId();
 
-        return memberRoutineContentId;
+        //return memberRoutineContentId;
+        return 1L;
     }
 
     @Transactional
-    public void deleteWorkout(Long routineId, Long routineContentId) {
+    public Long deleteWorkout(Long routineId, Long routineContentId) {
+
+        MemberRoutine savedMemberRoutine = routineRepository.findById(routineId).get();
+
+        if (validateIsRoutineFromChallenge(savedMemberRoutine)) {
+            return -1L;
+        }
 
         MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
 
@@ -88,40 +99,50 @@ public class MemberRoutineService {
                 break;
             }
         }
+        return 1L;
     }
 
     @Transactional
-    public void updateWorkout(Long routineContentId, MemberRoutineWorkoutContent memberRoutineWorkoutContent) {
+    public Long updateWorkout(Long routineContentId, MemberRoutineWorkoutContent memberRoutineWorkoutContent) {
+
+        MemberRoutine memberRoutine = routineContentRepository.findById(routineContentId).get().getMemberRoutine();
+
+        if (validateIsRoutineFromChallenge(memberRoutine)) {
+            return -1L;
+        }
 
         MemberRoutineContent memberRoutineContent = routineContentRepository.findById(routineContentId).get();
 
         Workout workout = workoutRepository.findByWorkoutName(memberRoutineWorkoutContent.getMemberRoutineWorkoutName());
         updateWorkoutContent(memberRoutineWorkoutContent, memberRoutineContent, workout);
 
+        return 1L;
     }
 
     @Transactional
-    public void deleteRoutine(Long routineId) {
+    public Long deleteRoutine(Long routineId) {
 
         MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
 
+        if (validateIsRoutineFromChallenge(memberRoutine)) {
+            return -1L;
+        }
+
         routineRepository.deleteById(routineId);
+        return 1L;
     }
 
     @Transactional
-    public void updateRoutineContentCheck(MemberRoutineContentCheckRequest memberRoutineContentCheckRequest) {
+    public void updateRoutineContentCheck(Long routineContentId) {
 
-        for (Long memberRoutineContentId : memberRoutineContentCheckRequest.getCheckedList()) {
+        MemberRoutineContent memberRoutineContent = routineContentRepository.findById(routineContentId).get();
+        boolean currentCheckStatus = memberRoutineContent.isMemberRoutineIsChecked();
 
-            MemberRoutineContent memberRoutineContent = routineContentRepository.findById(memberRoutineContentId).get();
-            memberRoutineContent.setMemberRoutineIsChecked(true);
-        }
+        memberRoutineContent.setMemberRoutineIsChecked(!currentCheckStatus);
+    }
 
-        for (Long memberRoutineContentId : memberRoutineContentCheckRequest.getUncheckedList()) {
-
-            MemberRoutineContent memberRoutineContent = routineContentRepository.findById(memberRoutineContentId).get();
-            memberRoutineContent.setMemberRoutineIsChecked(false);
-        }
+    private boolean validateIsRoutineFromChallenge(MemberRoutine memberRoutine) {
+        return memberRoutine.getChallengeRoutine() != null;
     }
 
     private void updateWorkoutContent(MemberRoutineWorkoutContent memberRoutineWorkoutContent, MemberRoutineContent memberRoutineContent, Workout workout) {

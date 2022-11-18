@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import capstone.everyhealth.controller.dto.Sns.SnsPostRequest;
 import capstone.everyhealth.domain.sns.SnsPost;
 import capstone.everyhealth.domain.stakeholder.Member;
+import capstone.everyhealth.repository.SnsRepository;
 import capstone.everyhealth.service.MemberService;
 import capstone.everyhealth.service.SnsService;
 import lombok.RequiredArgsConstructor;
@@ -113,4 +114,18 @@ public class SnsController {
         snsService.unFollow(followedMemberId, followingMemberId);
 
     }
+
+    @PutMapping("/sns/{snsId}/addLike")
+    public int addLike(@PathVariable Long snsId){
+
+       return snsService.addLike(snsId);
+
+    } 
+
+    @PutMapping("/sns/{snsId}/cancelLike")
+    public int cancelLike(@PathVariable Long snsId){
+        return snsService.cancelLike(snsId);
+    }
+    
 }
+
