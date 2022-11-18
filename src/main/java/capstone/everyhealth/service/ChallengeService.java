@@ -1,8 +1,7 @@
 package capstone.everyhealth.service;
 
-import capstone.everyhealth.controller.dto.Challenge.ChallengeRoutineCopyToParticipantData;
-import capstone.everyhealth.controller.dto.Challenge.ChallengeRoutineCopyToParticipantRequest;
 import capstone.everyhealth.domain.challenge.*;
+import capstone.everyhealth.domain.enums.ChallengeStatus;
 import capstone.everyhealth.domain.routine.MemberRoutine;
 import capstone.everyhealth.domain.routine.MemberRoutineContent;
 import capstone.everyhealth.domain.stakeholder.Member;
@@ -72,25 +71,31 @@ public class ChallengeService {
     }*/
 
     @Transactional
-    public void delete(Long challengeId) {
+    public Long delete(Long challengeId) {
         challengeRepository.deleteById(challengeId);
+        return challengeId;
     }
 
     @Transactional
-    public void participate(Long memberId, Long challengeId, ChallengeRoutineCopyToParticipantRequest challengeRoutineCopyToParticipantRequest) {
+    public int participate(Long memberId, Long challengeId, List<String> challengeRoutineProgressDateList) {
 
         Member member = memberRepository.findById(memberId).get();
         Challenge challenge = challengeRepository.findById(challengeId).get();
+        ChallengeParticipant challengeParticipant = challengeParticipantRepository.findByChallengeAndMember(challenge, member);
 
-        for (ChallengeRoutineCopyToParticipantData challengeRoutineCopyToParticipantData : challengeRoutineCopyToParticipantRequest.getChallengeRoutineCopyToParticipantDataList()) {
+        if (validateChallengeParticipation(challengeRoutineProgressDateList, challenge, challengeParticipant) < 0) {
+            return validateChallengeParticipation(challengeRoutineProgressDateList, challenge, challengeParticipant);
+        }
 
-            ChallengeRoutine challengeRoutine = challengeRoutineRepository.findById(challengeRoutineCopyToParticipantData.getChallengeRoutineId()).get();
-            MemberRoutine memberRoutine = createMemberRoutine(member, challengeRoutineCopyToParticipantData);
+        for (ChallengeRoutine challengeRoutine : challenge.getChallengeRoutineList()) {
+
+            String challengeRoutineProgressDate = challengeRoutineProgressDateList.get(0);
+            challengeRoutineProgressDateList.remove(0);
+            MemberRoutine memberRoutine = createMemberRoutine(member, challengeRoutineProgressDate, challengeRoutine);
 
             for (ChallengeRoutineContent challengeRoutineContent : challengeRoutine.getChallengeRoutineContentList()) {
 
                 MemberRoutineContent memberRoutineContent = createMemberRoutineContent(memberRoutine, challengeRoutineContent);
-                log.info("asdasd = {}",memberRoutineContent.getChallengeRoutineContent());
                 memberRoutine.getMemberRoutineContentList().add(memberRoutineContent);
             }
 
@@ -99,8 +104,13 @@ public class ChallengeService {
 
         challenge.setParticipationNum(challenge.getParticipationNum() + 1);
 
-        ChallengeParticipant challengeParticipant = createChallengeParticipant(member, challenge);
-        challengeParticipantRepository.save(challengeParticipant);
+        ChallengeParticipant newChallengeParticipant = createChallengeParticipant(member, challenge);
+        log.info("member = {}", member);
+        log.info("challenge = {}", challenge);
+        log.info("newChallengeParticipant = {}", newChallengeParticipant);
+        challengeParticipantRepository.save(newChallengeParticipant);
+
+        return 1;
     }
 
     public Map<Challenge, Integer> findChallengeAndCompletedRoutinesNumMapByMemberId(Long memberId) {
@@ -125,8 +135,8 @@ public class ChallengeService {
         MemberRoutine memberRoutine = memberRoutineRepository.findById(memberRoutineId).get();
         Member member = memberRoutine.getMember();
 
-        if(!validateAuthDate(memberRoutine.getRoutineRegisterdate())){
-            return -1L;
+        if (validateChallengeAuthPost(member, challengeRoutine, memberRoutine) < 0) {
+            return validateChallengeAuthPost(member, challengeRoutine, memberRoutine);
         }
 
         String challengeAuthPhotoUrl = fileUploadService.uploadImage(challengeAuthPostPhoto);
@@ -140,10 +150,6 @@ public class ChallengeService {
         return savedChallengeAuthPostId;
     }
 
-    private boolean validateAuthDate(String routineRegisterdate) {
-        return LocalDate.parse(routineRegisterdate, DateTimeFormatter.ISO_DATE).isEqual(LocalDate.now());
-    }
-
     public List<ChallengeAuthPost> findAllChallengeAuthPost(Long challengeId) {
 
         Challenge challenge = challengeRepository.findById(challengeId).get();
@@ -154,6 +160,82 @@ public class ChallengeService {
         }
 
         return challengeAuthPostRepository.findAllById(challengeRoutineIdList);
+    }
+
+    public List<ChallengeParticipant> findChallengeParticipantListByChallenge(Challenge challenge) {
+        return challengeParticipantRepository.findByChallenge(challenge);
+    }
+
+    private Long validateChallengeAuthPost(Member member, ChallengeRoutine challengeRoutine, MemberRoutine memberRoutine) {
+        if (!validateIsDuplicateParticipation(member, challengeRoutine)) {
+            return -2L;
+        }
+
+        if (!validateAuthDate(memberRoutine)) {
+            return -1L;
+        }
+
+        return 1L;
+    }
+
+    private boolean validateIsDuplicateParticipation(Member member, ChallengeRoutine challengeRoutine) {
+        ChallengeAuthPost challengeAuthPost = challengeAuthPostRepository.findByMemberAndChallengeRoutine(member, challengeRoutine);
+
+        return challengeAuthPost == null;
+    }
+
+    private Integer validateChallengeParticipation(List<String> challengeRoutineProgressDateList, Challenge challenge, ChallengeParticipant challengeParticipant) {
+        if (challengeParticipant != null) {
+            return -3;
+        }
+
+        if (!validateChallengeRoutineProgressDateNum(challenge, challengeRoutineProgressDateList)) {
+            return -1;
+        }
+
+        if (!validateChallengeRoutineProgressDateRange(challenge, challengeRoutineProgressDateList)) {
+            return -2;
+        }
+        return 1;
+    }
+
+    private boolean validateChallengeRoutineProgressDateNum(Challenge challenge, List<String> challengeRoutineProgressDateList) {
+        return challenge.getChallengeRoutineList().size() == challengeRoutineProgressDateList.size();
+    }
+
+    private boolean validateChallengeRoutineProgressDateRange(Challenge challenge, List<String> challengeRoutineProgressDateList) {
+
+        LocalDate startDate = LocalDate.parse(challenge.getStartDate(), DateTimeFormatter.ISO_DATE);
+        int count = 0;
+
+        for (String challengeRoutineProgressDateInString : challengeRoutineProgressDateList) {
+
+            LocalDate challengeRoutineProgressDate = LocalDate.parse(challengeRoutineProgressDateInString, DateTimeFormatter.ISO_DATE);
+
+            log.info("startDate = {}", startDate);
+            log.info("startDate + 5 = {}", startDate.plusDays(5));
+            log.info("startDate - 1 = {}", startDate.minusDays(1));
+            log.info("challengeRoutineProgressDate = {}", challengeRoutineProgressDate);
+
+            log.info("isAfter = {}", challengeRoutineProgressDate.isAfter(startDate.minusDays(1)));
+            log.info("isBefore = {}", challengeRoutineProgressDate.isBefore(startDate.plusDays(7)));
+
+            if (!((challengeRoutineProgressDate.isAfter(startDate.minusDays(1))
+                    && (challengeRoutineProgressDate.isBefore(startDate.plusDays(7)))))) {
+                return false;
+            }
+            count++;
+
+            if ((count >= 2)) {
+                startDate = startDate.plusDays(7);
+                count = 0;
+            }
+        }
+        return true;
+    }
+
+    private boolean validateAuthDate(MemberRoutine memberRoutine) {
+        return LocalDate.parse(memberRoutine.getRoutineRegisterdate(), DateTimeFormatter.ISO_DATE).isEqual(LocalDate.now());
     }
 
     private ChallengeAuthPost createChallengeAuthPost(ChallengeRoutine challengeRoutine, Member member, String challengeAuthPhotoUrl) {
@@ -173,15 +255,14 @@ public class ChallengeService {
         return ChallengeParticipant.builder()
                 .challenge(challenge)
                 .member(member)
+                .challengeStatus(ChallengeStatus.IN_PROGRESS)
                 .build();
     }
 
-    private MemberRoutine createMemberRoutine(Member member, ChallengeRoutineCopyToParticipantData challengeRoutineCopyToParticipantData) {
-        ChallengeRoutine challengeRoutine = challengeRoutineRepository.findById(challengeRoutineCopyToParticipantData.getChallengeRoutineId()).get();
-
+    private MemberRoutine createMemberRoutine(Member member, String challengeRoutineProgressDate, ChallengeRoutine challengeRoutine) {
         return MemberRoutine.builder()
                 .member(member)
-                .routineRegisterdate(challengeRoutineCopyToParticipantData.getChallengeRoutineProgressDate())
+                .routineRegisterdate(challengeRoutineProgressDate)
                 .memberRoutineContentList(new ArrayList<>())
                 .challengeRoutine(challengeRoutine)
                 .build();
