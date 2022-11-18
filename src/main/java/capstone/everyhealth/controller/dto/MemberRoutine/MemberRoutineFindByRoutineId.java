@@ -45,7 +45,10 @@ public class MemberRoutineFindByRoutineId {
             MemberRoutineContentData memberRoutineContentData = createMemberRoutineContentData(memberRoutineContent);
             memberRoutineData.getMemberRoutineContentList().add(memberRoutineContentData);
         }
-        this.challengeRoutineId = memberRoutine.getChallengeRoutine().getId();
+
+        if (memberRoutine.getChallengeRoutine() != null) {
+            this.challengeRoutineId = memberRoutine.getChallengeRoutine().getId();
+        }
         this.memberRoutineId = memberRoutine.getId();
         this.memberRoutineData = memberRoutineData;
     }
