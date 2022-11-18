@@ -29,4 +29,6 @@ public class Challenge {
     private int participationFee;
     private int participationNum;
     private int numPerWeek;
+    @Builder.Default
+    private boolean isFinished = false;
 }

@@ -3,7 +3,6 @@ package capstone.everyhealth.controller;
 import capstone.everyhealth.controller.dto.Challenge.*;
 import capstone.everyhealth.controller.dto.Challenge.auth.ChallengeFindAllAuthPostData;
 import capstone.everyhealth.controller.dto.Challenge.auth.ChallengeFindAllAuthPostResponse;
-import capstone.everyhealth.controller.dto.Challenge.auth.ChallengeFindAuthPostResponse;
 import capstone.everyhealth.domain.challenge.Challenge;
 import capstone.everyhealth.domain.challenge.ChallengeAuthPost;
 import capstone.everyhealth.domain.challenge.ChallengeRoutine;
@@ -124,27 +123,28 @@ public class ChallengeController {
 
 
     @ApiOperation(
-            value = "챌린지 삭제 by Admin",
+            value = "챌린지 삭제 by Admin (중간 발표 이후 수정 예정)",
             notes = "등록한 챌린지를 삭제한다. 반환 값 X"
     )
     @DeleteMapping("/challenges/{challengeId}")
-    public void delete(@ApiParam(value = "챌린지 id값", example = "1") @PathVariable Long challengeId) {
-        challengeService.delete(challengeId);
+    public String delete(@ApiParam(value = "챌린지 id값", example = "1") @PathVariable Long challengeId) {
+        return "중간 발표 이후 수정 예정";
+        //challengeService.delete(challengeId);
     }
 
     @ApiOperation(
             value = "챌린지 참가 by Member",
-            notes = "챌린지에 참가하여 해당 챌린지의 루틴을 개인 루틴에 저장한다.\n"
-                    + "참가 성공 시 챌린지 id를 반환한다."
+            notes = "챌린지에 참가하여 해당 챌린지의 루틴을 개인 루틴에 저장한다.\n\n"
+                    + "중복 참여 시 -3 반환\n"
+                    + "등록한 날짜가 해당 주 범위에서 벗어날 시 -2 반환\n"
+                    + "등록한 날짜 수가 챌린지 루틴 수와 다를 시 -1 반환\n"
     )
     @PostMapping("/members/{memberId}/challenges/{challengeId}")
-    public Long participate(@ApiParam(value = "멤버 id값", example = "1") @PathVariable Long memberId,
+    public int participate(@ApiParam(value = "멤버 id값", example = "1") @PathVariable Long memberId,
                             @ApiParam(value = "챌린지 id값", example = "1") @PathVariable Long challengeId,
-                            @ApiParam(value = "유저가 등록한 챌린지 루틴 별 수행 날짜") @RequestBody ChallengeRoutineCopyToParticipantRequest challengeRoutineCopyToParticipantRequest) {
+                            @ApiParam(value = "유저가 등록한 챌린지 루틴 별 수행 날짜", example = "[\"2022-11-06\", \"2022-11-12\", \"2022-11-13\", \"2022-11-19\"]") @RequestBody List<String> challengeRoutineProgressDateList) {
 
-        challengeService.participate(memberId, challengeId, challengeRoutineCopyToParticipantRequest);
-
-        return challengeId;
+        return challengeService.participate(memberId, challengeId, challengeRoutineProgressDateList);
     }
 
     @ApiOperation(
@@ -169,15 +169,16 @@ public class ChallengeController {
 
     @ApiOperation(
             value = "챌린지 사진 인증 by Member",
-            notes = "멤버 자신이 참여한 챌린지에서의 인증 사진을 올린다.\n"
-                    + "멤버 루틴 조회 ㅡ> 챌린지 인증 버튼 누르기 (챌린지 루틴만 있음) ㅡ> "
+            notes = "멤버 자신이 참여한 챌린지에서의 인증 사진을 올린다.\n\n"
+                    + "중복 루틴 등록 시 -2 반환\n"
+            +"인증 날짜가 아닐 시 -1 반환"
     )
-    @PostMapping("/challenges/auth/challenge-routines/{challengeRoutineId}/members/{memberId}")
+    @PostMapping("/challenges/auth/challenge-routines/{challengeRoutineId}/member-routines/{memberRoutineId}")
     public Long challengeAuthPost(@ApiParam(value = "챌린지 루틴의 id 값", example = "1") @PathVariable Long challengeRoutineId,
-                                  @ApiParam(value = "멤버의 id 값", example = "1") @PathVariable Long memberId,
+                                  @ApiParam(value = "멤버 루틴의 id 값", example = "1") @PathVariable Long memberRoutineId,
                                   @ApiParam(value = "챌린지 인증 사진 파일") @RequestPart MultipartFile challengeAuthPostPhoto
             /*@ApiParam(value = "루틴 날짜",example="2022-11-15") @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate currentDate*/) {
-        return challengeService.challengeAuthPost(challengeRoutineId, memberId, challengeAuthPostPhoto);
+        return challengeService.challengeAuthPost(challengeRoutineId, memberRoutineId, challengeAuthPostPhoto);
     }
 
     @ApiOperation(
@@ -199,30 +200,12 @@ public class ChallengeController {
         return new ChallengeFindAllAuthPostResponse(challengeFindAllAuthPostDataList);
     }
 
-    @ApiOperation(
-            value = "챌린지 인증 글 상세 보기 by Member",
-            notes = "챌린지 인증 글의 상세 내용을 불러온다."
-    )
-    @GetMapping("/challenges/auth/{challengeAuthPostId}")
-    public ChallengeFindAuthPostResponse findChallengeAuthPost(@ApiParam(value = "챌린지 인증 글 id 값", example = "1") @PathVariable Long challengeAuthPostId) {
-
-        ChallengeAuthPost challengeAuthPost = challengeService.findChallengeAuthPost(challengeAuthPostId);
-        ChallengeFindAuthPostResponse challengeFindAuthPostResponse = createChallengeFindAuthPostResponse(challengeAuthPost);
-
-        return challengeFindAuthPostResponse;
-    }
-
-    private ChallengeFindAuthPostResponse createChallengeFindAuthPostResponse(ChallengeAuthPost challengeAuthPost) {
-        return ChallengeFindAuthPostResponse.builder()
-                .photoUrl(challengeAuthPost.getPhotoUrl())
-                .reportedNum(challengeAuthPost.getReportedNum())
-                .build();
-    }
 
     private ChallengeFindAllAuthPostData createChallengeFindAllAuthPostData(ChallengeAuthPost challengeAuthPost) {
         return ChallengeFindAllAuthPostData.builder()
                 .memberId(challengeAuthPost.getMember().getId())
                 .challengeAuthPostId(challengeAuthPost.getId())
+                .photoUrl(challengeAuthPost.getPhotoUrl())
                 .build();
     }
 

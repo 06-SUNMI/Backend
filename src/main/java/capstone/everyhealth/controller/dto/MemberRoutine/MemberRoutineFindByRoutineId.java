@@ -12,6 +12,9 @@ import java.util.List;
 @Data
 public class MemberRoutineFindByRoutineId {
 
+
+    private Long challengeRoutineId;
+    private Long memberRoutineId;
     @ApiModelProperty(
             value = "루틴에 등록한 운동들 상세 내용",
             example = "["
@@ -43,6 +46,10 @@ public class MemberRoutineFindByRoutineId {
             memberRoutineData.getMemberRoutineContentList().add(memberRoutineContentData);
         }
 
+        if (memberRoutine.getChallengeRoutine() != null) {
+            this.challengeRoutineId = memberRoutine.getChallengeRoutine().getId();
+        }
+        this.memberRoutineId = memberRoutine.getId();
         this.memberRoutineData = memberRoutineData;
     }
 
@@ -54,8 +61,11 @@ public class MemberRoutineFindByRoutineId {
                 .memberRoutineWorkoutTime(memberRoutineContent.getMemberRoutineWorkoutTime())
                 .memberRoutineWorkoutWeight(memberRoutineContent.getMemberRoutineWorkoutWeight())
                 .memberRoutineWorkoutName(memberRoutineContent.getWorkout().getWorkoutName())
-                .challengeRoutineContentId(memberRoutineContent.getChallengeRoutineContent().getId())
                 .build();
+
+        if (memberRoutineContent.getChallengeRoutineContent() != null) {
+            memberRoutineContentData.setChallengeRoutineContentId(memberRoutineContent.getChallengeRoutineContent().getId());
+        }
 
         memberRoutineContentData.setMemberRoutineIsChecked(memberRoutineContent.isMemberRoutineIsChecked());
 
