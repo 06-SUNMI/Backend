@@ -169,14 +169,14 @@ public class ChallengeController {
     @ApiOperation(
             value = "챌린지 사진 인증 by Member",
             notes = "멤버 자신이 참여한 챌린지에서의 인증 사진을 올린다.\n"
-                    + "멤버 루틴 조회 ㅡ> 챌린지 인증 버튼 누르기 (챌린지 루틴만 있음) ㅡ> "
+                    + "챌린지 인증 글 id 값을 반환하고 날짜가 맞지 않으면 -1을 반환한다."
     )
-    @PostMapping("/challenges/auth/challenge-routines/{challengeRoutineId}/members/{memberId}")
+    @PostMapping("/challenges/auth/challenge-routines/{challengeRoutineId}/member-routines/{memberRoutineId}")
     public Long challengeAuthPost(@ApiParam(value = "챌린지 루틴의 id 값", example = "1") @PathVariable Long challengeRoutineId,
-                                  @ApiParam(value = "멤버의 id 값", example = "1") @PathVariable Long memberId,
+                                  @ApiParam(value = "멤버 루틴의 id 값", example = "1") @PathVariable Long memberRoutineId,
                                   @ApiParam(value = "챌린지 인증 사진 파일") @RequestPart MultipartFile challengeAuthPostPhoto
             /*@ApiParam(value = "루틴 날짜",example="2022-11-15") @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate currentDate*/) {
-        return challengeService.challengeAuthPost(challengeRoutineId, memberId, challengeAuthPostPhoto);
+        return challengeService.challengeAuthPost(challengeRoutineId, memberRoutineId, challengeAuthPostPhoto);
     }
 
     @ApiOperation(

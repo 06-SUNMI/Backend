@@ -12,6 +12,9 @@ import java.util.List;
 @Data
 public class MemberRoutineFindByRoutineId {
 
+
+    private Long challengeRoutineId;
+    private Long memberRoutineId;
     @ApiModelProperty(
             value = "루틴에 등록한 운동들 상세 내용",
             example = "["
@@ -42,7 +45,8 @@ public class MemberRoutineFindByRoutineId {
             MemberRoutineContentData memberRoutineContentData = createMemberRoutineContentData(memberRoutineContent);
             memberRoutineData.getMemberRoutineContentList().add(memberRoutineContentData);
         }
-
+        this.challengeRoutineId = memberRoutine.getChallengeRoutine().getId();
+        this.memberRoutineId = memberRoutine.getId();
         this.memberRoutineData = memberRoutineData;
     }
 

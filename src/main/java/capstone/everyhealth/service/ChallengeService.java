@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -118,10 +119,16 @@ public class ChallengeService {
     }
 
     @Transactional
-    public Long challengeAuthPost(Long challengeRoutineId, Long memberId, MultipartFile challengeAuthPostPhoto) {
+    public Long challengeAuthPost(Long challengeRoutineId, Long memberRoutineId, MultipartFile challengeAuthPostPhoto) {
 
         ChallengeRoutine challengeRoutine = challengeRoutineRepository.findById(challengeRoutineId).get();
-        Member member = memberRepository.findById(memberId).get();
+        MemberRoutine memberRoutine = memberRoutineRepository.findById(memberRoutineId).get();
+        Member member = memberRoutine.getMember();
+
+        if(!validateAuthDate(memberRoutine.getRoutineRegisterdate())){
+            return -1L;
+        }
+
         String challengeAuthPhotoUrl = fileUploadService.uploadImage(challengeAuthPostPhoto);
 
         ChallengeAuthPost challengeAuthPost = createChallengeAuthPost(challengeRoutine, member, challengeAuthPhotoUrl);
@@ -131,6 +138,10 @@ public class ChallengeService {
         challengeParticipant.setCompletedRoutinesNum(challengeParticipant.getCompletedRoutinesNum() + 1);
 
         return savedChallengeAuthPostId;
+    }
+
+    private boolean validateAuthDate(String routineRegisterdate) {
+        return LocalDate.parse(routineRegisterdate, DateTimeFormatter.ISO_DATE).isEqual(LocalDate.now());
     }
 
     public List<ChallengeAuthPost> findAllChallengeAuthPost(Long challengeId) {
