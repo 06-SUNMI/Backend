@@ -81,20 +81,18 @@ public class MemberRoutineService {
     @Transactional
     public Long deleteWorkout(Long routineId, Long routineContentId) {
 
-        MemberRoutine savedMemberRoutine = routineRepository.findById(routineId).get();
+        MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
 
-        if (validateIsRoutineFromChallenge(savedMemberRoutine)) {
+        if (validateIsRoutineFromChallenge(memberRoutine)) {
             return -1L;
         }
-
-        MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
 
         for (MemberRoutineContent memberRoutineContent : memberRoutine.getMemberRoutineContentList()) {
 
             if (memberRoutineContent.getId() == routineContentId) {
 
-                memberRoutineContent.setMemberRoutine(null);
                 memberRoutine.getMemberRoutineContentList().remove(memberRoutineContent);
+                routineContentRepository.delete(memberRoutineContent);
 
                 break;
             }
