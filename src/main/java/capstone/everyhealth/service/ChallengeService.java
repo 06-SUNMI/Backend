@@ -153,13 +153,21 @@ public class ChallengeService {
     public List<ChallengeAuthPost> findAllChallengeAuthPost(Long challengeId) {
 
         Challenge challenge = challengeRepository.findById(challengeId).get();
-        List<Long> challengeRoutineIdList = new ArrayList<>();
+        List<ChallengeAuthPost> totalChallengeAuthPostList = challengeAuthPostRepository.findAll();
+        List<ChallengeAuthPost> returnChallengeAuthPostList = new ArrayList<>();
 
-        for (ChallengeRoutine challengeRoutine : challenge.getChallengeRoutineList()) {
-            challengeRoutineIdList.add(challengeRoutine.getId());
+        for(ChallengeAuthPost challengeAuthPost : totalChallengeAuthPostList){
+
+            if(challengeAuthPost.getChallengeRoutine().getChallenge() == challenge){
+                returnChallengeAuthPostList.add(challengeAuthPost);
+            }
         }
 
-        return challengeAuthPostRepository.findAllById(challengeRoutineIdList);
+        return returnChallengeAuthPostList;
+    }
+
+    private boolean validateAuthDate(String routineRegisterdate) {
+        return LocalDate.parse(routineRegisterdate, DateTimeFormatter.ISO_DATE).isEqual(LocalDate.now());
     }
 
     public List<ChallengeParticipant> findChallengeParticipantListByChallenge(Challenge challenge) {
