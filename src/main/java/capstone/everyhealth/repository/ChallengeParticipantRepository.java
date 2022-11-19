@@ -13,4 +13,6 @@ public interface ChallengeParticipantRepository extends JpaRepository<ChallengeP
     List<ChallengeParticipant> findByMember(Member member);
 
     ChallengeParticipant findByChallengeAndMember(Challenge challenge, Member member);
+
+    List<ChallengeParticipant> findByChallenge(Challenge challenge);
 }

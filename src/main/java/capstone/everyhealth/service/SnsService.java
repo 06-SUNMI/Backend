@@ -73,4 +73,18 @@ public class SnsService {
         Member followingMember = memberService.findMemberById(followingMemberId);
         snsFollowRepository.deleteByFollowedMemberAndFollowingMember(followedMember, followingMember);
     }
+
+    @Transactional
+    public int addLike(Long snsId) {
+        SnsPost snsPost = snsRepository.findById(snsId).get();
+        snsPost.setLikes(snsPost.getLikes() + 1);
+        return snsPost.getLikes();
+    }
+
+    @Transactional
+    public int cancelLike(Long snsId) {
+        SnsPost snsPost = snsRepository.findById(snsId).get();
+        snsPost.setLikes(snsPost.getLikes() - 1);
+        return snsPost.getLikes();
+    }
 }
