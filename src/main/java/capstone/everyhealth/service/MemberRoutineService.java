@@ -81,16 +81,22 @@ public class MemberRoutineService {
     @Transactional
     public Long deleteWorkout(Long routineId, Long routineContentId) {
 
+        log.info("routineId = {}", routineId);
+        log.info("routineContentId = {}", routineContentId);
+
         MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
+        log.info("memberRoutine ID = {}", memberRoutine.getId());
 
         if (validateIsRoutineFromChallenge(memberRoutine)) {
             return -1L;
         }
 
         for (MemberRoutineContent memberRoutineContent : memberRoutine.getMemberRoutineContentList()) {
-
-            if (memberRoutineContent.getId() == routineContentId) {
-
+            log.info("memberRoutineContent.getId() = {}, type = {}", memberRoutineContent.getId(), memberRoutineContent.getId().getClass());
+            log.info("routineContentId = {}, type = {}", routineContentId, routineContentId.getClass());
+            log.info("memberRoutineContent.getId() == routineContentId = {}", memberRoutineContent.getId() == routineContentId);
+            if (memberRoutineContent.getId().equals(routineContentId)) {
+                log.info("routineContentId = {}", routineContentId);
                 memberRoutine.getMemberRoutineContentList().remove(memberRoutineContent);
                 routineContentRepository.delete(memberRoutineContent);
 
