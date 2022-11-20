@@ -3,10 +3,7 @@ package capstone.everyhealth.controller;
 import capstone.everyhealth.controller.dto.Challenge.*;
 import capstone.everyhealth.controller.dto.Challenge.auth.ChallengeFindAllAuthPostData;
 import capstone.everyhealth.controller.dto.Challenge.auth.ChallengeFindAllAuthPostResponse;
-import capstone.everyhealth.domain.challenge.Challenge;
-import capstone.everyhealth.domain.challenge.ChallengeAuthPost;
-import capstone.everyhealth.domain.challenge.ChallengeRoutine;
-import capstone.everyhealth.domain.challenge.ChallengeRoutineContent;
+import capstone.everyhealth.domain.challenge.*;
 import capstone.everyhealth.domain.routine.Workout;
 import capstone.everyhealth.domain.routine.WorkoutName;
 import capstone.everyhealth.service.ChallengeService;
@@ -141,8 +138,8 @@ public class ChallengeController {
     )
     @PostMapping("/members/{memberId}/challenges/{challengeId}")
     public int participate(@ApiParam(value = "멤버 id값", example = "1") @PathVariable Long memberId,
-                            @ApiParam(value = "챌린지 id값", example = "1") @PathVariable Long challengeId,
-                            @ApiParam(value = "유저가 등록한 챌린지 루틴 별 수행 날짜", example = "[\"2022-11-06\", \"2022-11-12\", \"2022-11-13\", \"2022-11-19\"]") @RequestBody List<String> challengeRoutineProgressDateList) {
+                           @ApiParam(value = "챌린지 id값", example = "1") @PathVariable Long challengeId,
+                           @ApiParam(value = "유저가 등록한 챌린지 루틴 별 수행 날짜", example = "[\"2022-11-13\", \"2022-11-19\", \"2022-11-20\", \"2022-11-22\"]") @RequestBody List<String> challengeRoutineProgressDateList) {
 
         return challengeService.participate(memberId, challengeId, challengeRoutineProgressDateList);
     }
@@ -155,23 +152,30 @@ public class ChallengeController {
     public List<ChallengeFindByMemberResponse> findChallengesByMemberId(@ApiParam(value = "멤버의 id 값", example = "1") @PathVariable Long memberId) {
 
         List<ChallengeFindByMemberResponse> challengeFindByMemberResponseList = new ArrayList<>();
-        Map<Challenge, Integer> challengeAndCompletedRoutinesNumMap = challengeService.findChallengeAndCompletedRoutinesNumMapByMemberId(memberId);
+        List<ChallengeParticipant> challengeParticipantList = challengeService.findChallengeParticipantListByMemberId(memberId);
 
-        for (Map.Entry<Challenge, Integer> entry : challengeAndCompletedRoutinesNumMap.entrySet()) {
+        for (ChallengeParticipant challengeParticipant : challengeParticipantList){
+
+            Challenge challenge = challengeService.find(challengeParticipant.getChallenge().getId());
+            ChallengeFindByMemberResponse challengeFindByMemberResponse = createChallengeFindByMemberResponse(challenge, challengeParticipant);
+            challengeFindByMemberResponseList.add(challengeFindByMemberResponse);
+        }
+        /*for (Map.Entry<Challenge, Integer> entry : challengeAndCompletedRoutinesNumMap.entrySet()) {
 
             ChallengeFindByMemberResponse challengeFindByMemberResponse = createChallengeFindByMemberResponse(entry.getKey());
             challengeFindByMemberResponse.setProgressRate(calculateProgressRate(entry.getKey(), entry.getValue()));
             challengeFindByMemberResponseList.add(challengeFindByMemberResponse);
-        }
+        }*/
 
-        return challengeFindByMemberResponseList;
+            return challengeFindByMemberResponseList;
     }
 
     @ApiOperation(
             value = "챌린지 사진 인증 by Member",
             notes = "멤버 자신이 참여한 챌린지에서의 인증 사진을 올린다.\n\n"
+                    + "루틴 progressRate가 100이 아닐 시 -3 반환\n"
                     + "중복 루틴 등록 시 -2 반환\n"
-            +"인증 날짜가 아닐 시 -1 반환"
+                    + "인증 날짜가 아닐 시 -1 반환"
     )
     @PostMapping("/challenges/auth/challenge-routines/{challengeRoutineId}/member-routines/{memberRoutineId}")
     public Long challengeAuthPost(@ApiParam(value = "챌린지 루틴의 id 값", example = "1") @PathVariable Long challengeRoutineId,
@@ -213,7 +217,7 @@ public class ChallengeController {
         return 100 * completedChallengeRoutineNum / challenge.getChallengeRoutineList().size();
     }
 
-    private ChallengeFindByMemberResponse createChallengeFindByMemberResponse(Challenge challenge) {
+    private ChallengeFindByMemberResponse createChallengeFindByMemberResponse(Challenge challenge,ChallengeParticipant challengeParticipant) {
         return ChallengeFindByMemberResponse.builder()
                 .challengeId(challenge.getId())
                 .endDate(challenge.getEndDate())
@@ -222,6 +226,7 @@ public class ChallengeController {
                 .participationFee(challenge.getParticipationFee())
                 .participationNum(challenge.getParticipationNum())
                 .startDate(challenge.getStartDate())
+                .challengeParticipantStatus(challengeParticipant.getChallengeStatus())
                 .build();
     }
 

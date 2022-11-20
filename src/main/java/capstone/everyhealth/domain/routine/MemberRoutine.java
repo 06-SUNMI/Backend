@@ -43,11 +43,11 @@ public class MemberRoutine {
         memberRoutineContent.changeMemberRoutine(this);
     }
 
-    public void calculateAndSetProgressRate(MemberRoutine memberRoutine) {
-        int routineContentNum = memberRoutine.getMemberRoutineContentList().size();
+    public void calculateAndSetProgressRate() {
+        int routineContentNum = this.memberRoutineContentList.size();
         int checkedRoutineContentCount = 0;
 
-        for (MemberRoutineContent memberRoutineContent : memberRoutine.getMemberRoutineContentList()) {
+        for (MemberRoutineContent memberRoutineContent : this.memberRoutineContentList) {
             checkedRoutineContentCount = memberRoutineContent.isMemberRoutineIsChecked() ? checkedRoutineContentCount + 1 : checkedRoutineContentCount;
         }
 
