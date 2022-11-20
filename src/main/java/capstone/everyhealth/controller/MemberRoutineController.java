@@ -52,10 +52,6 @@ public class MemberRoutineController {
 
         List<MemberRoutine> memberRoutineList = routineService.findAllRoutines(memberId);
 
-        for (MemberRoutine memberRoutine : memberRoutineList) {
-            memberRoutine.calculateAndSetProgressRate(memberRoutine);
-        }
-
         return new MemberRoutineFindAllResponse(memberRoutineList);
     }
 

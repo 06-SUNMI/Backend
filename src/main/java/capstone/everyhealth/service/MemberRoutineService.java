@@ -140,9 +140,11 @@ public class MemberRoutineService {
     public void updateRoutineContentCheck(Long routineContentId) {
 
         MemberRoutineContent memberRoutineContent = routineContentRepository.findById(routineContentId).get();
+        MemberRoutine memberRoutine = memberRoutineContent.getMemberRoutine();
         boolean currentCheckStatus = memberRoutineContent.isMemberRoutineIsChecked();
 
         memberRoutineContent.setMemberRoutineIsChecked(!currentCheckStatus);
+        memberRoutine.calculateAndSetProgressRate();
     }
 
     private boolean validateIsRoutineFromChallenge(MemberRoutine memberRoutine) {
