@@ -227,6 +227,7 @@ public class ChallengeController {
                 .participationNum(challenge.getParticipationNum())
                 .startDate(challenge.getStartDate())
                 .challengeParticipantStatus(challengeParticipant.getChallengeStatus())
+                .progressRate(100 * challengeParticipant.getCompletedRoutinesNum() / challenge.getChallengeRoutineList().size())
                 .build();
     }
 
