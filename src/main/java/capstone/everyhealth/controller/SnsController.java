@@ -3,7 +3,9 @@ package capstone.everyhealth.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import javax.transaction.TransactionScoped;
+
 
 import capstone.everyhealth.controller.dto.Sns.SnsCommentRequset;
 import capstone.everyhealth.controller.dto.Sns.SnsCommentResponse;
@@ -138,6 +140,40 @@ public class SnsController {
     public int cancelLike(@PathVariable Long snsId) {
         return snsService.cancelLike(snsId);
     }
+
+
+    @PostMapping("/sns/{snsId}/addComment")
+    public Long addComment(@RequestBody SnsCommentRequset snsCommentRequest, @PathVariable Long snsId) {
+
+        SnsPost snsPost = snsService.findOne(snsId);
+
+        SnsComment snsComment = SnsComment.builder()
+        .post(snsPost).snsComment(snsCommentRequest.getSnsComment()).build();
+        
+        return snsService.saveComment(snsComment);
+    }
+
+    @GetMapping("/sns/{snsId}/comment")
+    public List<SnsCommentResponse> findAllComment(){
+
+        List<SnsCommentResponse> snsCommentResponsesList = new ArrayList<>();
+        List<SnsComment> snsCommentsList = snsService.findAllComment();
+
+        for(SnsComment snsComment : snsCommentsList) {
+            SnsCommentResponse snsCommentResponse = createSnsCommentResponse(snsComment);
+            snsCommentResponsesList.add(snsCommentResponse);
+        }
+        return snsCommentResponsesList;
+    }
+
+    private SnsCommentResponse createSnsCommentResponse(SnsComment snsComment) {
+        SnsCommentResponse snsCommentResponse = SnsCommentResponse.builder()
+        .snsComment(snsComment.getSnsComment())
+        .build();
+
+        return snsCommentResponse;
+    }
+}
 
     @PostMapping("/sns/{snsId}/addComment")
     public Long addComment(@RequestBody SnsCommentRequset snsCommentRequest, @PathVariable Long snsId) {

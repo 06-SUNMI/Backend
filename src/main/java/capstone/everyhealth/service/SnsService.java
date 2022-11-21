@@ -102,6 +102,7 @@ public class SnsService {
         return snsCommentRepository.findAll();
     }
 
+
     @Transactional
     public void deletePost(Long snsId) {
         snsRepository.deleteById(snsId);
@@ -111,4 +112,5 @@ public class SnsService {
     public void deleteMember(Long memberId) {
         memberRepository.deleteById(memberId);
     }
+
 }
