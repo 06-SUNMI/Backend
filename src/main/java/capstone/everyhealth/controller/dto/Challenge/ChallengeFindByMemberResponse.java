@@ -1,5 +1,6 @@
 package capstone.everyhealth.controller.dto.Challenge;
 
+import capstone.everyhealth.domain.enums.ChallengeStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,4 +20,5 @@ public class ChallengeFindByMemberResponse {
     private int participationNum;
     private int numPerWeek;
     private int progressRate;
+    private ChallengeStatus challengeParticipantStatus;
 }

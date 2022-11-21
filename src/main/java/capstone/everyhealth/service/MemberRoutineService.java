@@ -81,20 +81,24 @@ public class MemberRoutineService {
     @Transactional
     public Long deleteWorkout(Long routineId, Long routineContentId) {
 
-        MemberRoutine savedMemberRoutine = routineRepository.findById(routineId).get();
+        log.info("routineId = {}", routineId);
+        log.info("routineContentId = {}", routineContentId);
 
-        if (validateIsRoutineFromChallenge(savedMemberRoutine)) {
+        MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
+        log.info("memberRoutine ID = {}", memberRoutine.getId());
+
+        if (validateIsRoutineFromChallenge(memberRoutine)) {
             return -1L;
         }
 
-        MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
-
         for (MemberRoutineContent memberRoutineContent : memberRoutine.getMemberRoutineContentList()) {
-
-            if (memberRoutineContent.getId() == routineContentId) {
-
-                memberRoutineContent.setMemberRoutine(null);
+            log.info("memberRoutineContent.getId() = {}, type = {}", memberRoutineContent.getId(), memberRoutineContent.getId().getClass());
+            log.info("routineContentId = {}, type = {}", routineContentId, routineContentId.getClass());
+            log.info("memberRoutineContent.getId() == routineContentId = {}", memberRoutineContent.getId() == routineContentId);
+            if (memberRoutineContent.getId().equals(routineContentId)) {
+                log.info("routineContentId = {}", routineContentId);
                 memberRoutine.getMemberRoutineContentList().remove(memberRoutineContent);
+                routineContentRepository.delete(memberRoutineContent);
 
                 break;
             }
@@ -136,9 +140,11 @@ public class MemberRoutineService {
     public void updateRoutineContentCheck(Long routineContentId) {
 
         MemberRoutineContent memberRoutineContent = routineContentRepository.findById(routineContentId).get();
+        MemberRoutine memberRoutine = memberRoutineContent.getMemberRoutine();
         boolean currentCheckStatus = memberRoutineContent.isMemberRoutineIsChecked();
 
         memberRoutineContent.setMemberRoutineIsChecked(!currentCheckStatus);
+        memberRoutine.calculateAndSetProgressRate();
     }
 
     private boolean validateIsRoutineFromChallenge(MemberRoutine memberRoutine) {
@@ -151,6 +157,5 @@ public class MemberRoutineService {
         memberRoutineContent.setMemberRoutineWorkoutTime(memberRoutineWorkoutContent.getMemberRoutineWorkoutTime());
         memberRoutineContent.setMemberRoutineWorkoutWeight(memberRoutineWorkoutContent.getMemberRoutineWorkoutWeight());
         memberRoutineContent.setWorkout(workout);
-        memberRoutineContent.setMemberRoutineIsChecked(false);
     }
 }

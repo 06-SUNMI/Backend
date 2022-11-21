@@ -101,4 +101,16 @@ public class SnsService {
     public List<SnsComment> findAllComment() {
         return snsCommentRepository.findAll();
     }
+
+
+    @Transactional
+    public void deletePost(Long snsId) {
+        snsRepository.deleteById(snsId);
+    }
+
+    @Transactional
+    public void deleteMember(Long memberId) {
+        memberRepository.deleteById(memberId);
+    }
+
 }

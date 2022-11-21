@@ -82,9 +82,10 @@ public class ChallengeService {
         Member member = memberRepository.findById(memberId).get();
         Challenge challenge = challengeRepository.findById(challengeId).get();
         ChallengeParticipant challengeParticipant = challengeParticipantRepository.findByChallengeAndMember(challenge, member);
+        int validationResult = validateChallengeParticipation(challengeRoutineProgressDateList, challenge, challengeParticipant);
 
-        if (validateChallengeParticipation(challengeRoutineProgressDateList, challenge, challengeParticipant) < 0) {
-            return validateChallengeParticipation(challengeRoutineProgressDateList, challenge, challengeParticipant);
+        if (validationResult < 0) {
+            return validationResult;
         }
 
         for (ChallengeRoutine challengeRoutine : challenge.getChallengeRoutineList()) {
@@ -113,9 +114,13 @@ public class ChallengeService {
         return 1;
     }
 
-    public Map<Challenge, Integer> findChallengeAndCompletedRoutinesNumMapByMemberId(Long memberId) {
+    public List<ChallengeParticipant> findChallengeParticipantListByMemberId(Long memberId) {
 
         Member member = memberRepository.findById(memberId).get();
+        List<ChallengeParticipant> challengeParticipantList = challengeParticipantRepository.findByMember(member);
+
+        return challengeParticipantList;
+        /*Member member = memberRepository.findById(memberId).get();
         List<ChallengeParticipant> challengeParticipantList = challengeParticipantRepository.findByMember(member);
         Map<Challenge, Integer> challengeAndCompletedRoutinesNumMap = new LinkedHashMap<>();
 
@@ -125,7 +130,7 @@ public class ChallengeService {
             challengeAndCompletedRoutinesNumMap.put(challenge, challengeParticipant.getCompletedRoutinesNum());
         }
 
-        return challengeAndCompletedRoutinesNumMap;
+        return challengeAndCompletedRoutinesNumMap;*/
     }
 
     @Transactional
@@ -135,8 +140,10 @@ public class ChallengeService {
         MemberRoutine memberRoutine = memberRoutineRepository.findById(memberRoutineId).get();
         Member member = memberRoutine.getMember();
 
-        if (validateChallengeAuthPost(member, challengeRoutine, memberRoutine) < 0) {
-            return validateChallengeAuthPost(member, challengeRoutine, memberRoutine);
+        Long validationResult = validateChallengeAuthPost(member, challengeRoutine, memberRoutine, challengeAuthPostPhoto);
+
+        if (validationResult.intValue() < 0) {
+            return validationResult;
         }
 
         String challengeAuthPhotoUrl = fileUploadService.uploadImage(challengeAuthPostPhoto);
@@ -153,20 +160,33 @@ public class ChallengeService {
     public List<ChallengeAuthPost> findAllChallengeAuthPost(Long challengeId) {
 
         Challenge challenge = challengeRepository.findById(challengeId).get();
-        List<Long> challengeRoutineIdList = new ArrayList<>();
+        List<ChallengeAuthPost> totalChallengeAuthPostList = challengeAuthPostRepository.findAll();
+        List<ChallengeAuthPost> returnChallengeAuthPostList = new ArrayList<>();
 
-        for (ChallengeRoutine challengeRoutine : challenge.getChallengeRoutineList()) {
-            challengeRoutineIdList.add(challengeRoutine.getId());
+        for (ChallengeAuthPost challengeAuthPost : totalChallengeAuthPostList) {
+
+            if (challengeAuthPost.getChallengeRoutine().getChallenge() == challenge) {
+                returnChallengeAuthPostList.add(challengeAuthPost);
+            }
         }
 
-        return challengeAuthPostRepository.findAllById(challengeRoutineIdList);
+        return returnChallengeAuthPostList;
+    }
+
+    private boolean validateAuthDate(String routineRegisterdate) {
+        return LocalDate.parse(routineRegisterdate, DateTimeFormatter.ISO_DATE).isEqual(LocalDate.now());
     }
 
     public List<ChallengeParticipant> findChallengeParticipantListByChallenge(Challenge challenge) {
         return challengeParticipantRepository.findByChallenge(challenge);
     }
 
-    private Long validateChallengeAuthPost(Member member, ChallengeRoutine challengeRoutine, MemberRoutine memberRoutine) {
+    private Long validateChallengeAuthPost(Member member, ChallengeRoutine challengeRoutine, MemberRoutine memberRoutine, MultipartFile challengeAuthPostPhoto) {
+
+        if (!validateIsAllRoutineContentsProgressed(memberRoutine)){
+            return -3L;
+        }
+
         if (!validateIsDuplicateParticipation(member, challengeRoutine)) {
             return -2L;
         }
@@ -176,6 +196,15 @@ public class ChallengeService {
         }
 
         return 1L;
+    }
+
+    private boolean validateIsRenderedFileExist(MultipartFile challengeAuthPostPhoto) {
+        return challengeAuthPostPhoto != null;
+    }
+
+    private boolean validateIsAllRoutineContentsProgressed(MemberRoutine memberRoutine) {
+        log.info("memberRoutine.getProgressRate() = {}",memberRoutine.getProgressRate());
+        return memberRoutine.getProgressRate() == 100;
     }
 
     private boolean validateIsDuplicateParticipation(Member member, ChallengeRoutine challengeRoutine) {
@@ -188,11 +217,9 @@ public class ChallengeService {
         if (challengeParticipant != null) {
             return -3;
         }
-
         if (!validateChallengeRoutineProgressDateNum(challenge, challengeRoutineProgressDateList)) {
             return -1;
         }
-
         if (!validateChallengeRoutineProgressDateRange(challenge, challengeRoutineProgressDateList)) {
             return -2;
         }
@@ -200,6 +227,10 @@ public class ChallengeService {
     }
 
     private boolean validateChallengeRoutineProgressDateNum(Challenge challenge, List<String> challengeRoutineProgressDateList) {
+
+        log.info("challenge.getChallengeRoutineList().size() = {}", challenge.getChallengeRoutineList().size());
+        log.info("challengeRoutineProgressDateList.size() = {}", challengeRoutineProgressDateList.size());
+
         return challenge.getChallengeRoutineList().size() == challengeRoutineProgressDateList.size();
     }
 

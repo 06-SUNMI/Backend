@@ -19,10 +19,10 @@ public class ChallengePostOrUpdateRequest {
     @ApiModelProperty(value = "챌린지 이름", example = "OO 챌린지")
     private String challengeName;
 
-    @ApiModelProperty(value = "챌린지 시작일", example = "2022-11-06")
+    @ApiModelProperty(value = "챌린지 시작일", example = "2022-11-13")
     private String challengeStartDate;
 
-    @ApiModelProperty(value = "챌린지 종료일", example = "2022-11-19")
+    @ApiModelProperty(value = "챌린지 종료일", example = "2022-11-26")
     private String challengeEndDate;
 
     @ApiModelProperty(value = "챌린지 참가비", example = "30000")
