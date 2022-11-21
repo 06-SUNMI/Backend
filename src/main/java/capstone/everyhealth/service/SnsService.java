@@ -2,15 +2,19 @@ package capstone.everyhealth.service;
 
 import java.util.List;
 
+import javax.xml.stream.events.Comment;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import capstone.everyhealth.controller.dto.Sns.SnsUpdateRequest;
+import capstone.everyhealth.domain.sns.SnsComment;
 import capstone.everyhealth.domain.sns.SnsFollowing;
 import capstone.everyhealth.domain.sns.SnsPost;
 import capstone.everyhealth.domain.stakeholder.Member;
 import capstone.everyhealth.repository.MemberRepository;
+import capstone.everyhealth.repository.SnsCommentRepository;
 import capstone.everyhealth.repository.SnsFollowRepository;
 import capstone.everyhealth.repository.SnsRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +29,7 @@ public class SnsService {
 
     private final MemberRepository memberRepository;
     private final SnsRepository snsRepository;
+    private final SnsCommentRepository snsCommentRepository;
 
     public List<Member> findByName(String userName) {
         return memberRepository.findAllByName(userName);
@@ -86,5 +91,14 @@ public class SnsService {
         SnsPost snsPost = snsRepository.findById(snsId).get();
         snsPost.setLikes(snsPost.getLikes() - 1);
         return snsPost.getLikes();
+    }
+
+    @Transactional
+    public Long saveComment(SnsComment snsComment) {
+        return snsCommentRepository.save(snsComment).getId();
+    }
+
+    public List<SnsComment> findAllComment() {
+        return snsCommentRepository.findAll();
     }
 }
