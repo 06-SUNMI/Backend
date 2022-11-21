@@ -130,7 +130,6 @@ public class SnsController {
         return snsService.cancelLike(snsId);
     }
 
-    ///////여기부터 댓글작성 만들기
     @PostMapping("/sns/{snsId}/addComment")
     public Long addComment(@RequestBody SnsCommentRequset snsCommentRequest, @PathVariable Long snsId) {
 
