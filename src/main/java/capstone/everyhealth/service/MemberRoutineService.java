@@ -41,7 +41,10 @@ public class MemberRoutineService {
     }
 
     public MemberRoutine findRoutineByRoutineId(Long routineId) {
-        return routineRepository.findById(routineId).get();
+
+        MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
+
+        return memberRoutine;
     }
 
     /*@Transactional
@@ -59,6 +62,11 @@ public class MemberRoutineService {
     @Transactional
     public Long addWorkout(Long routineId, MemberRoutineContent memberRoutineContent) {
 
+        MemberRoutine savedMemberRoutine = routineRepository.findById(routineId).get();
+        if (validateIsRoutineFromChallenge(savedMemberRoutine)) {
+            return -1L;
+        }
+
         MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
 
         memberRoutine.getMemberRoutineContentList().add(memberRoutineContent);
@@ -66,49 +74,81 @@ public class MemberRoutineService {
 
         Long memberRoutineContentId = routineContentRepository.save(memberRoutineContent).getId();
 
-        return memberRoutineContentId;
+        //return memberRoutineContentId;
+        return 1L;
     }
 
     @Transactional
-    public void deleteWorkout(Long routineId, Long routineContentId) {
+    public Long deleteWorkout(Long routineId, Long routineContentId) {
+
+        log.info("routineId = {}", routineId);
+        log.info("routineContentId = {}", routineContentId);
 
         MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
+        log.info("memberRoutine ID = {}", memberRoutine.getId());
+
+        if (validateIsRoutineFromChallenge(memberRoutine)) {
+            return -1L;
+        }
 
         for (MemberRoutineContent memberRoutineContent : memberRoutine.getMemberRoutineContentList()) {
-
-            if (memberRoutineContent.getId() == routineContentId) {
-
-                memberRoutineContent.setMemberRoutine(null);
+            log.info("memberRoutineContent.getId() = {}, type = {}", memberRoutineContent.getId(), memberRoutineContent.getId().getClass());
+            log.info("routineContentId = {}, type = {}", routineContentId, routineContentId.getClass());
+            log.info("memberRoutineContent.getId() == routineContentId = {}", memberRoutineContent.getId() == routineContentId);
+            if (memberRoutineContent.getId().equals(routineContentId)) {
+                log.info("routineContentId = {}", routineContentId);
                 memberRoutine.getMemberRoutineContentList().remove(memberRoutineContent);
+                routineContentRepository.delete(memberRoutineContent);
 
                 break;
             }
         }
+        return 1L;
     }
 
     @Transactional
-    public void updateWorkout(Long routineId, Long routineContentId, MemberRoutineWorkoutContent memberRoutineWorkoutContent) {
+    public Long updateWorkout(Long routineContentId, MemberRoutineWorkoutContent memberRoutineWorkoutContent) {
 
-        MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
+        MemberRoutine memberRoutine = routineContentRepository.findById(routineContentId).get().getMemberRoutine();
 
-        for (MemberRoutineContent memberRoutineContent : memberRoutine.getMemberRoutineContentList()) {
-
-            if (memberRoutineContent.getId() == routineContentId) {
-
-                Workout workout = workoutRepository.findByWorkoutName(memberRoutineWorkoutContent.getMemberRoutineWorkoutName());
-                updateWorkoutContent(memberRoutineWorkoutContent, memberRoutineContent, workout);
-
-                break;
-            }
+        if (validateIsRoutineFromChallenge(memberRoutine)) {
+            return -1L;
         }
+
+        MemberRoutineContent memberRoutineContent = routineContentRepository.findById(routineContentId).get();
+
+        Workout workout = workoutRepository.findByWorkoutName(memberRoutineWorkoutContent.getMemberRoutineWorkoutName());
+        updateWorkoutContent(memberRoutineWorkoutContent, memberRoutineContent, workout);
+
+        return 1L;
     }
 
     @Transactional
-    public void deleteRoutine(Long routineId) {
+    public Long deleteRoutine(Long routineId) {
 
         MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
+
+        if (validateIsRoutineFromChallenge(memberRoutine)) {
+            return -1L;
+        }
 
         routineRepository.deleteById(routineId);
+        return 1L;
+    }
+
+    @Transactional
+    public void updateRoutineContentCheck(Long routineContentId) {
+
+        MemberRoutineContent memberRoutineContent = routineContentRepository.findById(routineContentId).get();
+        MemberRoutine memberRoutine = memberRoutineContent.getMemberRoutine();
+        boolean currentCheckStatus = memberRoutineContent.isMemberRoutineIsChecked();
+
+        memberRoutineContent.setMemberRoutineIsChecked(!currentCheckStatus);
+        memberRoutine.calculateAndSetProgressRate();
+    }
+
+    private boolean validateIsRoutineFromChallenge(MemberRoutine memberRoutine) {
+        return memberRoutine.getChallengeRoutine() != null;
     }
 
     private void updateWorkoutContent(MemberRoutineWorkoutContent memberRoutineWorkoutContent, MemberRoutineContent memberRoutineContent, Workout workout) {

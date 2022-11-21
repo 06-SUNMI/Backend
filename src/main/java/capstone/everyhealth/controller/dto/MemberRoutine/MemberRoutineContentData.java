@@ -15,6 +15,8 @@ public class MemberRoutineContentData {
 
     @ApiModelProperty(value = "등록 운동 id 값",example = "1")
     private Long memberRoutineContentId;
+    @ApiModelProperty(value = "챌린지 루틴 id 값",example = "1")
+    private Long challengeRoutineContentId;
     @ApiModelProperty(value = "운동 이름",example = "PUSH_UP")
     private WorkoutName memberRoutineWorkoutName;
     @ApiModelProperty(value = "운동 중량",example = "50")
@@ -25,4 +27,6 @@ public class MemberRoutineContentData {
     private Integer memberRoutineWorkoutSet;
     @ApiModelProperty(value = "운동 시간(분으로? 초로? 정하기)",example = "100")
     private Integer memberRoutineWorkoutTime;
+    @ApiModelProperty(value = "운동 수행 여부(체크 여부)",example = "false")
+    private boolean memberRoutineIsChecked;
 }

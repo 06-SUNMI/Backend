@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -86,7 +85,9 @@ public class MemberRoutineController {
 
     @ApiOperation(
             value = "루틴 운동 추가하기",
-            notes = "사용자가 등록한 특정 루틴에서 루틴 상세 내용(운동명, 운동 시간 등...)을 추가한다."
+            notes = "사용자가 등록한 특정 루틴에서 루틴 상세 내용(운동명, 운동 시간 등...)을 추가한다.\n"
+                    +"성공 시 1 반환\n"
+                    +"챌린지 루틴일 시 -1 반환 (추가 불가)"
     )
     @ResponseBody
     @PostMapping("/routines/{routineId}/routine-content")
@@ -101,38 +102,53 @@ public class MemberRoutineController {
 
     @ApiOperation(
             value = "루틴 운동 삭제하기",
-            notes = "사용자가 등록한 특정 루틴에서 루틴 상세 내용(운동명, 운동 시간 등...)을 삭제한다."
+            notes = "사용자가 등록한 특정 루틴에서 루틴 상세 내용(운동명, 운동 시간 등...)을 삭제한다.\n\n"
+            +"성공 시 삭제한 루틴 id 값 반환\n"
+            +"챌린지 루틴일 시 -1 반환 (삭제 불가)"
     )
     @ResponseBody
     @DeleteMapping("/routines/{routineId}/routine-content/{routineContentId}")
-    public void deleteRoutineWorkout(@ApiParam(value = "루틴 id 값", example = "1") @PathVariable Long routineId,
+    public Long deleteRoutineWorkout(@ApiParam(value = "루틴 id 값", example = "1") @PathVariable Long routineId,
                                      @ApiParam(value = "삭제 할 운동 내용 id(상세 조회 쪽의 반환 값 중memberRoutineContentId)", example = "1") @PathVariable Long routineContentId) {
-        routineService.deleteWorkout(routineId, routineContentId);
+        return routineService.deleteWorkout(routineId, routineContentId);
     }
 
     @ApiOperation(
             value = "루틴 운동 내용 수정하기",
             notes = "사용자가 등록한 특정 루틴에서 루틴 상세 내용(운동명, 운동 시간 등...)을 수정한다."
+                    +"성공 시 1 반환\n"
+                    +"챌린지 루틴일 시 -1 반환 (수정 불가)"
     )
     @ResponseBody
     @PutMapping("/routines/{routineId}/routine-content/{routineContentId}")
-    public void updateRoutineWorkout(@ApiParam(value = "루틴 id 값", example = "1") @PathVariable Long routineId,
-                                     @ApiParam(value = "수정 할 운동 내용 id(상세 조회 쪽의 반환 값 중 memberRoutineContentId)", example = "1") @PathVariable Long routineContentId,
+    public Long updateRoutineWorkout(@ApiParam(value = "수정 할 운동 내용 id(상세 조회 쪽의 반환 값 중 memberRoutineContentId)", example = "1") @PathVariable Long routineContentId,
                                      @ApiParam(value = "수정 할 운동 내용") @RequestBody MemberRoutineWorkoutContent memberRoutineWorkoutContent) {
 
-        routineService.updateWorkout(routineId, routineContentId, memberRoutineWorkoutContent);
+        return routineService.updateWorkout(routineContentId, memberRoutineWorkoutContent);
     }
 
 
     @ApiOperation(
             value = "루틴 삭제하기",
             notes = "사용자가 등록한 특정 루틴을 삭제한다."
+                    +"성공 시 1 반환\n"
+                    +"챌린지 루틴일 시 -1 반환 (삭제 불가)"
     )
     @ResponseBody
     @DeleteMapping("/routines/{routineId}")
-    public void delete(@ApiParam(value = "루틴의 id값", example = "1") @PathVariable Long routineId) {
+    public Long delete(@ApiParam(value = "루틴의 id값", example = "1") @PathVariable Long routineId) {
 
-        routineService.deleteRoutine(routineId);
+        return routineService.deleteRoutine(routineId);
+    }
+
+    @ApiOperation(
+            value = "루틴에 등록한 운동들 체크 / 체크 해제하기",
+            notes = "사용자가 등록한 특정 루틴에서 운동 수행 여부를 체크 및 체크 해제를 한다. (한번 체크할 때 마다 반영됨)\n"
+    )
+    @ResponseBody
+    @PutMapping("/routines/routine-contents/{routineContentId}/check")
+    public void updateRoutineContentCheck(@ApiParam(value = "루틴 운동 내용 id 값",example = "1") @PathVariable Long routineContentId){
+        routineService.updateRoutineContentCheck(routineContentId);
     }
 
     public MemberRoutine createMemberRoutine(Long memberId, MemberRoutineRegisterRequest memberRoutineRegisterRequest) {

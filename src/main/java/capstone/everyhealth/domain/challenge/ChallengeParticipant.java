@@ -1,5 +1,6 @@
 package capstone.everyhealth.domain.challenge;
 
+import capstone.everyhealth.domain.enums.ChallengeStatus;
 import lombok.*;
 import capstone.everyhealth.domain.stakeholder.Member;
 
@@ -7,6 +8,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,4 +25,10 @@ public class ChallengeParticipant {
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @Builder.Default
+    private int completedRoutinesNum = 0;
+
+    @Enumerated(EnumType.STRING)
+    private ChallengeStatus challengeStatus;
 }

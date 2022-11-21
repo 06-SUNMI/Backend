@@ -35,8 +35,9 @@ public class MemberRoutineFindAllResponse {
 
             Long routineId = memberRoutine.getId();
             String routineRegisterDate = memberRoutine.getRoutineRegisterdate();
-            MemberRoutineData memberRoutineData = new MemberRoutineData(routineId, routineRegisterDate);
+            int progressRate = memberRoutine.getProgressRate();
 
+            MemberRoutineData memberRoutineData = new MemberRoutineData(routineId, routineRegisterDate, progressRate);
             memberRoutineDataList.add(memberRoutineData);
         }
     }
@@ -47,5 +48,6 @@ public class MemberRoutineFindAllResponse {
 
         private Long routineId;
         private String routineRegisterData;
+        private int progressRate;
     }
 }

@@ -1,5 +1,7 @@
 package capstone.everyhealth.domain.routine;
 
+import capstone.everyhealth.domain.challenge.ChallengeRoutine;
+import capstone.everyhealth.domain.challenge.ChallengeRoutineContent;
 import lombok.*;
 
 import javax.persistence.*;
@@ -22,6 +24,11 @@ public class MemberRoutineContent {
     private MemberRoutine memberRoutine;
 
     @OneToOne
+    @JoinColumn(name = "challenge_routine_content_id")
+    private ChallengeRoutineContent challengeRoutineContent;
+
+
+    @OneToOne
     @JoinColumn(name = "workout_id")
     private Workout workout;
 
@@ -29,7 +36,8 @@ public class MemberRoutineContent {
     private Integer memberRoutineWorkoutCount;
     private Integer memberRoutineWorkoutSet;
     private Integer memberRoutineWorkoutTime;
-    private boolean memberRoutineIsChecked;
+    @Builder.Default
+    private boolean memberRoutineIsChecked = false;
 
     public void changeMemberRoutine(MemberRoutine memberRoutine) {
         this.memberRoutine = memberRoutine;
