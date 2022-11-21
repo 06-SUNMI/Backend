@@ -3,6 +3,8 @@ package capstone.everyhealth.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import capstone.everyhealth.controller.dto.Sns.SnsCommentRequset;
+import capstone.everyhealth.controller.dto.Sns.SnsCommentResponse;
 import capstone.everyhealth.controller.dto.Sns.SnsFindResponse;
 import capstone.everyhealth.controller.dto.Sns.SnsUpdateRequest;
 
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import capstone.everyhealth.controller.dto.Sns.SnsPostRequest;
+import capstone.everyhealth.domain.sns.SnsComment;
 import capstone.everyhealth.domain.sns.SnsPost;
 import capstone.everyhealth.domain.stakeholder.Member;
 import capstone.everyhealth.repository.SnsRepository;
@@ -126,6 +129,38 @@ public class SnsController {
     public int cancelLike(@PathVariable Long snsId){
         return snsService.cancelLike(snsId);
     }
-    
+
+    ///////여기부터 댓글작성 만들기
+    @PostMapping("/sns/{snsId}/addComment")
+    public Long addComment(@RequestBody SnsCommentRequset snsCommentRequest, @PathVariable Long snsId) {
+
+        SnsPost snsPost = snsService.findOne(snsId);
+
+        SnsComment snsComment = SnsComment.builder()
+        .post(snsPost).snsComment(snsCommentRequest.getSnsComment()).build();
+        
+        return snsService.saveComment(snsComment);
+    }
+
+    @GetMapping("/sns/{snsId}/comment")
+    public List<SnsCommentResponse> findAllComment(){
+
+        List<SnsCommentResponse> snsCommentResponsesList = new ArrayList<>();
+        List<SnsComment> snsCommentsList = snsService.findAllComment();
+
+        for(SnsComment snsComment : snsCommentsList) {
+            SnsCommentResponse snsCommentResponse = createSnsCommentResponse(snsComment);
+            snsCommentResponsesList.add(snsCommentResponse);
+        }
+        return snsCommentResponsesList;
+    }
+
+    private SnsCommentResponse createSnsCommentResponse(SnsComment snsComment) {
+        SnsCommentResponse snsCommentResponse = SnsCommentResponse.builder()
+        .snsComment(snsComment.getSnsComment())
+        .build();
+
+        return snsCommentResponse;
+    }
 }
 
