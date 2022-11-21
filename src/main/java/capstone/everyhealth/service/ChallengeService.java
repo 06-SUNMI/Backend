@@ -257,7 +257,7 @@ public class ChallengeService {
             }
             count++;
 
-            if ((count >= 2)) {
+            if ((count >= challenge.getNumPerWeek())) {
                 startDate = startDate.plusDays(7);
                 count = 0;
             }

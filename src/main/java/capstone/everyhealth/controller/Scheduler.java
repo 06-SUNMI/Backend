@@ -26,10 +26,15 @@ public class Scheduler {
     private final ChallengeService challengeService;
 
     @PostConstruct
-    @Scheduled(cron = "0 0 0 * * 1")
+    @Scheduled(cron = "5 0/10 * * * *")
     public void run() {
 
         for (Challenge challenge : challengeService.findAll()) {
+
+            // 종료된 챌린지는 검사 X
+            if (challenge.isFinished() == false) {
+                continue;
+            }
 
             LocalDate challengeStartDate = LocalDate.parse(challenge.getStartDate(), DateTimeFormatter.ISO_DATE);
             LocalDate challengeEndDate = LocalDate.parse(challenge.getEndDate(), DateTimeFormatter.ISO_DATE);
@@ -38,6 +43,7 @@ public class Scheduler {
             int challengeTotalWeek = (Period.between(challengeStartDate, challengeEndDate).getDays() + 1) / 7;
             int challengeTotalRoutinesNum = challengeTotalWeek * challenge.getNumPerWeek();
 
+            // 오늘이 챌린지 종료일이 아니면 검사 X
             if (!(LocalDate.now().isEqual(challengeEndDate))) {
                 break;
             }
@@ -46,7 +52,7 @@ public class Scheduler {
 
                 if (challengeParticipant.getCompletedRoutinesNum() == challengeTotalRoutinesNum) {
                     challengeParticipant.setChallengeStatus(ChallengeStatus.SUCCESS);
-                }else{
+                } else {
                     challengeParticipant.setChallengeStatus(ChallengeStatus.FAIL);
                 }
             }
