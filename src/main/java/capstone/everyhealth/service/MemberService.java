@@ -1,12 +1,14 @@
 package capstone.everyhealth.service;
 
 import capstone.everyhealth.domain.stakeholder.Member;
+import capstone.everyhealth.exception.stakeholder.MemberNotFound;
 import capstone.everyhealth.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -14,6 +16,7 @@ import java.util.List;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+
     @Transactional
     public Long saveMember(Member member) {
         return memberRepository.save(member).getId();
@@ -23,8 +26,8 @@ public class MemberService {
         return memberRepository.findAll();
     }
 
-    public Member findMemberById(Long member_id) {
-        return memberRepository.findById(member_id).get();
+    public Member findMemberById(Long memberId) throws MemberNotFound {
+        return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
     }
 
     @Transactional

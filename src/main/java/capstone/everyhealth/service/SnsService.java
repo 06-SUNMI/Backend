@@ -2,6 +2,7 @@ package capstone.everyhealth.service;
 
 import java.util.List;
 
+import capstone.everyhealth.exception.stakeholder.MemberNotFound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,7 +61,7 @@ public class SnsService {
     MemberService memberService;
 
     @Transactional
-    public Long follow(Long followedMemberId, Long followingMemberId) { // 저장
+    public Long follow(Long followedMemberId, Long followingMemberId) throws MemberNotFound { // 저장
         SnsFollowing snsFollowing = new SnsFollowing(); // 객체생성
         snsFollowing.setFollowedMember(memberService.findMemberById(followedMemberId));
         snsFollowing.setFollowingMember(memberService.findMemberById(followingMemberId)); // 필드에 값채우기
@@ -68,7 +69,7 @@ public class SnsService {
     }
 
     @Transactional
-    public void unFollow(Long followedMemberId, Long followingMemberId) {
+    public void unFollow(Long followedMemberId, Long followingMemberId) throws MemberNotFound {
         Member followedMember = memberService.findMemberById(followedMemberId);
         Member followingMember = memberService.findMemberById(followingMemberId);
         snsFollowRepository.deleteByFollowedMemberAndFollowingMember(followedMember, followingMember);

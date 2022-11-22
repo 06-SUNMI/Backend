@@ -6,6 +6,7 @@ import java.util.List;
 import capstone.everyhealth.controller.dto.Sns.SnsFindResponse;
 import capstone.everyhealth.controller.dto.Sns.SnsUpdateRequest;
 
+import capstone.everyhealth.exception.stakeholder.MemberNotFound;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,7 +42,7 @@ public class SnsController {
 
     @PostMapping("/sns/{userId}")
 
-    public Long save(@RequestBody SnsPostRequest snsPostRequest, @PathVariable Long userId) {
+    public Long save(@RequestBody SnsPostRequest snsPostRequest, @PathVariable Long userId) throws MemberNotFound {
 
         Member member = memberService.findMemberById(userId);
 
@@ -102,14 +103,14 @@ public class SnsController {
     }
 
     @PostMapping("/sns/follow/{followingMemberId}/{followedMemberId}")
-    public Long follow(@PathVariable Long followingMemberId, @PathVariable Long followedMemberId) {
+    public Long follow(@PathVariable Long followingMemberId, @PathVariable Long followedMemberId) throws MemberNotFound {
 
         return snsService.follow(followedMemberId, followingMemberId);
 
     }
 
     @DeleteMapping("/sns/follow/{followingMemberId}/{followedMemberId}")
-    public void unFollow(@PathVariable Long followingMemberId, @PathVariable Long followedMemberId) {
+    public void unFollow(@PathVariable Long followingMemberId, @PathVariable Long followedMemberId) throws MemberNotFound {
 
         snsService.unFollow(followedMemberId, followingMemberId);
 
@@ -120,12 +121,12 @@ public class SnsController {
 
        return snsService.addLike(snsId);
 
-    } 
+    }
 
     @PutMapping("/sns/{snsId}/cancelLike")
     public int cancelLike(@PathVariable Long snsId){
         return snsService.cancelLike(snsId);
     }
-    
+
 }
 

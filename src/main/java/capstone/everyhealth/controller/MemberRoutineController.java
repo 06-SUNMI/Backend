@@ -2,6 +2,11 @@ package capstone.everyhealth.controller;
 
 import capstone.everyhealth.controller.dto.MemberRoutine.*;
 import capstone.everyhealth.domain.routine.*;
+import capstone.everyhealth.exception.memberroutine.ChallengeRoutineNotEditable;
+import capstone.everyhealth.exception.memberroutine.MemberRoutineContentNotFound;
+import capstone.everyhealth.exception.memberroutine.MemberRoutineNotFound;
+import capstone.everyhealth.exception.memberroutine.WorkoutNotFound;
+import capstone.everyhealth.exception.stakeholder.MemberNotFound;
 import capstone.everyhealth.service.MemberRoutineService;
 import capstone.everyhealth.service.MemberService;
 import capstone.everyhealth.service.WorkoutService;
@@ -31,7 +36,7 @@ public class MemberRoutineController {
                     + "저장된 루틴의 id 값을 반환하여 이를 통해 해당 루틴의 상세 정보를 확인할 수 있다.\n"
     )
     @PostMapping("/members/{memberId}/routines")
-    public Long registerMemberRoutine(@ApiParam(value = "사용자의 id값", example = "1") @PathVariable Long memberId, @ApiParam(value = "루틴에 추가한 운동 정보 목록과 등록 날짜") @RequestBody MemberRoutineRegisterRequest memberRoutineRegisterRequest) {
+    public Long registerMemberRoutine(@ApiParam(value = "사용자의 id값", example = "1") @PathVariable Long memberId, @ApiParam(value = "루틴에 추가한 운동 정보 목록과 등록 날짜") @RequestBody MemberRoutineRegisterRequest memberRoutineRegisterRequest) throws MemberNotFound, WorkoutNotFound {
 
         MemberRoutine memberRoutine = createMemberRoutine(memberId, memberRoutineRegisterRequest);
         createMemberRoutineContentList(memberRoutineRegisterRequest, memberRoutine);
@@ -48,7 +53,7 @@ public class MemberRoutineController {
     )
     @ResponseBody
     @GetMapping("/members/{memberId}/routines")
-    public MemberRoutineFindAllResponse findAllRoutines(@ApiParam(/*name = "member_id",*/ value = "사용자의 id값", example = "1") @PathVariable Long memberId) {
+    public MemberRoutineFindAllResponse findAllRoutines(@ApiParam(/*name = "member_id",*/ value = "사용자의 id값", example = "1") @PathVariable Long memberId) throws MemberNotFound {
 
         List<MemberRoutine> memberRoutineList = routineService.findAllRoutines(memberId);
 
@@ -61,7 +66,7 @@ public class MemberRoutineController {
     )
     @ResponseBody
     @GetMapping("/routines/{routineId}")
-    public MemberRoutineFindByRoutineId findRoutineByRoutineId(@ApiParam(value = "루틴의 id값", example = "1") @PathVariable Long routineId) {
+    public MemberRoutineFindByRoutineId findRoutineByRoutineId(@ApiParam(value = "루틴의 id값", example = "1") @PathVariable Long routineId) throws MemberRoutineNotFound {
 
         MemberRoutine memberRoutine = routineService.findRoutineByRoutineId(routineId);
         MemberRoutineFindByRoutineId memberRoutineFindByRoutineId = new MemberRoutineFindByRoutineId(memberRoutine);
@@ -92,7 +97,7 @@ public class MemberRoutineController {
     @ResponseBody
     @PostMapping("/routines/{routineId}/routine-content")
     public Long addRoutineWorkout(@ApiParam(value = "루틴 id 값", example = "1") @PathVariable Long routineId,
-                                  @ApiParam(value = "추가 할 운동 내용") @RequestBody MemberRoutineWorkoutContent memberRoutineWorkoutContent) {
+                                  @ApiParam(value = "추가 할 운동 내용") @RequestBody MemberRoutineWorkoutContent memberRoutineWorkoutContent) throws MemberRoutineNotFound, ChallengeRoutineNotEditable, WorkoutNotFound {
 
         Workout workout = workoutService.findByWorkoutName(memberRoutineWorkoutContent.getMemberRoutineWorkoutName());
         MemberRoutineContent memberRoutineContent = createMemberRoutineContent(memberRoutineWorkoutContent, workout);
@@ -109,7 +114,7 @@ public class MemberRoutineController {
     @ResponseBody
     @DeleteMapping("/routines/{routineId}/routine-content/{routineContentId}")
     public Long deleteRoutineWorkout(@ApiParam(value = "루틴 id 값", example = "1") @PathVariable Long routineId,
-                                     @ApiParam(value = "삭제 할 운동 내용 id(상세 조회 쪽의 반환 값 중memberRoutineContentId)", example = "1") @PathVariable Long routineContentId) {
+                                     @ApiParam(value = "삭제 할 운동 내용 id(상세 조회 쪽의 반환 값 중memberRoutineContentId)", example = "1") @PathVariable Long routineContentId) throws ChallengeRoutineNotEditable, MemberRoutineNotFound {
         return routineService.deleteWorkout(routineId, routineContentId);
     }
 
@@ -122,7 +127,7 @@ public class MemberRoutineController {
     @ResponseBody
     @PutMapping("/routines/{routineId}/routine-content/{routineContentId}")
     public Long updateRoutineWorkout(@ApiParam(value = "수정 할 운동 내용 id(상세 조회 쪽의 반환 값 중 memberRoutineContentId)", example = "1") @PathVariable Long routineContentId,
-                                     @ApiParam(value = "수정 할 운동 내용") @RequestBody MemberRoutineWorkoutContent memberRoutineWorkoutContent) {
+                                     @ApiParam(value = "수정 할 운동 내용") @RequestBody MemberRoutineWorkoutContent memberRoutineWorkoutContent) throws ChallengeRoutineNotEditable, MemberRoutineContentNotFound, MemberRoutineNotFound {
 
         return routineService.updateWorkout(routineContentId, memberRoutineWorkoutContent);
     }
@@ -136,8 +141,7 @@ public class MemberRoutineController {
     )
     @ResponseBody
     @DeleteMapping("/routines/{routineId}")
-    public Long delete(@ApiParam(value = "루틴의 id값", example = "1") @PathVariable Long routineId) {
-
+    public Long delete(@ApiParam(value = "루틴의 id값", example = "1") @PathVariable Long routineId) throws ChallengeRoutineNotEditable, MemberRoutineNotFound {
         return routineService.deleteRoutine(routineId);
     }
 
@@ -147,11 +151,11 @@ public class MemberRoutineController {
     )
     @ResponseBody
     @PutMapping("/routines/routine-contents/{routineContentId}/check")
-    public void updateRoutineContentCheck(@ApiParam(value = "루틴 운동 내용 id 값",example = "1") @PathVariable Long routineContentId){
+    public void updateRoutineContentCheck(@ApiParam(value = "루틴 운동 내용 id 값",example = "1") @PathVariable Long routineContentId) throws MemberRoutineContentNotFound {
         routineService.updateRoutineContentCheck(routineContentId);
     }
 
-    public MemberRoutine createMemberRoutine(Long memberId, MemberRoutineRegisterRequest memberRoutineRegisterRequest) {
+    public MemberRoutine createMemberRoutine(Long memberId, MemberRoutineRegisterRequest memberRoutineRegisterRequest) throws MemberNotFound {
 
         return MemberRoutine.builder()
                 .member(memberService.findMemberById(memberId))
