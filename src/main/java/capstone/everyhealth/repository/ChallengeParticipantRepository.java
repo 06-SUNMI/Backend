@@ -7,12 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ChallengeParticipantRepository extends JpaRepository<ChallengeParticipant, Long> {
     List<ChallengeParticipant> findByMember(Member member);
 
-    ChallengeParticipant findByChallengeAndMember(Challenge challenge, Member member);
+    Optional<ChallengeParticipant> findByChallengeAndMember(Challenge challenge, Member member);
 
     List<ChallengeParticipant> findByChallenge(Challenge challenge);
 }
