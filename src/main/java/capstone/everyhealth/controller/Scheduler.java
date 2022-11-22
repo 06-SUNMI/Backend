@@ -1,4 +1,4 @@
-package capstone.everyhealth.controller;
+/*package capstone.everyhealth.controller;
 
 import capstone.everyhealth.domain.challenge.Challenge;
 import capstone.everyhealth.domain.challenge.ChallengeParticipant;
@@ -30,12 +30,12 @@ public class Scheduler {
     @Scheduled(cron = "1 0 0 * * 0")
     public void checkChallengeParticipantProgress() throws ChallengeNotFound {
 
-        /*
+        //
 
-            매주 토 ~ 일 넘어가는 자정에 검사
-            매일 검사 안하는 이유 - 1주차 예시서 누구는 월화수 , 누구는 목금토에 할 수 있으므로
+        //    매주 토 ~ 일 넘어가는 자정에 검사
+        //    매일 검사 안하는 이유 - 1주차 예시서 누구는 월화수 , 누구는 목금토에 할 수 있으므로
 
-         */
+        //
 
         for (Challenge challenge : challengeService.findAll()) {
 
@@ -87,3 +87,4 @@ public class Scheduler {
         return challenge.isFinished();
     }
 }
+*/
