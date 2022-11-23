@@ -1,14 +1,14 @@
 package capstone.everyhealth.domain.report;
 
+import capstone.everyhealth.domain.challenge.ChallengeAuthPost;
 import lombok.Getter;
-import capstone.everyhealth.domain.sns.SnsPost;
 import capstone.everyhealth.domain.stakeholder.Member;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
-public class ChallengeReport {
+public class ChallengeAuthPostReport {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -19,8 +19,8 @@ public class ChallengeReport {
     private Member member;
 
     @ManyToOne
-    @JoinColumn(name = "sns_post_id")
-    private SnsPost snsPost;
+    @JoinColumn(name = "challenge_auth_post_id")
+    private ChallengeAuthPost challengeAuthPost;
 
     private String reason;
 }

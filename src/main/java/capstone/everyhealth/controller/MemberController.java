@@ -3,6 +3,7 @@ package capstone.everyhealth.controller;
 import capstone.everyhealth.controller.dto.Stakeholder.MemberCreateRequest;
 import capstone.everyhealth.controller.dto.Stakeholder.MemberFindResponse;
 import capstone.everyhealth.domain.stakeholder.Member;
+import capstone.everyhealth.exception.stakeholder.MemberNotFound;
 import capstone.everyhealth.service.MemberService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Api(tags = {"임시 멤버 데이터 조작을 위한 API"})
-public class StakeholderController {
+public class MemberController {
 
     private final MemberService memberService;
 
@@ -62,7 +63,7 @@ public class StakeholderController {
             notes = "특정 멤버를 조회한다."
     )
     @GetMapping("/members/{memberId}")
-    public MemberFindResponse findMember(@ApiParam(value = "사용자의 id값", example = "1") @PathVariable Long memberId) {
+    public MemberFindResponse findMember(@ApiParam(value = "사용자의 id값", example = "1") @PathVariable Long memberId) throws MemberNotFound {
 
         Member member = memberService.findMemberById(memberId);
         MemberFindResponse memberFindResponse = createMemberFindResponse(member);

@@ -5,6 +5,11 @@ import capstone.everyhealth.domain.routine.MemberRoutine;
 import capstone.everyhealth.domain.routine.MemberRoutineContent;
 import capstone.everyhealth.domain.routine.Workout;
 import capstone.everyhealth.domain.stakeholder.Member;
+import capstone.everyhealth.exception.memberroutine.ChallengeRoutineNotEditable;
+import capstone.everyhealth.exception.memberroutine.MemberRoutineContentNotFound;
+import capstone.everyhealth.exception.memberroutine.MemberRoutineNotFound;
+import capstone.everyhealth.exception.memberroutine.WorkoutNotFound;
+import capstone.everyhealth.exception.stakeholder.MemberNotFound;
 import capstone.everyhealth.repository.MemberRepository;
 import capstone.everyhealth.repository.MemberRoutineContentRepository;
 import capstone.everyhealth.repository.MemberRoutineRepository;
@@ -28,21 +33,23 @@ public class MemberRoutineService {
 
 
     @Transactional
-    public Long save(MemberRoutine routine) {
+    public Long save(MemberRoutine routine) throws WorkoutNotFound {
+
+        validateIsWorkoutIncludedInRoutine(routine);
 
         return routineRepository.save(routine).getId();
     }
 
-    public List<MemberRoutine> findAllRoutines(Long memberId) {
+    public List<MemberRoutine> findAllRoutines(Long memberId) throws MemberNotFound {
 
-        Member member = memberRepository.findById(memberId).get();
+        Member member = memberRepository.findById(memberId).orElseThrow(()->new MemberNotFound(memberId));
 
         return routineRepository.findByMember(member);
     }
 
-    public MemberRoutine findRoutineByRoutineId(Long routineId) {
+    public MemberRoutine findRoutineByRoutineId(Long routineId) throws MemberRoutineNotFound {
 
-        MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
+        MemberRoutine memberRoutine = routineRepository.findById(routineId).orElseThrow(() -> new MemberRoutineNotFound(routineId));
 
         return memberRoutine;
     }
@@ -60,62 +67,52 @@ public class MemberRoutineService {
     }*/
 
     @Transactional
-    public Long addWorkout(Long routineId, MemberRoutineContent memberRoutineContent) {
+    public Long addWorkout(Long routineId, MemberRoutineContent memberRoutineContent) throws MemberRoutineNotFound, ChallengeRoutineNotEditable, WorkoutNotFound {
 
-        MemberRoutine savedMemberRoutine = routineRepository.findById(routineId).get();
-        if (validateIsRoutineFromChallenge(savedMemberRoutine)) {
-            return -1L;
-        }
+        MemberRoutine memberRoutine = routineRepository.findById(routineId).orElseThrow(()->new MemberRoutineNotFound(routineId));
 
-        MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
+        validateIsWorkoutIncludedInRoutine(memberRoutine);
+        validateIsRoutineFromChallenge(memberRoutine);
 
         memberRoutine.getMemberRoutineContentList().add(memberRoutineContent);
         memberRoutineContent.setMemberRoutine(memberRoutine);
 
         Long memberRoutineContentId = routineContentRepository.save(memberRoutineContent).getId();
 
-        //return memberRoutineContentId;
-        return 1L;
+        return memberRoutineContentId;
     }
 
     @Transactional
-    public Long deleteWorkout(Long routineId, Long routineContentId) {
+    public Long deleteWorkout(Long routineId, Long routineContentId) throws ChallengeRoutineNotEditable, MemberRoutineNotFound {
 
         log.info("routineId = {}", routineId);
         log.info("routineContentId = {}", routineContentId);
 
-        MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
-        log.info("memberRoutine ID = {}", memberRoutine.getId());
+        MemberRoutine memberRoutine = routineRepository.findById(routineId).orElseThrow(()-> new MemberRoutineNotFound(routineId));
 
-        if (validateIsRoutineFromChallenge(memberRoutine)) {
-            return -1L;
-        }
+        validateIsRoutineFromChallenge(memberRoutine);
 
         for (MemberRoutineContent memberRoutineContent : memberRoutine.getMemberRoutineContentList()) {
-            log.info("memberRoutineContent.getId() = {}, type = {}", memberRoutineContent.getId(), memberRoutineContent.getId().getClass());
-            log.info("routineContentId = {}, type = {}", routineContentId, routineContentId.getClass());
-            log.info("memberRoutineContent.getId() == routineContentId = {}", memberRoutineContent.getId() == routineContentId);
+
             if (memberRoutineContent.getId().equals(routineContentId)) {
-                log.info("routineContentId = {}", routineContentId);
+
                 memberRoutine.getMemberRoutineContentList().remove(memberRoutineContent);
                 routineContentRepository.delete(memberRoutineContent);
 
                 break;
             }
         }
-        return 1L;
+        return routineContentId;
     }
 
     @Transactional
-    public Long updateWorkout(Long routineContentId, MemberRoutineWorkoutContent memberRoutineWorkoutContent) {
+    public Long updateWorkout(Long routineContentId, MemberRoutineWorkoutContent memberRoutineWorkoutContent) throws ChallengeRoutineNotEditable, MemberRoutineContentNotFound, MemberRoutineNotFound {
 
-        MemberRoutine memberRoutine = routineContentRepository.findById(routineContentId).get().getMemberRoutine();
+        MemberRoutine memberRoutine = routineContentRepository.findById(routineContentId).orElseThrow(()-> new MemberRoutineContentNotFound(routineContentId)).getMemberRoutine();
 
-        if (validateIsRoutineFromChallenge(memberRoutine)) {
-            return -1L;
-        }
+        validateIsRoutineFromChallenge(memberRoutine);
 
-        MemberRoutineContent memberRoutineContent = routineContentRepository.findById(routineContentId).get();
+        MemberRoutineContent memberRoutineContent = routineContentRepository.findById(routineContentId).orElseThrow(()->new MemberRoutineContentNotFound(routineContentId));
 
         Workout workout = workoutRepository.findByWorkoutName(memberRoutineWorkoutContent.getMemberRoutineWorkoutName());
         updateWorkoutContent(memberRoutineWorkoutContent, memberRoutineContent, workout);
@@ -124,22 +121,20 @@ public class MemberRoutineService {
     }
 
     @Transactional
-    public Long deleteRoutine(Long routineId) {
+    public Long deleteRoutine(Long routineId) throws ChallengeRoutineNotEditable, MemberRoutineNotFound {
 
-        MemberRoutine memberRoutine = routineRepository.findById(routineId).get();
+        MemberRoutine memberRoutine = routineRepository.findById(routineId).orElseThrow(()->new MemberRoutineNotFound(routineId));
 
-        if (validateIsRoutineFromChallenge(memberRoutine)) {
-            return -1L;
-        }
+        validateIsRoutineFromChallenge(memberRoutine);
 
         routineRepository.deleteById(routineId);
         return 1L;
     }
 
     @Transactional
-    public void updateRoutineContentCheck(Long routineContentId) {
+    public void updateRoutineContentCheck(Long routineContentId) throws MemberRoutineContentNotFound {
 
-        MemberRoutineContent memberRoutineContent = routineContentRepository.findById(routineContentId).get();
+        MemberRoutineContent memberRoutineContent = routineContentRepository.findById(routineContentId).orElseThrow(()->new MemberRoutineContentNotFound(routineContentId));
         MemberRoutine memberRoutine = memberRoutineContent.getMemberRoutine();
         boolean currentCheckStatus = memberRoutineContent.isMemberRoutineIsChecked();
 
@@ -147,8 +142,19 @@ public class MemberRoutineService {
         memberRoutine.calculateAndSetProgressRate();
     }
 
-    private boolean validateIsRoutineFromChallenge(MemberRoutine memberRoutine) {
-        return memberRoutine.getChallengeRoutine() != null;
+    private void validateIsWorkoutIncludedInRoutine(MemberRoutine routine) throws WorkoutNotFound {
+        for (MemberRoutineContent memberRoutineContent : routine.getMemberRoutineContentList()) {
+
+            if (memberRoutineContent.getWorkout() == null) {
+                throw new WorkoutNotFound();
+            }
+        }
+    }
+
+    private void validateIsRoutineFromChallenge(MemberRoutine memberRoutine) throws ChallengeRoutineNotEditable {
+        if (memberRoutine.getChallengeRoutine() != null){
+            throw new ChallengeRoutineNotEditable();
+        }
     }
 
     private void updateWorkoutContent(MemberRoutineWorkoutContent memberRoutineWorkoutContent, MemberRoutineContent memberRoutineContent, Workout workout) {

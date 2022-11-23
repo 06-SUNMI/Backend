@@ -12,7 +12,7 @@ import capstone.everyhealth.controller.dto.Sns.SnsCommentResponse;
 import capstone.everyhealth.controller.dto.Sns.SnsFindResponse;
 import capstone.everyhealth.controller.dto.Sns.SnsUpdateRequest;
 
-import org.springframework.transaction.annotation.Transactional;
+import capstone.everyhealth.exception.stakeholder.MemberNotFound;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +22,6 @@ import capstone.everyhealth.controller.dto.Sns.SnsPostRequest;
 import capstone.everyhealth.domain.sns.SnsComment;
 import capstone.everyhealth.domain.sns.SnsPost;
 import capstone.everyhealth.domain.stakeholder.Member;
-import capstone.everyhealth.repository.SnsRepository;
 import capstone.everyhealth.service.MemberService;
 import capstone.everyhealth.service.SnsService;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +48,7 @@ public class SnsController {
 
     @PostMapping("/sns/{userId}")
 
-    public Long save(@RequestBody SnsPostRequest snsPostRequest, @PathVariable Long userId) {
+    public Long save(@RequestBody SnsPostRequest snsPostRequest, @PathVariable Long userId) throws MemberNotFound {
 
         Member member = memberService.findMemberById(userId);
 
@@ -110,20 +109,20 @@ public class SnsController {
     }
 
     @DeleteMapping("/sns/{snsId}")
-    public void deletePost(@PathVariable Long snsId){
+    public void deletePost(@PathVariable Long snsId) {
         snsService.deletePost(snsId);
     }
 
 
     @PostMapping("/sns/follow/{followingMemberId}/{followedMemberId}")
-    public Long follow(@PathVariable Long followingMemberId, @PathVariable Long followedMemberId) {
+    public Long follow(@PathVariable Long followingMemberId, @PathVariable Long followedMemberId) throws MemberNotFound {
 
         return snsService.follow(followedMemberId, followingMemberId);
 
     }
 
     @DeleteMapping("/sns/follow/{followingMemberId}/{followedMemberId}")
-    public void unFollow(@PathVariable Long followingMemberId, @PathVariable Long followedMemberId) {
+    public void unFollow(@PathVariable Long followingMemberId, @PathVariable Long followedMemberId) throws MemberNotFound {
 
         snsService.unFollow(followedMemberId, followingMemberId);
 
@@ -140,40 +139,6 @@ public class SnsController {
     public int cancelLike(@PathVariable Long snsId) {
         return snsService.cancelLike(snsId);
     }
-
-
-    @PostMapping("/sns/{snsId}/addComment")
-    public Long addComment(@RequestBody SnsCommentRequset snsCommentRequest, @PathVariable Long snsId) {
-
-        SnsPost snsPost = snsService.findOne(snsId);
-
-        SnsComment snsComment = SnsComment.builder()
-        .post(snsPost).snsComment(snsCommentRequest.getSnsComment()).build();
-        
-        return snsService.saveComment(snsComment);
-    }
-
-    @GetMapping("/sns/{snsId}/comment")
-    public List<SnsCommentResponse> findAllComment(){
-
-        List<SnsCommentResponse> snsCommentResponsesList = new ArrayList<>();
-        List<SnsComment> snsCommentsList = snsService.findAllComment();
-
-        for(SnsComment snsComment : snsCommentsList) {
-            SnsCommentResponse snsCommentResponse = createSnsCommentResponse(snsComment);
-            snsCommentResponsesList.add(snsCommentResponse);
-        }
-        return snsCommentResponsesList;
-    }
-
-    private SnsCommentResponse createSnsCommentResponse(SnsComment snsComment) {
-        SnsCommentResponse snsCommentResponse = SnsCommentResponse.builder()
-        .snsComment(snsComment.getSnsComment())
-        .build();
-
-        return snsCommentResponse;
-    }
-}
 
     @PostMapping("/sns/{snsId}/addComment")
     public Long addComment(@RequestBody SnsCommentRequset snsCommentRequest, @PathVariable Long snsId) {
@@ -206,5 +171,5 @@ public class SnsController {
 
         return snsCommentResponse;
     }
-
 }
+
