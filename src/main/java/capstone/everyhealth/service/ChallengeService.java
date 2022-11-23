@@ -81,8 +81,8 @@ public class ChallengeService {
     @Transactional
     public int participate(Long memberId, Long challengeId, List<String> challengeRoutineProgressDateList) throws MemberNotFound, ChallengeNotFound, NotInChallengeRoutineProgressDateRange, SelectedDatesNumNotEqualsWithChallenge, DuplicateChallengeParticipant {
 
-        Member member = memberRepository.findById(memberId).orElseThrow(()->new MemberNotFound(memberId));
-        Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(()->new ChallengeNotFound(challengeId));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
+        Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(() -> new ChallengeNotFound(challengeId));
 
         validateChallengeParticipation(challengeRoutineProgressDateList, challenge, member);
 
@@ -114,7 +114,7 @@ public class ChallengeService {
 
     public List<ChallengeParticipant> findChallengeParticipantListByMemberId(Long memberId) throws MemberNotFound {
 
-        Member member = memberRepository.findById(memberId).orElseThrow(()->new MemberNotFound(memberId));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
         List<ChallengeParticipant> challengeParticipantList = challengeParticipantRepository.findByMember(member);
 
         return challengeParticipantList;
@@ -123,8 +123,8 @@ public class ChallengeService {
     @Transactional
     public Long challengeAuthPost(Long challengeRoutineId, Long memberRoutineId, MultipartFile challengeAuthPostPhoto) throws ChallengeParticipantNotFound, ChallengeRoutineNotFound, MemberRoutineNotFound, DuplicateChallengeAuthInRoutine, NotAllRoutineContentsProgressedInChallenge {
 
-        ChallengeRoutine challengeRoutine = challengeRoutineRepository.findById(challengeRoutineId).orElseThrow(()->new ChallengeRoutineNotFound(challengeRoutineId));
-        MemberRoutine memberRoutine = memberRoutineRepository.findById(memberRoutineId).orElseThrow(()->new MemberRoutineNotFound(memberRoutineId));
+        ChallengeRoutine challengeRoutine = challengeRoutineRepository.findById(challengeRoutineId).orElseThrow(() -> new ChallengeRoutineNotFound(challengeRoutineId));
+        MemberRoutine memberRoutine = memberRoutineRepository.findById(memberRoutineId).orElseThrow(() -> new MemberRoutineNotFound(memberRoutineId));
         Member member = memberRoutine.getMember();
 
         validateChallengeAuthPost(member, challengeRoutine, memberRoutine);
@@ -133,7 +133,25 @@ public class ChallengeService {
 
         ChallengeAuthPost challengeAuthPost = createChallengeAuthPost(challengeRoutine, member, challengeAuthPhotoUrl);
         Long savedChallengeAuthPostId = challengeAuthPostRepository.save(challengeAuthPost).getId();
-        ChallengeParticipant challengeParticipant = challengeParticipantRepository.findByChallengeAndMember(challengeRoutine.getChallenge(), member).orElseThrow(()->new ChallengeParticipantNotFound());
+        ChallengeParticipant challengeParticipant = challengeParticipantRepository.findByChallengeAndMember(challengeRoutine.getChallenge(), member).orElseThrow(() -> new ChallengeParticipantNotFound());
+
+        challengeParticipant.setCompletedRoutinesNum(challengeParticipant.getCompletedRoutinesNum() + 1);
+
+        return savedChallengeAuthPostId;
+    }
+
+    @Transactional
+    public Long challengeAuthPostForTest(Long challengeRoutineId, Long memberRoutineId) throws ChallengeParticipantNotFound, ChallengeRoutineNotFound, MemberRoutineNotFound, DuplicateChallengeAuthInRoutine, NotAllRoutineContentsProgressedInChallenge {
+
+        ChallengeRoutine challengeRoutine = challengeRoutineRepository.findById(challengeRoutineId).orElseThrow(() -> new ChallengeRoutineNotFound(challengeRoutineId));
+        MemberRoutine memberRoutine = memberRoutineRepository.findById(memberRoutineId).orElseThrow(() -> new MemberRoutineNotFound(memberRoutineId));
+        Member member = memberRoutine.getMember();
+
+        validateChallengeAuthPost(member, challengeRoutine, memberRoutine);
+
+        ChallengeAuthPost challengeAuthPost = createChallengeAuthPostForTest(challengeRoutine, member);
+        Long savedChallengeAuthPostId = challengeAuthPostRepository.save(challengeAuthPost).getId();
+        ChallengeParticipant challengeParticipant = challengeParticipantRepository.findByChallengeAndMember(challengeRoutine.getChallenge(), member).orElseThrow(() -> new ChallengeParticipantNotFound());
 
         challengeParticipant.setCompletedRoutinesNum(challengeParticipant.getCompletedRoutinesNum() + 1);
 
@@ -142,7 +160,7 @@ public class ChallengeService {
 
     public List<ChallengeAuthPost> findAllChallengeAuthPost(Long challengeId) throws ChallengeNotFound {
 
-        Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(()->new ChallengeNotFound(challengeId));
+        Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(() -> new ChallengeNotFound(challengeId));
         List<ChallengeAuthPost> totalChallengeAuthPostList = challengeAuthPostRepository.findAll();
         List<ChallengeAuthPost> returnChallengeAuthPostList = new ArrayList<>();
 
@@ -159,12 +177,19 @@ public class ChallengeService {
     @Transactional
     public void updateChallengeStatusFinished(Long challengeId) throws ChallengeNotFound {
 
-        Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(()->new ChallengeNotFound(challengeId));
+        Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(() -> new ChallengeNotFound(challengeId));
         challenge.setFinished(true);
     }
 
     public List<ChallengeParticipant> findChallengeParticipantListByChallenge(Challenge challenge) {
         return challengeParticipantRepository.findByChallenge(challenge);
+    }
+
+    @Transactional
+    public void updateChallengeParticipantStatus(Long challengeParticipantId, ChallengeStatus challengeStatus) throws ChallengeParticipantNotFound {
+
+        ChallengeParticipant challengeParticipant = challengeParticipantRepository.findById(challengeParticipantId).orElseThrow(() -> new ChallengeParticipantNotFound());
+        challengeParticipant.setChallengeStatus(challengeStatus);
     }
 
     private void validateChallengeAuthPost(Member member, ChallengeRoutine challengeRoutine, MemberRoutine memberRoutine) throws NotAllRoutineContentsProgressedInChallenge, DuplicateChallengeAuthInRoutine {
@@ -195,7 +220,7 @@ public class ChallengeService {
 
     private void validateChallengeParticipation(List<String> challengeRoutineProgressDateList, Challenge challenge, Member member) throws SelectedDatesNumNotEqualsWithChallenge, NotInChallengeRoutineProgressDateRange, DuplicateChallengeParticipant {
 
-        if(!challengeParticipantRepository.findByChallengeAndMember(challenge, member).isEmpty()){
+        if (!challengeParticipantRepository.findByChallengeAndMember(challenge, member).isEmpty()) {
             throw new DuplicateChallengeParticipant();
         }
 
@@ -255,6 +280,14 @@ public class ChallengeService {
                 .challengeRoutine(challengeRoutine)
                 .member(member)
                 .photoUrl(challengeAuthPhotoUrl)
+                .build();
+    }
+
+    private ChallengeAuthPost createChallengeAuthPostForTest(ChallengeRoutine challengeRoutine, Member member) {
+        return ChallengeAuthPost.builder()
+                .challengeRoutine(challengeRoutine)
+                .member(member)
+                .photoUrl(null)
                 .build();
     }
 
