@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-public class SnsReport {
+public class SnsPostReport {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
