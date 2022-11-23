@@ -3,6 +3,12 @@ package capstone.everyhealth.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import javax.transaction.TransactionScoped;
+
+
+import capstone.everyhealth.controller.dto.Sns.SnsCommentRequset;
+import capstone.everyhealth.controller.dto.Sns.SnsCommentResponse;
 import capstone.everyhealth.controller.dto.Sns.SnsFindResponse;
 import capstone.everyhealth.controller.dto.Sns.SnsUpdateRequest;
 
@@ -13,9 +19,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import capstone.everyhealth.controller.dto.Sns.SnsPostRequest;
+import capstone.everyhealth.domain.sns.SnsComment;
 import capstone.everyhealth.domain.sns.SnsPost;
 import capstone.everyhealth.domain.stakeholder.Member;
-import capstone.everyhealth.repository.SnsRepository;
 import capstone.everyhealth.service.MemberService;
 import capstone.everyhealth.service.SnsService;
 import lombok.RequiredArgsConstructor;
@@ -102,6 +108,12 @@ public class SnsController {
         return snsFindResponse;
     }
 
+    @DeleteMapping("/sns/{snsId}")
+    public void deletePost(@PathVariable Long snsId) {
+        snsService.deletePost(snsId);
+    }
+
+
     @PostMapping("/sns/follow/{followingMemberId}/{followedMemberId}")
     public Long follow(@PathVariable Long followingMemberId, @PathVariable Long followedMemberId) throws MemberNotFound {
 
@@ -117,16 +129,47 @@ public class SnsController {
     }
 
     @PutMapping("/sns/{snsId}/addLike")
-    public int addLike(@PathVariable Long snsId){
+    public int addLike(@PathVariable Long snsId) {
 
-       return snsService.addLike(snsId);
+        return snsService.addLike(snsId);
 
     }
 
     @PutMapping("/sns/{snsId}/cancelLike")
-    public int cancelLike(@PathVariable Long snsId){
+    public int cancelLike(@PathVariable Long snsId) {
         return snsService.cancelLike(snsId);
     }
 
+    @PostMapping("/sns/{snsId}/addComment")
+    public Long addComment(@RequestBody SnsCommentRequset snsCommentRequest, @PathVariable Long snsId) {
+
+        SnsPost snsPost = snsService.findOne(snsId);
+
+        SnsComment snsComment = SnsComment.builder()
+                .post(snsPost).snsComment(snsCommentRequest.getSnsComment()).build();
+
+        return snsService.saveComment(snsComment);
+    }
+
+    @GetMapping("/sns/{snsId}/comment")
+    public List<SnsCommentResponse> findAllComment() {
+
+        List<SnsCommentResponse> snsCommentResponsesList = new ArrayList<>();
+        List<SnsComment> snsCommentsList = snsService.findAllComment();
+
+        for (SnsComment snsComment : snsCommentsList) {
+            SnsCommentResponse snsCommentResponse = createSnsCommentResponse(snsComment);
+            snsCommentResponsesList.add(snsCommentResponse);
+        }
+        return snsCommentResponsesList;
+    }
+
+    private SnsCommentResponse createSnsCommentResponse(SnsComment snsComment) {
+        SnsCommentResponse snsCommentResponse = SnsCommentResponse.builder()
+                .snsComment(snsComment.getSnsComment())
+                .build();
+
+        return snsCommentResponse;
+    }
 }
 
