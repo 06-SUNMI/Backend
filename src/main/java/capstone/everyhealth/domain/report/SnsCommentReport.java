@@ -4,10 +4,12 @@ import capstone.everyhealth.domain.sns.SnsComment;
 import capstone.everyhealth.domain.sns.SnsPost;
 import capstone.everyhealth.domain.stakeholder.Member;
 import lombok.Data;
+import lombok.Getter;
 
 import javax.persistence.*;
 
-@Data
+@Entity
+@Getter
 public class SnsCommentReport {
 
     @Id

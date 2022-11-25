@@ -15,5 +15,7 @@ public interface ChallengeParticipantRepository extends JpaRepository<ChallengeP
 
     Optional<ChallengeParticipant> findByChallengeAndMember(Challenge challenge, Member member);
 
-    List<ChallengeParticipant> findByChallenge(Challenge challenge);
+    List<ChallengeParticipant> findAllByChallenge(Challenge challenge);
+
+    List<ChallengeParticipant> findAllByMember(Member member);
 }
