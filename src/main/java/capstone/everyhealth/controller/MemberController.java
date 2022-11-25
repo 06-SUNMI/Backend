@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Api(tags = {"임시 멤버 데이터 조작을 위한 API"})
-public class StakeholderController {
+public class MemberController {
 
     private final MemberService memberService;
 

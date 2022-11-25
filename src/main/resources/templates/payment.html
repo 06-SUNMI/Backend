@@ -1,0 +1,54 @@
+<!-- jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
+<!-- iamport.payment.js -->
+<script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.8.js"></script>
+
+<button onclick="requestPay()">결제하기</button>
+
+<script>
+    var IMP = window.IMP; // 생략 가능
+    IMP.init("imp22617232"); // 예: imp00000000
+
+    function requestPay() {
+        console.log("requestPay 시작");
+        // IMP.request_pay(param, callback) 결제창 호출
+        IMP.request_pay({ // param
+            pg: "html5_inicis",
+            pay_method: "card",
+            merchant_uid: "[[${orderNumber}]]",
+            name: "[[${challengeName}]]",
+            amount: "[[${challengePrice}]]",
+            //buyer_email: "test1234@aaaa.com",
+            buyer_name: "[[${participantName}]]",
+            //buyer_tel: "010-1234-5678",
+            //buyer_addr: "서울특별시 강남구 신사동",
+            //buyer_postcode: "01181",
+        }, function (rsp) { // callback
+            console.log("func 시작");
+            console.log("rsp.imp_uid :"+rsp.imp_uid);
+            console.log("rsp.merchant_uid :"+rsp.merchant_uid);
+            if (rsp.success) {
+                console.log("SUCCESS!");
+                // jQuery로 HTTP 요청
+                jQuery.ajax({
+                    url: "http://15.164.168.230:8080/payments/result", // 예: https://www.myservice.com/payments/complete
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    data: JSON.stringify({
+                        imp_uid: rsp.imp_uid,
+                        merchant_uid: rsp.merchant_uid,
+                        challenge_id: "[[${challengeId}]]",
+                        member_id: "[[${memberId}]]"
+                    })
+                }).done(function (data) {
+                    // 가맹점 서버 결제 API 성공시 로직
+                    console.log("가맹점 서버 결제 API 성공");
+                    //window.location.href = "/payment/result";
+                    console.log(data);
+                })
+            } else {
+                alert("결제에 실패하였습니다. 에러 내용: " +  rsp.error_msg);
+            }
+        });
+    }
+</script>
