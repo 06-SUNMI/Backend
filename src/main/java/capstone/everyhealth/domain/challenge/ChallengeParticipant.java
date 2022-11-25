@@ -1,5 +1,6 @@
 package capstone.everyhealth.domain.challenge;
 
+import capstone.everyhealth.domain.enums.ChallengePaymentStatus;
 import capstone.everyhealth.domain.enums.ChallengeStatus;
 import lombok.*;
 import capstone.everyhealth.domain.stakeholder.Member;
@@ -31,4 +32,7 @@ public class ChallengeParticipant {
 
     @Enumerated(EnumType.STRING)
     private ChallengeStatus challengeStatus;
+
+    @OneToOne(mappedBy = "challengeParticipant")
+    private ChallengeTransaction challengeTransaction;
 }

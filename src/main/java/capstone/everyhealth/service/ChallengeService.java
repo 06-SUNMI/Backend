@@ -1,6 +1,8 @@
 package capstone.everyhealth.service;
 
+import capstone.everyhealth.controller.dto.Challenge.payment.ChallengeTransactionHistory;
 import capstone.everyhealth.domain.challenge.*;
+import capstone.everyhealth.domain.enums.ChallengePaymentStatus;
 import capstone.everyhealth.domain.enums.ChallengeStatus;
 import capstone.everyhealth.domain.routine.MemberRoutine;
 import capstone.everyhealth.domain.routine.MemberRoutineContent;
@@ -12,6 +14,7 @@ import capstone.everyhealth.fileupload.service.FileUploadService;
 import capstone.everyhealth.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +37,7 @@ public class ChallengeService {
     private final ChallengeParticipantRepository challengeParticipantRepository;
     private final FileUploadService fileUploadService;
     private final ChallengeAuthPostRepository challengeAuthPostRepository;
+    private final ChallengeTransactionRepository challengeTransactionRepository;
 
     @Transactional
     public Long save(Challenge challenge) {
@@ -182,7 +186,7 @@ public class ChallengeService {
     }
 
     public List<ChallengeParticipant> findChallengeParticipantListByChallenge(Challenge challenge) {
-        return challengeParticipantRepository.findByChallenge(challenge);
+        return challengeParticipantRepository.findAllByChallenge(challenge);
     }
 
     @Transactional
@@ -190,6 +194,46 @@ public class ChallengeService {
 
         ChallengeParticipant challengeParticipant = challengeParticipantRepository.findById(challengeParticipantId).orElseThrow(() -> new ChallengeParticipantNotFound());
         challengeParticipant.setChallengeStatus(challengeStatus);
+    }
+
+    @Transactional
+    public void saveChallengePaymentResult(JSONObject paymentData, Long challengeId, Long memberId) throws ChallengeNotFound, MemberNotFound, ChallengeParticipantNotFound {
+
+        ChallengeParticipant challengeParticipant = findChallengeParticipant(challengeId,memberId);
+        ChallengeTransaction challengeTransaction = createChallengeTransaction(paymentData, challengeParticipant);
+        challengeTransaction.addTransaction(challengeParticipant);
+        log.info("challengeParticipant = {}",challengeParticipant);
+        challengeTransactionRepository.save(challengeTransaction);
+    }
+
+    private ChallengeTransaction createChallengeTransaction(JSONObject paymentData, ChallengeParticipant challengeParticipant) {
+        return ChallengeTransaction.builder()
+                .challengePaymentStatus(ChallengePaymentStatus.PAID)
+                .challengeParticipant(challengeParticipant)
+                .merchantUid((String) paymentData.get("merchant_uid"))
+                .build();
+    }
+
+    public ChallengeParticipant findChallengeParticipant(Long challengeId, Long memberId) throws ChallengeNotFound, MemberNotFound, ChallengeParticipantNotFound {
+
+        Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(() -> new ChallengeNotFound(challengeId));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
+
+        return challengeParticipantRepository.findByChallengeAndMember(challenge, member).orElseThrow(() -> new ChallengeParticipantNotFound());
+    }
+
+    @Transactional
+    public void refund(ChallengeTransaction challengeTransaction) {
+        challengeTransaction.setChallengePaymentStatus(ChallengePaymentStatus.REFUNDED);
+    }
+
+    public List<ChallengeTransaction> findChallengeTransactionHistory(Long memberId) throws MemberNotFound, ChallengeNotFound, ChallengeParticipantNotFound {
+
+        Member member = memberRepository.findById(memberId).orElseThrow(()->new MemberNotFound(memberId));
+        List<ChallengeParticipant> challengeParticipantList = challengeParticipantRepository.findAllByMember(member);
+        List<ChallengeTransaction> challengeTransactionList = challengeTransactionRepository.findAllByChallengeParticipantIn(challengeParticipantList);
+
+        return challengeTransactionList;
     }
 
     private void validateChallengeAuthPost(Member member, ChallengeRoutine challengeRoutine, MemberRoutine memberRoutine) throws NotAllRoutineContentsProgressedInChallenge, DuplicateChallengeAuthInRoutine {
