@@ -1,5 +1,6 @@
 package capstone.everyhealth.controller.dto.Sns;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SnsPostRequest {
 
-    private String snsImageLink;
-    private String snsVideoLink;
+    @ApiModelProperty(value = "sns 글 내용", example = "sns 작성 글 내용")
     private String snsContent;
 }

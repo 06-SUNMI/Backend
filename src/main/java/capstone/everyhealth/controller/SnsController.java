@@ -12,11 +12,14 @@ import capstone.everyhealth.controller.dto.Sns.SnsCommentResponse;
 import capstone.everyhealth.controller.dto.Sns.SnsFindResponse;
 import capstone.everyhealth.controller.dto.Sns.SnsUpdateRequest;
 
+import capstone.everyhealth.domain.sns.SnsPostImageOrVideo;
+import capstone.everyhealth.exception.Sns.SnsPostNotFound;
 import capstone.everyhealth.exception.stakeholder.MemberNotFound;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 import capstone.everyhealth.controller.dto.Sns.SnsPostRequest;
 import capstone.everyhealth.domain.sns.SnsComment;
@@ -26,59 +29,47 @@ import capstone.everyhealth.service.MemberService;
 import capstone.everyhealth.service.SnsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Api(tags = {"SNS API"})
 public class SnsController {
 
     private final SnsService snsService;
     private final MemberService memberService;
 
-    @GetMapping("/users/{userName}")
-    public List<Member> search(@PathVariable String userName) {
-
-        log.info(userName);
-
+    @ApiOperation(
+            value = "유저 이름 검색",
+            notes = "검색한 이름과 일치하는 유저들을 조회한다."
+    )
+    @GetMapping("/sns/users/{userName}")
+    public List<Member> search(@ApiParam(value = "검색할 유저 이름") @PathVariable String userName) {
         return snsService.findByName(userName);
     }
 
-    @PostMapping("/sns/{userId}")
-
-    public Long save(@RequestBody SnsPostRequest snsPostRequest, @PathVariable Long userId) throws MemberNotFound {
-
-        Member member = memberService.findMemberById(userId);
-
-        SnsPost snsPost = SnsPost.builder().member(member).content(snsPostRequest.getSnsContent())
-                .videoLink(snsPostRequest.getSnsVideoLink()).imageLink(snsPostRequest.getSnsImageLink()).build();
-
-        return snsService.save(snsPost);
+    @ApiOperation(
+            value = "Sns 게시글 작성",
+            notes = "유저가 작성한 Sns 게시글을 저장한다."
+    )
+    @PostMapping(path = "/sns/posts/users/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Long save(@ApiParam(value = "게시글 파일 (여러개 가능)") @RequestPart("snsPostsImageOrVideoFileList") List<MultipartFile> snsPostsImageOrVideoFileList,
+                     @ApiParam(value = "사용자 id 값") @PathVariable Long userId,
+            /*@ApiParam(value = "작성 게시글의 내용") @RequestPart SnsPostRequest snsPostRequest)*/
+                     @ApiParam(value = "Sns 작성 글 내용") @RequestParam("snsPostContent") String snsPostContent) throws MemberNotFound {
+        return snsService.save(snsPostContent, userId, snsPostsImageOrVideoFileList);
     }
 
-    @GetMapping("/sns/{snsId}")
-
-    public SnsFindResponse findOne(@PathVariable Long snsId) {
-
-        SnsPost snsPost = snsService.findOne(snsId);
-        SnsFindResponse snsFindResponse = SnsFindResponse.builder()
-                .snsContent(snsPost.getContent())
-                .snsVideoLink(snsPost.getVideoLink())
-                .snsImageLink(snsPost.getImageLink())
-                .memberId(snsPost.getMember().getId())
-                .build();
-        return snsFindResponse;
-    }
-
-    @GetMapping("/sns")
-    public List<SnsFindResponse> findAllMembers() {
+    @ApiOperation(
+            value = "Sns 게시글 불러오기",
+            notes = "Sns 전체 게시글을 불러온다. (상세 내용 포함)"
+    )
+    @GetMapping("/sns/posts")
+    public List<SnsFindResponse> findAllSnsPosts() {
 
         List<SnsFindResponse> snsFindResponseList = new ArrayList<>();
-        List<SnsPost> snsPostsList = snsService.findAll();
-
-        log.info("before");
+        List<SnsPost> snsPostsList = snsService.findAllSnsPosts();
 
         for (SnsPost snsPost : snsPostsList) {
 
@@ -86,72 +77,94 @@ public class SnsController {
             snsFindResponseList.add(snsFindResponse);
         }
 
-        log.info("after");
-
         return snsFindResponseList;
     }
 
-    @PutMapping("/sns/{snsId}")
-    public void update(@RequestBody SnsUpdateRequest snsUpdateRequest, @PathVariable Long snsId) {
+    @ApiOperation(
+            value = "Sns 게시글 내용 수정",
+            notes = "유저가 수정한 Sns 게시글 내용을 저장한다."
+    )
+    @PutMapping("/sns/posts/{snsPostId}")
+    public String update(@ApiParam(value = "Sns 작성 글 id 값") @PathVariable Long snsPostId,
+                         @ApiParam(value = "Sns 게시글 내용") @RequestBody SnsPostRequest snsUpdateRequest,
+                         @ApiParam(value = "게시글 파일 (여러개 개능)") @RequestPart List<MultipartFile> snsPostsImageOrVideoFileList) throws SnsPostNotFound {
+        snsService.update(snsPostId, snsUpdateRequest.getSnsContent(), snsPostsImageOrVideoFileList);
 
-        snsService.update(snsUpdateRequest, snsId);
+        return "수정 완료";
     }
 
-    private SnsFindResponse createSnsFindResponse(SnsPost snsPost) {
-        SnsFindResponse snsFindResponse = SnsFindResponse.builder()
-                .memberId(snsPost.getId())
-                .snsContent(snsPost.getContent())
-                .snsImageLink(snsPost.getImageLink())
-                .snsVideoLink(snsPost.getVideoLink())
-                .build();
+    @ApiOperation(
+            value = "Sns 게시글 삭제",
+            notes = "유저가 선택한 Sns 게시글을 삭제한다."
+    )
+    @DeleteMapping("/sns/posts/{snsPostId}")
+    public String deletePost(@ApiParam(value = "Sns 게시 글 id 값") @PathVariable Long snsPostId) {
+        snsService.deletePost(snsPostId);
 
-        return snsFindResponse;
-    }
-
-    @DeleteMapping("/sns/{snsId}")
-    public void deletePost(@PathVariable Long snsId) {
-        snsService.deletePost(snsId);
+        return "삭제 완료";
     }
 
 
+    @ApiOperation(
+            value = "Sns 유저 팔로우",
+            notes = "한 유저(follwingMember)가 다른 유저(followedMember)를 팔로우 한다."
+    )
     @PostMapping("/sns/follow/{followingMemberId}/{followedMemberId}")
-    public Long follow(@PathVariable Long followingMemberId, @PathVariable Long followedMemberId) throws MemberNotFound {
-
+    public Long follow(@ApiParam(value = "팔로우 하는 사람 id") @PathVariable Long followingMemberId,
+                       @ApiParam(value = "팔로우 받는 사람 id") @PathVariable Long followedMemberId) throws MemberNotFound {
         return snsService.follow(followedMemberId, followingMemberId);
-
     }
 
+    @ApiOperation(
+            value = "Sns 유저 언팔로우",
+            notes = "한 유저(follwingMember)가 다른 유저(followedMember)를 언팔로우 한다."
+    )
     @DeleteMapping("/sns/follow/{followingMemberId}/{followedMemberId}")
-    public void unFollow(@PathVariable Long followingMemberId, @PathVariable Long followedMemberId) throws MemberNotFound {
+    public String unFollow(@ApiParam(value = "팔로우 취소 하는 사람 id") @PathVariable Long followingMemberId,
+                           @ApiParam(value = "팔로우 취소 받는 사람 id") @PathVariable Long followedMemberId) throws MemberNotFound {
 
         snsService.unFollow(followedMemberId, followingMemberId);
 
+        return "팔로우 취소 완료";
     }
 
-    @PutMapping("/sns/{snsId}/addLike")
-    public int addLike(@PathVariable Long snsId) {
-
-        return snsService.addLike(snsId);
-
+    @ApiOperation(
+            value = "Sns 작성 글 좋아요 누르기",
+            notes = "Sns 작성 글에 좋아요를 누르면 좋아요 누른 뒤의 좋아요 수(+1)를 반환한다."
+    )
+    @PutMapping("/sns/posts/{snsPostId}/addLike")
+    public int addLike(@ApiParam(value = "좋아요 누른 Sns 작성 글 id 값") @PathVariable Long snsPostId) throws SnsPostNotFound {
+        return snsService.addLike(snsPostId);
     }
 
-    @PutMapping("/sns/{snsId}/cancelLike")
-    public int cancelLike(@PathVariable Long snsId) {
+    @ApiOperation(
+            value = "Sns 작성 글 좋아요 취소하기",
+            notes = "이미 좋아요를 누른 Sns 작성 글에 좋아요를 다시 누르면 좋아요 누른 뒤의 좋아요 수(-1)를 반환한다."
+    )
+    @PutMapping("/sns/posts/{snsId}/cancelLike")
+    public int cancelLike(@ApiParam(value = "좋아요 받은 Sns 작성 글 id") @PathVariable Long snsId) throws SnsPostNotFound {
         return snsService.cancelLike(snsId);
     }
 
-    @PostMapping("/sns/{snsId}/addComment")
-    public Long addComment(@RequestBody SnsCommentRequset snsCommentRequest, @PathVariable Long snsId) {
+    @ApiOperation(
+            value = "댓글 달기",
+            notes = "유저가 작성한 댓글을 저장한다."
+    )
+    @PostMapping("/sns/posts/{snsPostId}/addComment")
+    public Long addComment(@RequestBody SnsCommentRequset snsCommentRequest,
+                           @PathVariable Long snsPostId) throws SnsPostNotFound {
 
-        SnsPost snsPost = snsService.findOne(snsId);
+        SnsPost snsPost = snsService.findOne(snsPostId);
 
         SnsComment snsComment = SnsComment.builder()
-                .post(snsPost).snsComment(snsCommentRequest.getSnsComment()).build();
+                .snsPost(snsPost).snsComment(snsCommentRequest.getSnsComment()).build();
+
+        snsPost.addComment(snsComment);
 
         return snsService.saveComment(snsComment);
     }
 
-    @GetMapping("/sns/{snsId}/comment")
+    @GetMapping("/sns/posts/{snsPostId}/comment")
     public List<SnsCommentResponse> findAllComment() {
 
         List<SnsCommentResponse> snsCommentResponsesList = new ArrayList<>();
@@ -162,6 +175,24 @@ public class SnsController {
             snsCommentResponsesList.add(snsCommentResponse);
         }
         return snsCommentResponsesList;
+    }
+
+    private SnsFindResponse createSnsFindResponse(SnsPost snsPost) {
+        List<String> snsPostImageOrVideoLinkList = new ArrayList<>();
+
+        for (SnsPostImageOrVideo snsPostImageOrVideo : snsPost.getSnsPostImageOrVideoList()) {
+            snsPostImageOrVideoLinkList.add(snsPostImageOrVideo.getImageOrVideoUrl());
+        }
+
+        SnsFindResponse snsFindResponse = SnsFindResponse.builder()
+                .snsPostId(snsPost.getId())
+                .memberId(snsPost.getId())
+                .snsContent(snsPost.getContent())
+                .snsImageOrVideoLinkList(snsPostImageOrVideoLinkList)
+                .snsLikesNum(snsPost.getLikes())
+                .build();
+
+        return snsFindResponse;
     }
 
     private SnsCommentResponse createSnsCommentResponse(SnsComment snsComment) {
