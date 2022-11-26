@@ -22,8 +22,8 @@ public class SnsComment {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "post_id")
-    private SnsPost post;
+    @JoinColumn(name = "sns_post_id")
+    private SnsPost snsPost;
 
     private String snsComment;
 }

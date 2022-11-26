@@ -6,15 +6,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class SnsFindResponse {
-    private Long memberId;
-    private String snsImageLink;
-    private String snsVideoLink;
-    private String snsContent;
 
+    private Long snsPostId;
+    private Long memberId;
+    private List<String> snsImageOrVideoLinkList = new ArrayList<>();
+    private String snsContent;
+    private int snsLikesNum;
 }

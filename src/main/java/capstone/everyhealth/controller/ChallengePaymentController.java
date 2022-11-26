@@ -91,6 +91,13 @@ public class ChallengePaymentController {
         challengeService.saveChallengePaymentResult(paymentData, challengeId, memberId);
     }
 
+    @ResponseBody
+    @GetMapping("/payments/result")
+    @ApiIgnore
+    public String paymentResultPage(){
+        return "결제 완료 페이지";
+    }
+
     @ApiOperation(
             value = "챌린지 결제 취소",
             notes = "챌린지 성공 시 참가비를 환급한다."
