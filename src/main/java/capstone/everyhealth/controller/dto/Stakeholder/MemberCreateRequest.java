@@ -1,29 +1,26 @@
 package capstone.everyhealth.controller.dto.Stakeholder;
 
-import capstone.everyhealth.domain.enums.LoginType;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
-
-import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberCreateRequest {
+public class MemberCreateRequest{
 
     @ApiModelProperty(value = "유저 이름",example = "홍길동")
     private String memberName;
-    @ApiModelProperty(value="소셜 로그인 한 곳",example = "카카오")
-    private String loginAt;
+    @ApiModelProperty(value = "유저 이메일",example = "asdf1234@naver.com")
+    private String memberEmail;
     @ApiModelProperty(value ="소셜 로그인 한 곳에서 등록돼 있는 계정의 유저 고유 식별자 (id) 값",example = "123321")
     private String socialAccountId;
     @ApiModelProperty(value = "유저 키",example = "178")
     private int memberHeight;
     @ApiModelProperty(value = "유저 몸무게",example = "66")
     private int memberWeight;
-    @ApiModelProperty(value = "유저가 등록한 헬스장",example = "OO 헬스장")
+    @ApiModelProperty(value = "유저가 등록한 헬스장 이름",example = "OO 헬스장")
     private String memberRegisteredGymName;
+    @ApiModelProperty(value = "동명의 헬스장을 구별하기 위한 유저가 등록한 헬스장의 고유 id 값(카카오 로컬 API서 제공)", example = "13213132")
+    private String memberRegisteredGymId;
 }
