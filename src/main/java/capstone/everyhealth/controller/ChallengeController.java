@@ -8,6 +8,8 @@ import capstone.everyhealth.domain.routine.Workout;
 import capstone.everyhealth.domain.routine.WorkoutName;
 import capstone.everyhealth.exception.challenge.*;
 import capstone.everyhealth.exception.memberroutine.MemberRoutineNotFound;
+import capstone.everyhealth.exception.report.DuplicateReporter;
+import capstone.everyhealth.exception.report.WriterEqualsReporter;
 import capstone.everyhealth.exception.stakeholder.MemberNotFound;
 import capstone.everyhealth.service.ChallengeService;
 import capstone.everyhealth.service.WorkoutService;
@@ -144,7 +146,7 @@ public class ChallengeController {
     @PostMapping("/members/{memberId}/challenges/{challengeId}")
     public int participate(@ApiParam(value = "멤버 id값", example = "1") @PathVariable Long memberId,
                            @ApiParam(value = "챌린지 id값", example = "1") @PathVariable Long challengeId,
-                           @ApiParam(value = "유저가 등록한 챌린지 루틴 별 수행 날짜", example = "[\"2022-11-13\", \"2022-11-19\", \"2022-11-20\", \"2022-11-22\"]") @RequestBody List<String> challengeRoutineProgressDateList) throws MemberNotFound, ChallengeNotFound, NotInChallengeRoutineProgressDateRange, SelectedDatesNumNotEqualsWithChallenge, DuplicateChallengeParticipant {
+                           @ApiParam(value = "유저가 등록한 챌린지 루틴 별 수행 날짜", example = "[\"2022-11-20\", \"2022-11-26\", \"2022-11-27\", \"2022-11-28\"]") @RequestBody List<String> challengeRoutineProgressDateList) throws MemberNotFound, ChallengeNotFound, SelectedDatesNumNotEqualsWithChallenge, DuplicateChallengeParticipant, ChallengeRoutineProgressDateOutOfDate, MismatchChallengeRoutineProgressDateNumPerWeek {
 
         return challengeService.participate(memberId, challengeId, challengeRoutineProgressDateList);
     }
@@ -210,6 +212,16 @@ public class ChallengeController {
         return new ChallengeFindAllAuthPostResponse(challengeFindAllAuthPostDataList);
     }
 
+    @ApiOperation(
+            value = "챌린지 인증 글 신고",
+            notes = "다른 멤버가 작성한 챌린지 인증 글을 신고한다."
+    )
+    @GetMapping("/challenges/auth/{challengeAuthPostId}/report/members/{memberId}")
+    public Long reportChallengeAuthPost(@ApiParam(value = "챌린지 인증 글 id", example = "1") @PathVariable Long challengeAuthPostId,
+                                        @ApiParam(value = "멤버 id", example = "1") @PathVariable Long memberId,
+                                        @ApiParam(value = "신고 사유", example = "신고 사유") @RequestParam String reportReason) throws MemberNotFound, ChallengeAuthNotFound, DuplicateReporter, WriterEqualsReporter {
+        return challengeService.reportChallengeAuthPost(challengeAuthPostId, memberId, reportReason);
+    }
 
     private ChallengeFindAllAuthPostData createChallengeFindAllAuthPostData(ChallengeAuthPost challengeAuthPost) {
         return ChallengeFindAllAuthPostData.builder()

@@ -4,11 +4,14 @@ import capstone.everyhealth.controller.dto.Challenge.payment.ChallengeTransactio
 import capstone.everyhealth.domain.challenge.*;
 import capstone.everyhealth.domain.enums.ChallengePaymentStatus;
 import capstone.everyhealth.domain.enums.ChallengeStatus;
+import capstone.everyhealth.domain.report.ChallengeAuthPostReport;
 import capstone.everyhealth.domain.routine.MemberRoutine;
 import capstone.everyhealth.domain.routine.MemberRoutineContent;
 import capstone.everyhealth.domain.stakeholder.Member;
 import capstone.everyhealth.exception.challenge.*;
 import capstone.everyhealth.exception.memberroutine.MemberRoutineNotFound;
+import capstone.everyhealth.exception.report.DuplicateReporter;
+import capstone.everyhealth.exception.report.WriterEqualsReporter;
 import capstone.everyhealth.exception.stakeholder.MemberNotFound;
 import capstone.everyhealth.fileupload.service.FileUploadService;
 import capstone.everyhealth.repository.*;
@@ -38,6 +41,7 @@ public class ChallengeService {
     private final FileUploadService fileUploadService;
     private final ChallengeAuthPostRepository challengeAuthPostRepository;
     private final ChallengeTransactionRepository challengeTransactionRepository;
+    private final ChallengeAuthPostReportRepository challengeAuthPostReportRepository;
 
     @Transactional
     public Long save(Challenge challenge) {
@@ -83,7 +87,7 @@ public class ChallengeService {
     }
 
     @Transactional
-    public int participate(Long memberId, Long challengeId, List<String> challengeRoutineProgressDateList) throws MemberNotFound, ChallengeNotFound, NotInChallengeRoutineProgressDateRange, SelectedDatesNumNotEqualsWithChallenge, DuplicateChallengeParticipant {
+    public int participate(Long memberId, Long challengeId, List<String> challengeRoutineProgressDateList) throws MemberNotFound, ChallengeNotFound, MismatchChallengeRoutineProgressDateNumPerWeek, SelectedDatesNumNotEqualsWithChallenge, DuplicateChallengeParticipant, ChallengeRoutineProgressDateOutOfDate {
 
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
         Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(() -> new ChallengeNotFound(challengeId));
@@ -199,19 +203,24 @@ public class ChallengeService {
     @Transactional
     public void saveChallengePaymentResult(JSONObject paymentData, Long challengeId, Long memberId) throws ChallengeNotFound, MemberNotFound, ChallengeParticipantNotFound {
 
-        ChallengeParticipant challengeParticipant = findChallengeParticipant(challengeId,memberId);
+        ChallengeParticipant challengeParticipant = findChallengeParticipant(challengeId, memberId);
         ChallengeTransaction challengeTransaction = createChallengeTransaction(paymentData, challengeParticipant);
         challengeTransaction.addTransaction(challengeParticipant);
-        log.info("challengeParticipant = {}",challengeParticipant);
+        log.info("challengeParticipant = {}", challengeParticipant);
         challengeTransactionRepository.save(challengeTransaction);
     }
 
-    private ChallengeTransaction createChallengeTransaction(JSONObject paymentData, ChallengeParticipant challengeParticipant) {
-        return ChallengeTransaction.builder()
-                .challengePaymentStatus(ChallengePaymentStatus.PAID)
-                .challengeParticipant(challengeParticipant)
-                .merchantUid((String) paymentData.get("merchant_uid"))
-                .build();
+    @Transactional
+    public Long reportChallengeAuthPost(Long challengeAuthPostId, Long memberId, String reportReason) throws ChallengeAuthNotFound, MemberNotFound, DuplicateReporter, WriterEqualsReporter {
+
+        ChallengeAuthPost challengeAuthPost = challengeAuthPostRepository.findById(challengeAuthPostId).orElseThrow(() -> new ChallengeAuthNotFound(challengeAuthPostId));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
+
+        validateChallengeAuthPostReport(challengeAuthPost, member);
+
+        ChallengeAuthPostReport challengeAuthPostReport = createChallengeAuthPostReport(reportReason, challengeAuthPost, member);
+
+        return challengeAuthPostReportRepository.save(challengeAuthPostReport).getId();
     }
 
     public ChallengeParticipant findChallengeParticipant(Long challengeId, Long memberId) throws ChallengeNotFound, MemberNotFound, ChallengeParticipantNotFound {
@@ -229,11 +238,37 @@ public class ChallengeService {
 
     public List<ChallengeTransaction> findChallengeTransactionHistory(Long memberId) throws MemberNotFound, ChallengeNotFound, ChallengeParticipantNotFound {
 
-        Member member = memberRepository.findById(memberId).orElseThrow(()->new MemberNotFound(memberId));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
         List<ChallengeParticipant> challengeParticipantList = challengeParticipantRepository.findAllByMember(member);
         List<ChallengeTransaction> challengeTransactionList = challengeTransactionRepository.findAllByChallengeParticipantIn(challengeParticipantList);
 
         return challengeTransactionList;
+    }
+
+    private void validateChallengeAuthPostReport(ChallengeAuthPost challengeAuthPost, Member member) throws DuplicateReporter, WriterEqualsReporter {
+        if (challengeAuthPost.getMember().getId() == member.getId()) {
+            throw new WriterEqualsReporter();
+        }
+
+        if (challengeAuthPostReportRepository.findByChallengeAuthPostAndMember(challengeAuthPost, member).isPresent()) {
+            throw new DuplicateReporter();
+        }
+    }
+
+    private ChallengeAuthPostReport createChallengeAuthPostReport(String reportReason, ChallengeAuthPost challengeAuthPost, Member member) {
+        return ChallengeAuthPostReport.builder()
+                .challengeAuthPost(challengeAuthPost)
+                .member(member)
+                .reason(reportReason)
+                .build();
+    }
+
+    private ChallengeTransaction createChallengeTransaction(JSONObject paymentData, ChallengeParticipant challengeParticipant) {
+        return ChallengeTransaction.builder()
+                .challengePaymentStatus(ChallengePaymentStatus.PAID)
+                .challengeParticipant(challengeParticipant)
+                .merchantUid((String) paymentData.get("merchant_uid"))
+                .build();
     }
 
     private void validateChallengeAuthPost(Member member, ChallengeRoutine challengeRoutine, MemberRoutine memberRoutine) throws NotAllRoutineContentsProgressedInChallenge, DuplicateChallengeAuthInRoutine {
@@ -262,29 +297,46 @@ public class ChallengeService {
         return challengeAuthPost == null;
     }
 
-    private void validateChallengeParticipation(List<String> challengeRoutineProgressDateList, Challenge challenge, Member member) throws SelectedDatesNumNotEqualsWithChallenge, NotInChallengeRoutineProgressDateRange, DuplicateChallengeParticipant {
+    private void validateChallengeParticipation(List<String> challengeRoutineProgressDateList, Challenge challenge, Member member) throws SelectedDatesNumNotEqualsWithChallenge, MismatchChallengeRoutineProgressDateNumPerWeek, DuplicateChallengeParticipant, ChallengeRoutineProgressDateOutOfDate {
 
         if (!challengeParticipantRepository.findByChallengeAndMember(challenge, member).isEmpty()) {
             throw new DuplicateChallengeParticipant();
         }
 
+        if (!validateChallengeRoutineProgressDateNotOutOfDate(challenge, challengeRoutineProgressDateList)) {
+            throw new ChallengeRoutineProgressDateOutOfDate();
+        }
+
         if (!validateChallengeRoutineProgressDateNum(challenge, challengeRoutineProgressDateList)) {
             throw new SelectedDatesNumNotEqualsWithChallenge();
         }
-        if (!validateChallengeRoutineProgressDateRange(challenge, challengeRoutineProgressDateList)) {
-            throw new NotInChallengeRoutineProgressDateRange();
+
+        if (!validateChallengeRoutineProgressDateNumPerWeek(challenge, challengeRoutineProgressDateList)) {
+            throw new MismatchChallengeRoutineProgressDateNumPerWeek();
         }
+    }
+
+    private boolean validateChallengeRoutineProgressDateNotOutOfDate(Challenge challenge, List<String> challengeRoutineProgressDateList) {
+
+        LocalDate startDate = LocalDate.parse(challenge.getStartDate(), DateTimeFormatter.ISO_DATE);
+        LocalDate endDate = LocalDate.parse(challenge.getEndDate(), DateTimeFormatter.ISO_DATE);
+
+        for (String challengeRoutineProgressDateInString : challengeRoutineProgressDateList) {
+            LocalDate challengeRoutineProgressDate = LocalDate.parse(challengeRoutineProgressDateInString, DateTimeFormatter.ISO_DATE);
+
+            if (challengeRoutineProgressDate.isBefore(startDate) || challengeRoutineProgressDate.isAfter(endDate)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean validateChallengeRoutineProgressDateNum(Challenge challenge, List<String> challengeRoutineProgressDateList) {
 
-        log.info("challenge.getChallengeRoutineList().size() = {}", challenge.getChallengeRoutineList().size());
-        log.info("challengeRoutineProgressDateList.size() = {}", challengeRoutineProgressDateList.size());
-
         return challenge.getChallengeRoutineList().size() == challengeRoutineProgressDateList.size();
     }
 
-    private boolean validateChallengeRoutineProgressDateRange(Challenge challenge, List<String> challengeRoutineProgressDateList) {
+    private boolean validateChallengeRoutineProgressDateNumPerWeek(Challenge challenge, List<String> challengeRoutineProgressDateList) {
 
         LocalDate startDate = LocalDate.parse(challenge.getStartDate(), DateTimeFormatter.ISO_DATE);
         int count = 0;
@@ -292,14 +344,6 @@ public class ChallengeService {
         for (String challengeRoutineProgressDateInString : challengeRoutineProgressDateList) {
 
             LocalDate challengeRoutineProgressDate = LocalDate.parse(challengeRoutineProgressDateInString, DateTimeFormatter.ISO_DATE);
-
-            log.info("startDate = {}", startDate);
-            log.info("startDate + 5 = {}", startDate.plusDays(5));
-            log.info("startDate - 1 = {}", startDate.minusDays(1));
-            log.info("challengeRoutineProgressDate = {}", challengeRoutineProgressDate);
-
-            log.info("isAfter = {}", challengeRoutineProgressDate.isAfter(startDate.minusDays(1)));
-            log.info("isBefore = {}", challengeRoutineProgressDate.isBefore(startDate.plusDays(7)));
 
             if (!((challengeRoutineProgressDate.isAfter(startDate.minusDays(1))
                     && (challengeRoutineProgressDate.isBefore(startDate.plusDays(7)))))) {

@@ -200,7 +200,7 @@ public class SnsController {
     @PostMapping("/sns/report/comments/{snsCommentId}/members/{memberId}")
     public Long reportSnsComment(@ApiParam(value="신고 당한 sns 댓글 id",example = "1") @PathVariable  Long snsCommentId,
                               @ApiParam(value="신고자 id",example = "1") @PathVariable Long memberId,
-                              @ApiParam(value="신고 사유",example = "신고 사유") @ModelAttribute String reportReason) throws MemberNotFound, SnsPostNotFound, SnsCommentNotFound, DuplicateReporter, WriterEqualsReporter {
+                              @ApiParam(value="신고 사유",example = "신고 사유") @RequestParam String reportReason) throws MemberNotFound, SnsPostNotFound, SnsCommentNotFound, DuplicateReporter, WriterEqualsReporter {
         return snsService.reportSnsComment(snsCommentId,memberId,reportReason);
     }
 
