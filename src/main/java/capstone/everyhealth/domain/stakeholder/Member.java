@@ -16,10 +16,12 @@ public class Member {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
+    private String email;
     private String socialAccountId;
-    private String loginAt;
     private int height;
     private int weight;
     private String gymName;
-    private String name;
+    private String gymId;
+    private String customProfileImageUrl;
 }
