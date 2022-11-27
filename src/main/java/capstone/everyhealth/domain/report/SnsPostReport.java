@@ -1,13 +1,16 @@
 package capstone.everyhealth.domain.report;
 
-import lombok.Getter;
+import lombok.*;
 import capstone.everyhealth.domain.sns.SnsPost;
 import capstone.everyhealth.domain.stakeholder.Member;
 
 import javax.persistence.*;
 
 @Entity
-@Getter
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class SnsPostReport {
 
     @Id

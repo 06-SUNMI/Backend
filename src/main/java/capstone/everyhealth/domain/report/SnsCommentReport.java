@@ -3,13 +3,15 @@ package capstone.everyhealth.domain.report;
 import capstone.everyhealth.domain.sns.SnsComment;
 import capstone.everyhealth.domain.sns.SnsPost;
 import capstone.everyhealth.domain.stakeholder.Member;
-import lombok.Data;
-import lombok.Getter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
-@Getter
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class SnsCommentReport {
 
     @Id

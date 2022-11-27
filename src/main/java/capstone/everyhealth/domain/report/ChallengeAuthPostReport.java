@@ -1,13 +1,16 @@
 package capstone.everyhealth.domain.report;
 
 import capstone.everyhealth.domain.challenge.ChallengeAuthPost;
-import lombok.Getter;
+import lombok.*;
 import capstone.everyhealth.domain.stakeholder.Member;
 
 import javax.persistence.*;
 
 @Entity
-@Getter
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChallengeAuthPostReport {
 
     @Id

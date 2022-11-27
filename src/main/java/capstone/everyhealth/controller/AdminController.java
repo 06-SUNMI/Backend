@@ -45,7 +45,6 @@ public class AdminController {
     )
     @GetMapping("/admins/report/sns/posts")
     public List<ReportedSnsPostResponse> findSnsPostReports() {
-
         List<SnsPostReport> snsPostReportList = adminService.findAllSnsPostReports();
         List<ReportedSnsPostResponse> reportedSnsResponseList = new ArrayList<>();
 
