@@ -1,25 +1,25 @@
 package capstone.everyhealth.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import capstone.everyhealth.domain.report.SnsCommentReport;
+import capstone.everyhealth.domain.report.SnsPostReport;
 import capstone.everyhealth.domain.sns.SnsPostImageOrVideo;
+import capstone.everyhealth.exception.Sns.SnsCommentNotFound;
 import capstone.everyhealth.exception.Sns.SnsPostNotFound;
+import capstone.everyhealth.exception.report.DuplicateReporter;
+import capstone.everyhealth.exception.report.WriterEqualsReporter;
 import capstone.everyhealth.exception.stakeholder.MemberNotFound;
 import capstone.everyhealth.fileupload.service.FileUploadService;
+import capstone.everyhealth.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import capstone.everyhealth.controller.dto.Sns.SnsUpdateRequest;
 import capstone.everyhealth.domain.sns.SnsComment;
 import capstone.everyhealth.domain.sns.SnsFollowing;
 import capstone.everyhealth.domain.sns.SnsPost;
 import capstone.everyhealth.domain.stakeholder.Member;
-import capstone.everyhealth.repository.MemberRepository;
-import capstone.everyhealth.repository.SnsCommentRepository;
-import capstone.everyhealth.repository.SnsFollowRepository;
-import capstone.everyhealth.repository.SnsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +35,8 @@ public class SnsService {
     private final SnsRepository snsRepository;
     private final SnsCommentRepository snsCommentRepository;
     private final FileUploadService fileUploadService;
+    private final SnsPostReportRepository snsPostReportRepository;
+    private final SnsCommentReportRepository snsCommentReportRepository;
 
     public List<Member> findByName(String userName) {
         return memberRepository.findAllByName(userName);
@@ -50,7 +52,9 @@ public class SnsService {
                 .member(member)
                 .build();
 
-        addSnsPostsOrVideoFileListInSnsPost(snsPostsImageOrVideoFileList, snsPost);
+        if (snsPostsImageOrVideoFileList != null) {
+            addSnsPostsOrVideoFileListInSnsPost(snsPostsImageOrVideoFileList, snsPost);
+        }
 
         return snsRepository.save(snsPost).getId();
     }
@@ -63,7 +67,9 @@ public class SnsService {
         originSnsPost.setContent(snsPostContent);
         originSnsPost.getSnsPostImageOrVideoList().clear();
 
-        addSnsPostsOrVideoFileListInSnsPost(snsPostsImageOrVideoFileList, originSnsPost);
+        if (snsPostsImageOrVideoFileList != null) {
+            addSnsPostsOrVideoFileListInSnsPost(snsPostsImageOrVideoFileList, originSnsPost);
+        }
     }
 
     public SnsPost findOne(Long snsPostId) throws SnsPostNotFound {
@@ -126,6 +132,64 @@ public class SnsService {
     @Transactional
     public void deleteMember(Long memberId) {
         memberRepository.deleteById(memberId);
+    }
+
+    @Transactional
+    public Long reportSnsPost(Long snsPostId, Long memberId, String reportReason) throws SnsPostNotFound, MemberNotFound, DuplicateReporter, WriterEqualsReporter {
+
+        SnsPost snsPost = snsRepository.findById(snsPostId).orElseThrow(() -> new SnsPostNotFound(snsPostId));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
+
+        validateSnsPostReport(snsPost, member);
+
+        SnsPostReport snsPostReport = createSnsPostReport(snsPostId, memberId, reportReason);
+        return snsPostReportRepository.save(snsPostReport).getId();
+    }
+
+    @Transactional
+    public Long reportSnsComment(Long snsCommentId, Long memberId, String reportReason) throws SnsCommentNotFound, MemberNotFound, DuplicateReporter, WriterEqualsReporter {
+
+        SnsComment snsComment = snsCommentRepository.findById(snsCommentId).orElseThrow(() -> new SnsCommentNotFound(snsCommentId));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
+
+        validateSnsCommentReport(snsComment, member);
+
+        SnsCommentReport snsCommentReport = createSnsCommentReport(snsCommentId, memberId, reportReason);
+        return snsCommentReportRepository.save(snsCommentReport).getId();
+    }
+
+    private void validateSnsCommentReport(SnsComment snsComment, Member member) throws WriterEqualsReporter, DuplicateReporter {
+        if (snsComment.getMember().getId() == member.getId()) {
+            throw new WriterEqualsReporter();
+        }
+        if (snsCommentReportRepository.findByMemberAndSnsComment(member, snsComment).isPresent()) {
+            throw new DuplicateReporter();
+        }
+    }
+
+    private void validateSnsPostReport(SnsPost snsPost, Member member) throws WriterEqualsReporter, DuplicateReporter {
+        if (snsPost.getMember().getId() == member.getId()) {
+            throw new WriterEqualsReporter();
+        }
+        if (snsPostReportRepository.findByMemberAndSnsPost(member, snsPost).isPresent()) {
+            throw new DuplicateReporter();
+        }
+    }
+
+    private SnsCommentReport createSnsCommentReport(Long snsCommentId, Long memberId, String reportReason) throws SnsCommentNotFound, MemberNotFound {
+        return SnsCommentReport.builder()
+                .snsComment(snsCommentRepository.findById(snsCommentId).orElseThrow(() -> new SnsCommentNotFound(snsCommentId)))
+                .member(memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId)))
+                .reason(reportReason)
+                .build();
+    }
+
+    private SnsPostReport createSnsPostReport(Long snsPostId, Long memberId, String reportReason) throws SnsPostNotFound, MemberNotFound {
+        return SnsPostReport.builder()
+                .snsPost(snsRepository.findById(snsPostId).orElseThrow(() -> new SnsPostNotFound(snsPostId)))
+                .member(memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId)))
+                .reason(reportReason)
+                .build();
     }
 
     private void addSnsPostsOrVideoFileListInSnsPost(List<MultipartFile> snsPostsImageOrVideoFileList, SnsPost snsPost) {
