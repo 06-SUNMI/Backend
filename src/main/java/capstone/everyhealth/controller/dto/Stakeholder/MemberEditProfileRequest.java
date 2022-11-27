@@ -1,25 +1,29 @@
 package capstone.everyhealth.controller.dto.Stakeholder;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
-@Getter
+@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberFindResponse {
+public class MemberEditProfileRequest {
 
-    private Long memberId;
     @ApiModelProperty(value = "유저 이름",example = "홍길동")
     private String memberName;
-    @ApiModelProperty(value="소셜 로그인 한 곳",example = "카카오")
-    private String loginAt;
-    @ApiModelProperty(value ="소셜 로그인 한 곳에서 등록돼 있는 계정의 유저 고유 식별자 (id) 값",example = "123321")
-    private String socialAccountId;
     @ApiModelProperty(value = "유저 키",example = "178")
     private int memberHeight;
     @ApiModelProperty(value = "유저 몸무게",example = "66")
     private int memberWeight;
     @ApiModelProperty(value = "유저가 등록한 헬스장",example = "OO 헬스장")
     private String memberRegisteredGymName;
+    @ApiModelProperty(value = "유저가 등록한 헬스장 id",example = "1124152")
+    private String memberRegisteredGymId;
+    @ApiModelProperty(value = "프로필 이미지 파일")
+    private MultipartFile memberProfileImageFile;
 }
