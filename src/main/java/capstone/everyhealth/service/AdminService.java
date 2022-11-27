@@ -6,7 +6,7 @@ import capstone.everyhealth.domain.report.SnsCommentReport;
 import capstone.everyhealth.domain.report.SnsPostReport;
 import capstone.everyhealth.exception.stakeholder.AdminLoginFailed;
 import capstone.everyhealth.repository.AdminRepository;
-import capstone.everyhealth.repository.ChallengeReportRepository;
+import capstone.everyhealth.repository.ChallengeAuthPostReportRepository;
 import capstone.everyhealth.repository.SnsCommentReportRepository;
 import capstone.everyhealth.repository.SnsPostReportRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class AdminService {
     private final AdminRepository adminRepository;
     private final SnsPostReportRepository snsPostReportRepository;
     private final SnsCommentReportRepository snsCommentReportRepository;
-    private final ChallengeReportRepository challengeReportRepository;
+    private final ChallengeAuthPostReportRepository challengeAuthPostReportRepository;
 
     public void adminLoginValidation(AdminLoginRequest adminLoginRequest) throws AdminLoginFailed {
         validateAdminLoginRequest(adminLoginRequest);
@@ -40,7 +40,7 @@ public class AdminService {
     }
 
     public List<ChallengeAuthPostReport> findAllChallengeAuthPostReports() {
-        return challengeReportRepository.findAll();
+        return challengeAuthPostReportRepository.findAll();
     }
 
     private void validateAdminLoginRequest(AdminLoginRequest adminLoginRequest) throws AdminLoginFailed {
