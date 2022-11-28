@@ -2,6 +2,7 @@ package capstone.everyhealth.service;
 
 import java.util.List;
 
+import capstone.everyhealth.controller.dto.Sns.SnsCommentUpdateRequset;
 import capstone.everyhealth.domain.report.SnsCommentReport;
 import capstone.everyhealth.domain.report.SnsPostReport;
 import capstone.everyhealth.domain.sns.SnsPostImageOrVideo;
@@ -156,6 +157,17 @@ public class SnsService {
 
         SnsCommentReport snsCommentReport = createSnsCommentReport(snsCommentId, memberId, reportReason);
         return snsCommentReportRepository.save(snsCommentReport).getId();
+    }
+
+    @Transactional
+    public void deleteComment(Long commentId) {
+        snsCommentRepository.deleteById(commentId);
+    }
+
+    @Transactional //수정
+    public void updateComment(SnsCommentUpdateRequset snsCommentUpdateRequset, Long commentId) {
+        SnsComment originComment = snsCommentRepository.findById(commentId).get();
+        originComment.setSnsComment(snsCommentUpdateRequset.getSnsComment());
     }
 
     private void validateSnsCommentReport(SnsComment snsComment, Member member) throws WriterEqualsReporter, DuplicateReporter {

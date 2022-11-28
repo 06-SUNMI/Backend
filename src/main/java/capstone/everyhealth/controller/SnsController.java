@@ -7,10 +7,7 @@ import java.util.List;
 import javax.transaction.TransactionScoped;
 
 
-import capstone.everyhealth.controller.dto.Sns.SnsCommentRequset;
-import capstone.everyhealth.controller.dto.Sns.SnsCommentResponse;
-import capstone.everyhealth.controller.dto.Sns.SnsFindResponse;
-import capstone.everyhealth.controller.dto.Sns.SnsUpdateRequest;
+import capstone.everyhealth.controller.dto.Sns.*;
 
 import capstone.everyhealth.domain.sns.SnsPostImageOrVideo;
 import capstone.everyhealth.exception.Sns.SnsCommentNotFound;
@@ -24,7 +21,6 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import capstone.everyhealth.controller.dto.Sns.SnsPostRequest;
 import capstone.everyhealth.domain.sns.SnsComment;
 import capstone.everyhealth.domain.sns.SnsPost;
 import capstone.everyhealth.domain.stakeholder.Member;
@@ -202,6 +198,18 @@ public class SnsController {
                               @ApiParam(value="신고자 id",example = "1") @PathVariable Long memberId,
                               @ApiParam(value="신고 사유",example = "신고 사유") @RequestParam String reportReason) throws MemberNotFound, SnsPostNotFound, SnsCommentNotFound, DuplicateReporter, WriterEqualsReporter {
         return snsService.reportSnsComment(snsCommentId,memberId,reportReason);
+    }
+
+    @DeleteMapping("/sns/comments/{commentId}")
+    public void deleteComment(@PathVariable Long commentId) {
+        snsService.deleteComment(commentId);
+    }
+
+    @PutMapping("/sns/comments/{commentId}") // 수정
+    public void updateComment(@RequestBody SnsCommentUpdateRequset snsCommentUpdateRequest,
+                              @PathVariable Long commentId) {
+
+        snsService.updateComment(snsCommentUpdateRequest, commentId);
     }
 
     private SnsFindResponse createSnsFindResponse(SnsPost snsPost) {
