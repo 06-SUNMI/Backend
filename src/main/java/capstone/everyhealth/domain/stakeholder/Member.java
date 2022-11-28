@@ -18,6 +18,7 @@ public class Member {
 
     private String name;
     private String email;
+    private String loginAt;
     private String socialAccountId;
     private int height;
     private int weight;

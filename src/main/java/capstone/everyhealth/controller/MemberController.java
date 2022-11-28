@@ -2,6 +2,7 @@ package capstone.everyhealth.controller;
 
 import capstone.everyhealth.controller.dto.Stakeholder.MemberCreateRequest;
 import capstone.everyhealth.controller.dto.Stakeholder.MemberEditProfileRequest;
+import capstone.everyhealth.controller.dto.Stakeholder.MemberFindResponse;
 import capstone.everyhealth.controller.dto.Stakeholder.MemberProfileFindResponse;
 import capstone.everyhealth.domain.stakeholder.Member;
 import capstone.everyhealth.exception.stakeholder.MemberNotFound;
@@ -42,9 +43,31 @@ public class MemberController {
             value = "전체 멤버 조회 (테스트용)",
             notes = "현재 db에 저장된 멤버들의 id 리스트를 반환한다."
     )
-    @GetMapping("/members")
+    @GetMapping("/members-test")
     public List<Long> findAllMembers() {
         return memberService.findAll();
+    }
+
+    @ApiOperation(
+            value = "전체 멤버 조회 - 카카오 로그인 가입 여부 확인용",
+            notes = "각 멤버의 loginAt(ex)카카오)과 socialId를 전달한다."
+    )
+    @GetMapping("/members")
+    public List<MemberFindResponse> findAllMember(){
+
+        List<MemberFindResponse> memberFindResponseList = new ArrayList<>();
+        List<Member> memberList = memberService.findAllMember();
+
+        for(Member member:memberList){
+            MemberFindResponse memberFindResponse = MemberFindResponse.builder()
+                    .loginAt(member.getLoginAt())
+                    .socialId(member.getSocialAccountId())
+                    .build();
+
+            memberFindResponseList.add(memberFindResponse);
+        }
+
+        return memberFindResponseList;
     }
 
     @ApiOperation(
@@ -102,6 +125,7 @@ public class MemberController {
         return Member.builder()
                 .name(memberCreateRequest.getMemberName())
                 .email(memberCreateRequest.getMemberEmail())
+                .loginAt(memberCreateRequest.getLoginAt())
                 .socialAccountId(memberCreateRequest.getSocialAccountId())
                 .height(memberCreateRequest.getMemberHeight())
                 .weight(memberCreateRequest.getMemberWeight())

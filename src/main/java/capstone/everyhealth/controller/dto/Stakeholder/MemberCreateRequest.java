@@ -13,6 +13,8 @@ public class MemberCreateRequest{
     private String memberName;
     @ApiModelProperty(value = "유저 이메일",example = "asdf1234@naver.com")
     private String memberEmail;
+    @ApiModelProperty(value = "소셜 로그인한 곳",example = "KAKAO")
+    private String loginAt;
     @ApiModelProperty(value ="소셜 로그인 한 곳에서 등록돼 있는 계정의 유저 고유 식별자 (id) 값",example = "123321")
     private String socialAccountId;
     @ApiModelProperty(value = "유저 키",example = "178")
