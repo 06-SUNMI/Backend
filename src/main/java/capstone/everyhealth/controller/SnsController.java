@@ -7,7 +7,9 @@ import java.util.List;
 import javax.transaction.TransactionScoped;
 
 
-import capstone.everyhealth.controller.dto.Sns.*;
+import capstone.everyhealth.controller.dto.Sns.SnsCommentRequset;
+import capstone.everyhealth.controller.dto.Sns.SnsCommentResponse;
+import capstone.everyhealth.controller.dto.Sns.SnsFindResponse;
 
 import capstone.everyhealth.domain.sns.SnsPostImageOrVideo;
 import capstone.everyhealth.exception.Sns.SnsCommentNotFound;
@@ -52,11 +54,11 @@ public class SnsController {
             value = "Sns 게시글 작성",
             notes = "유저가 작성한 Sns 게시글을 저장한다."
     )
-    @PostMapping(path = "/sns/posts/users/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "/sns/posts/users/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public Long save(@ApiParam(value = "게시글 파일 (여러개 가능)") @RequestPart(required = false) List<MultipartFile> snsPostsImageOrVideoFileList,
                      @ApiParam(value = "사용자 id 값") @PathVariable Long userId,
             /*@ApiParam(value = "작성 게시글의 내용") @RequestPart SnsPostRequest snsPostRequest)*/
-                     @ApiParam(value = "Sns 작성 글 내용") @RequestParam() String snsPostContent) throws MemberNotFound {
+                     @ApiParam(value = "Sns 작성 글 내용") @RequestParam("snsPostContent") String snsPostContent) throws MemberNotFound {
         return snsService.save(snsPostContent, userId, snsPostsImageOrVideoFileList);
     }
 
@@ -83,11 +85,11 @@ public class SnsController {
             value = "Sns 게시글 내용 수정",
             notes = "유저가 수정한 Sns 게시글 내용을 저장한다."
     )
-    @PutMapping("/sns/posts/{snsPostId}")
-    public String update(@ApiParam(value = "Sns 작성 글 id 값") @PathVariable Long snsPostId,
-                         @ApiParam(value = "Sns 게시글 내용") @RequestBody SnsPostRequest snsUpdateRequest,
-                         @ApiParam(value = "게시글 파일 (여러개 개능)") @RequestPart(required = false) List<MultipartFile> snsPostsImageOrVideoFileList) throws SnsPostNotFound {
-        snsService.update(snsPostId, snsUpdateRequest.getSnsContent(), snsPostsImageOrVideoFileList);
+    @PutMapping(path = "/sns/posts/{snsPostId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public String update(@ApiParam(value = "게시글 파일 (여러개 개능)") @RequestPart(required = false) List<MultipartFile> snsPostsImageOrVideoFileList,
+                         @ApiParam(value = "Sns 작성 글 id 값") @PathVariable Long snsPostId,
+                         @ApiParam(value = "Sns 게시글 내용") @RequestParam String snsPostContent) throws SnsPostNotFound {
+        snsService.update(snsPostId, snsPostContent, snsPostsImageOrVideoFileList);
 
         return "수정 완료";
     }
@@ -150,9 +152,9 @@ public class SnsController {
             notes = "유저가 작성한 댓글을 저장한다."
     )
     @PostMapping("/sns/posts/{snsPostId}/comments/members/{memberId}")
-    public Long addComment(@ApiParam(value="댓글 내용",example = "댓글 내용")@RequestBody SnsCommentRequset snsCommentRequest,
-                           @ApiParam(value ="댓글 단 작성 글 id")@PathVariable Long snsPostId,
-                           @ApiParam(value="멤버 id")@PathVariable Long memberId) throws SnsPostNotFound, MemberNotFound {
+    public Long addComment(@ApiParam(value = "댓글 내용", example = "댓글 내용") @RequestBody SnsCommentRequset snsCommentRequest,
+                           @ApiParam(value = "댓글 단 작성 글 id") @PathVariable Long snsPostId,
+                           @ApiParam(value = "멤버 id") @PathVariable Long memberId) throws SnsPostNotFound, MemberNotFound {
 
         SnsPost snsPost = snsService.findOne(snsPostId);
         Member member = memberService.findMemberById(memberId);
@@ -183,10 +185,10 @@ public class SnsController {
             notes = "Sns 작성 글을 신고하고 해당 기록을 db에 저장한다.\n"
     )
     @PostMapping("/sns/report/posts/{snsPostId}/members/{memberId}")
-    public Long reportSnsPost(@ApiParam(value="신고 당한 sns글 id",example = "1") @PathVariable  Long snsPostId,
-                                @ApiParam(value="신고자 id",example = "1") @PathVariable Long memberId,
-                                @ApiParam(value="신고 사유",example = "신고 사유") @RequestParam String reportReason) throws MemberNotFound, SnsPostNotFound, DuplicateReporter, WriterEqualsReporter {
-        return snsService.reportSnsPost(snsPostId,memberId,reportReason);
+    public Long reportSnsPost(@ApiParam(value = "신고 당한 sns글 id", example = "1") @PathVariable Long snsPostId,
+                              @ApiParam(value = "신고자 id", example = "1") @PathVariable Long memberId,
+                              @ApiParam(value = "신고 사유", example = "신고 사유") @RequestParam String reportReason) throws MemberNotFound, SnsPostNotFound, DuplicateReporter, WriterEqualsReporter {
+        return snsService.reportSnsPost(snsPostId, memberId, reportReason);
     }
 
     @ApiOperation(
@@ -194,22 +196,10 @@ public class SnsController {
             notes = "Sns 댓글을 신고하고 해당 기록을 db에 저장한다.\n"
     )
     @PostMapping("/sns/report/comments/{snsCommentId}/members/{memberId}")
-    public Long reportSnsComment(@ApiParam(value="신고 당한 sns 댓글 id",example = "1") @PathVariable  Long snsCommentId,
-                              @ApiParam(value="신고자 id",example = "1") @PathVariable Long memberId,
-                              @ApiParam(value="신고 사유",example = "신고 사유") @RequestParam String reportReason) throws MemberNotFound, SnsPostNotFound, SnsCommentNotFound, DuplicateReporter, WriterEqualsReporter {
-        return snsService.reportSnsComment(snsCommentId,memberId,reportReason);
-    }
-
-    @DeleteMapping("/sns/comments/{commentId}")
-    public void deleteComment(@PathVariable Long commentId) {
-        snsService.deleteComment(commentId);
-    }
-
-    @PutMapping("/sns/comments/{commentId}") // 수정
-    public void updateComment(@RequestBody SnsCommentUpdateRequset snsCommentUpdateRequest,
-                              @PathVariable Long commentId) {
-
-        snsService.updateComment(snsCommentUpdateRequest, commentId);
+    public Long reportSnsComment(@ApiParam(value = "신고 당한 sns 댓글 id", example = "1") @PathVariable Long snsCommentId,
+                                 @ApiParam(value = "신고자 id", example = "1") @PathVariable Long memberId,
+                                 @ApiParam(value = "신고 사유", example = "신고 사유") @RequestParam String reportReason) throws MemberNotFound, SnsPostNotFound, SnsCommentNotFound, DuplicateReporter, WriterEqualsReporter {
+        return snsService.reportSnsComment(snsCommentId, memberId, reportReason);
     }
 
     private SnsFindResponse createSnsFindResponse(SnsPost snsPost) {
