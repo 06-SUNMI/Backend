@@ -58,7 +58,7 @@ public class SnsController {
     public Long save(@ApiParam(value = "게시글 파일 (여러개 가능)") @RequestPart(required = false) List<MultipartFile> snsPostsImageOrVideoFileList,
                      @ApiParam(value = "사용자 id 값") @PathVariable Long userId,
             /*@ApiParam(value = "작성 게시글의 내용") @RequestPart SnsPostRequest snsPostRequest)*/
-                     @ApiParam(value = "Sns 작성 글 내용") @RequestParam("snsPostContent") String snsPostContent) throws MemberNotFound {
+                     @ApiParam(value = "Sns 작성 글 내용") @RequestPart String snsPostContent) throws MemberNotFound {
         return snsService.save(snsPostContent, userId, snsPostsImageOrVideoFileList);
     }
 
@@ -88,7 +88,7 @@ public class SnsController {
     @PutMapping(path = "/sns/posts/{snsPostId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public String update(@ApiParam(value = "게시글 파일 (여러개 개능)") @RequestPart(required = false) List<MultipartFile> snsPostsImageOrVideoFileList,
                          @ApiParam(value = "Sns 작성 글 id 값") @PathVariable Long snsPostId,
-                         @ApiParam(value = "Sns 게시글 내용") @RequestParam String snsPostContent) throws SnsPostNotFound {
+                         @ApiParam(value = "Sns 게시글 내용") @RequestPart String snsPostContent) throws SnsPostNotFound {
         snsService.update(snsPostId, snsPostContent, snsPostsImageOrVideoFileList);
 
         return "수정 완료";
