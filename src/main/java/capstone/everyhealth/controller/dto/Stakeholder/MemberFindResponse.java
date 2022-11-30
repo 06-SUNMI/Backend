@@ -12,7 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MemberFindResponse {
 
-    @ApiModelProperty(value="소셜 로그인한 곳",example = "카카오")
+    @ApiModelProperty(value="멤버 id",example = "1")
+    private Long memberId;
+    @ApiModelProperty(value="소셜 로그인한 곳",example = "KAKAO")
     private String loginAt;
     @ApiModelProperty(value="소셜 로그인한 곳 고유 id",example = "12313131")
     private String socialId;

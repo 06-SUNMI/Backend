@@ -23,9 +23,10 @@ application.properties
 application-dev.properties
 application-prd.properties
 application-test.properties
-**/src/main/java/capstone/everyhealth/config/ApplicationDevProperties.*
-**/src/main/java/capstone/everyhealth/InitDb.*
 ApplicationDevProperties.java
+InitDb.java
+Test.java
+InitService.java
 
 
 .idea
