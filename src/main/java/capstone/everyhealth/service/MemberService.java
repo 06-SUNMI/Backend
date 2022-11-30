@@ -1,6 +1,7 @@
 package capstone.everyhealth.service;
 
 import capstone.everyhealth.controller.dto.Stakeholder.MemberEditProfileRequest;
+import capstone.everyhealth.controller.dto.Stakeholder.MemberFindResponse;
 import capstone.everyhealth.domain.stakeholder.Member;
 import capstone.everyhealth.exception.stakeholder.MemberNotFound;
 import capstone.everyhealth.fileupload.service.FileUploadService;
@@ -52,6 +53,10 @@ public class MemberService {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
 
         updateMemberData(memberEditProfileRequest, member, memberProfileImageFile);
+    }
+
+    public List<Member> findAllMember() {
+        return memberRepository.findAll();
     }
 
     private void updateMemberData(MemberEditProfileRequest memberEditProfileRequest, Member member, MultipartFile memberProfileImageFile) {
