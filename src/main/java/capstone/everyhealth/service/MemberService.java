@@ -59,6 +59,13 @@ public class MemberService {
         return memberRepository.findAll();
     }
 
+    public List<Member> findMemberByGymId(Long memberId) throws MemberNotFound {
+        Member member = memberRepository.findById(memberId).orElseThrow(()-> new MemberNotFound(memberId));
+        String gymId = member.getGymId();
+
+        return memberRepository.findAllByGymIdAndIdNot(gymId,memberId);
+    }
+
     private void updateMemberData(MemberEditProfileRequest memberEditProfileRequest, Member member, MultipartFile memberProfileImageFile) {
 
         String customProfileImageUrl;

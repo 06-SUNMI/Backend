@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,18 +61,41 @@ public class ChallengeController {
     }
 
     @ApiOperation(
-            value = "챌린지 전체 조회 by Member, Admin",
-            notes = "등록된 전체 챌린지를 조회한다.\n"
+            value = "진행 중인 챌린지 전체 조회 by Member, Admin",
+            notes = "현재 진행 중인 전체 챌린지를 조회한다.\n"
                     + "관리자는 관리자 페이지서, 사용자는 앱 내 챌린지 페이지서 전체 챌린지를 조회할 때 사용한다.\n"
                     + "여기선 챌린지 목록만 보여주는 거라 겉 내용만. 루틴 및 세부 내용은 X\n"
                     + "상세 내용은 반환 값 중 id를 이용하여 상세 조회\n"
     )
 
     @GetMapping("/challenges")
-    public List<ChallengeFindResponse> findAll() {
+    public List<ChallengeFindResponse> findAllOpenChallenges() {
 
         List<ChallengeFindResponse> challengeFindResponseList = new ArrayList<>();
-        List<Challenge> challengeList = challengeService.findAll();
+        List<Challenge> challengeList = challengeService.findAllOpenChallenges();
+
+        for (Challenge challenge : challengeList) {
+
+            ChallengeFindResponse challengeFindResponse = createChallengeFindResponse(challenge);
+            challengeFindResponseList.add(challengeFindResponse);
+        }
+
+        return challengeFindResponseList;
+    }
+
+    @ApiOperation(
+            value = "종료된 챌린지 전체 조회 by Member, Admin",
+            notes = "종료된 전체 챌린지를 조회한다.\n"
+                    + "관리자는 관리자 페이지서, 사용자는 앱 내 챌린지 페이지서 전체 챌린지를 조회할 때 사용한다.\n"
+                    + "여기선 챌린지 목록만 보여주는 거라 겉 내용만. 루틴 및 세부 내용은 X\n"
+                    + "상세 내용은 반환 값 중 id를 이용하여 상세 조회\n"
+    )
+
+    @GetMapping("/challenges/closed")
+    public List<ChallengeFindResponse> findAllClosedChallenges() {
+
+        List<ChallengeFindResponse> challengeFindResponseList = new ArrayList<>();
+        List<Challenge> challengeList = challengeService.findAllClosedChallenges();
 
         for (Challenge challenge : challengeList) {
 
@@ -238,12 +263,12 @@ public class ChallengeController {
     private ChallengeFindByMemberResponse createChallengeFindByMemberResponse(Challenge challenge, ChallengeParticipant challengeParticipant) {
         return ChallengeFindByMemberResponse.builder()
                 .challengeId(challenge.getId())
-                .endDate(challenge.getEndDate())
+                .endDate(changeTypeLocalDateToString(challenge.getEndDate()))
                 .name(challenge.getName())
                 .numPerWeek(challenge.getNumPerWeek())
                 .participationFee(challenge.getParticipationFee())
                 .participationNum(challenge.getParticipationNum())
-                .startDate(challenge.getStartDate())
+                .startDate(changeTypeLocalDateToString(challenge.getStartDate()))
                 .challengeParticipantStatus(challengeParticipant.getChallengeStatus())
                 .progressRate(100 * challengeParticipant.getCompletedRoutinesNum() / challenge.getChallengeRoutineList().size())
                 .build();
@@ -267,8 +292,8 @@ public class ChallengeController {
                 .numPerWeek(challenge.getNumPerWeek())
                 .participationNum(challenge.getParticipationNum())
                 .participationFee(challenge.getParticipationFee())
-                .startDate(challenge.getStartDate())
-                .endDate(challenge.getEndDate())
+                .startDate(changeTypeLocalDateToString(challenge.getStartDate()))
+                .endDate(changeTypeLocalDateToString(challenge.getEndDate()))
                 .challengeRoutineDataList(challengeRoutineDataList)
                 .build();
     }
@@ -294,12 +319,12 @@ public class ChallengeController {
     private ChallengeFindResponse createChallengeFindResponse(Challenge challenge) {
         return ChallengeFindResponse.builder()
                 .challengeId(challenge.getId())
-                .endDate(challenge.getEndDate())
+                .endDate(changeTypeLocalDateToString(challenge.getEndDate()))
                 .name(challenge.getName())
                 .numPerWeek(challenge.getNumPerWeek())
                 .participationFee(challenge.getParticipationFee())
                 .participationNum(challenge.getParticipationNum())
-                .startDate(challenge.getStartDate())
+                .startDate(changeTypeLocalDateToString(challenge.getStartDate()))
                 .build();
     }
 
@@ -324,8 +349,8 @@ public class ChallengeController {
         }
 
         return Challenge.builder()
-                .endDate(challengePostRequest.getChallengeEndDate())
-                .startDate(challengePostRequest.getChallengeStartDate())
+                .endDate(changeTypeStringToLocalDate(challengePostRequest.getChallengeEndDate()))
+                .startDate(changeTypeStringToLocalDate(challengePostRequest.getChallengeStartDate()))
                 .name(challengePostRequest.getChallengeName())
                 .numPerWeek(challengePostRequest.getChallengeNumPerWeek())
                 .participationFee(challengePostRequest.getChallengeParticipationFee())
@@ -354,5 +379,13 @@ public class ChallengeController {
         WorkoutName workoutName = challengeRoutineContentData.getChallengeRoutineWorkoutName();
 
         return workoutService.findByWorkoutName(workoutName);
+    }
+
+    private LocalDate changeTypeStringToLocalDate(String localDate){
+        return LocalDate.parse(localDate, DateTimeFormatter.ISO_DATE);
+    }
+
+    private String changeTypeLocalDateToString(LocalDate localDate){
+        return localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 }

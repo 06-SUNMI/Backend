@@ -11,6 +11,7 @@ import capstone.everyhealth.controller.dto.Sns.SnsCommentRequset;
 import capstone.everyhealth.controller.dto.Sns.SnsCommentResponse;
 import capstone.everyhealth.controller.dto.Sns.SnsFindResponse;
 
+import capstone.everyhealth.controller.dto.Stakeholder.MemberProfileFindResponse;
 import capstone.everyhealth.domain.sns.SnsPostImageOrVideo;
 import capstone.everyhealth.exception.Sns.SnsCommentNotFound;
 import capstone.everyhealth.exception.Sns.SnsPostNotFound;
@@ -200,6 +201,41 @@ public class SnsController {
                                  @ApiParam(value = "신고자 id", example = "1") @PathVariable Long memberId,
                                  @ApiParam(value = "신고 사유", example = "신고 사유") @RequestParam String reportReason) throws MemberNotFound, SnsPostNotFound, SnsCommentNotFound, DuplicateReporter, WriterEqualsReporter {
         return snsService.reportSnsComment(snsCommentId, memberId, reportReason);
+    }
+
+    @ApiOperation(
+            value = "같은 헬스장 다니는 유저 조회",
+            notes = "등록된 헬스장이 같은 유저들을 조회한다.\n"
+                    + "헬스장 이름이 아니라 카카오 로컬 api에서의 id가 같은 조건으로 검색\n"
+    )
+    @GetMapping("/sns/members/{memberId}/same-gym")
+    public List<MemberProfileFindResponse> findAllMemberByGymId(@ApiParam(value = "멤버 id 값", example = "1") @PathVariable Long memberId) throws MemberNotFound {
+
+        List<MemberProfileFindResponse> memberProfileFindResponseList = new ArrayList<>();
+        List<Member> memberList = memberService.findMemberByGymId(memberId);
+
+        for(Member member : memberList){
+            log.info("gym-id : {}",member.getGymId());
+        }
+
+        addMemberProfileFindResponseToList(memberProfileFindResponseList, memberList);
+
+        return memberProfileFindResponseList;
+    }
+
+    private void addMemberProfileFindResponseToList(List<MemberProfileFindResponse> memberProfileFindResponseList, List<Member> memberList) {
+        for (Member member : memberList) {
+
+            MemberProfileFindResponse memberProfileFindResponse = MemberProfileFindResponse.builder()
+                    .memberHeight(member.getHeight())
+                    .memberName(member.getName())
+                    .memberRegisteredGymName(member.getGymName())
+                    .memberWeight(member.getWeight())
+                    .customProfileImageUrl(member.getCustomProfileImageUrl())
+                    .build();
+
+            memberProfileFindResponseList.add(memberProfileFindResponse);
+        }
     }
 
     private SnsFindResponse createSnsFindResponse(SnsPost snsPost) {
