@@ -322,8 +322,8 @@ public class ChallengeService {
 
     private boolean validateChallengeRoutineProgressDateNotOutOfDate(Challenge challenge, List<String> challengeRoutineProgressDateList) {
 
-        LocalDate startDate = challenge.getStartDate();
-        LocalDate endDate = challenge.getEndDate();
+        LocalDate startDate = changeTypeStringToLocalDate(challenge.getStartDate());
+        LocalDate endDate = changeTypeStringToLocalDate(challenge.getEndDate());
 
         for (String challengeRoutineProgressDateInString : challengeRoutineProgressDateList) {
             LocalDate challengeRoutineProgressDate = LocalDate.parse(challengeRoutineProgressDateInString, DateTimeFormatter.ISO_DATE);
@@ -342,7 +342,7 @@ public class ChallengeService {
 
     private boolean validateChallengeRoutineProgressDateNumPerWeek(Challenge challenge, List<String> challengeRoutineProgressDateList) {
 
-        LocalDate startDate = challenge.getStartDate();
+        LocalDate startDate = changeTypeStringToLocalDate(challenge.getStartDate());
         int count = 0;
 
         for (String challengeRoutineProgressDateInString : challengeRoutineProgressDateList) {
@@ -438,5 +438,13 @@ public class ChallengeService {
         }
 
         prevChallenge.getChallengeRoutineList().clear();
+    }
+
+    private LocalDate changeTypeStringToLocalDate(String localDate){
+        return LocalDate.parse(localDate, DateTimeFormatter.ISO_DATE);
+    }
+
+    private String changeTypeLocalDateToString(LocalDate localDate){
+        return localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 }

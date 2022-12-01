@@ -156,13 +156,13 @@ public class ChallengePaymentController {
     }
 
     private ChallengeTransactionHistory createChallengeTransactionHistory(ChallengeTransaction challengeTransaction) {
-        LocalDate challengeStartDate = challengeTransaction.getChallengeParticipant().getChallenge().getStartDate();
-        LocalDate challengeEndDate = challengeTransaction.getChallengeParticipant().getChallenge().getEndDate();
+        String challengeStartDate = challengeTransaction.getChallengeParticipant().getChallenge().getStartDate();
+        String challengeEndDate = challengeTransaction.getChallengeParticipant().getChallenge().getEndDate();
         return ChallengeTransactionHistory.builder()
                 .challengePaymentStatus(challengeTransaction.getChallengePaymentStatus())
-                .challengeEndDate(challengeEndDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                .challengeEndDate(challengeEndDate)
                 .challengeName(challengeTransaction.getChallengeParticipant().getChallenge().getName())
-                .challengeStartDate(challengeStartDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                .challengeStartDate(challengeStartDate)
                 .challengeStatus(challengeTransaction.getChallengeParticipant().getChallengeStatus())
                 .build();
     }

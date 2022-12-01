@@ -25,8 +25,8 @@ public class Challenge {
     private List<ChallengeRoutine> challengeRoutineList = new ArrayList<>();
 
     private String name;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private String startDate;
+    private String endDate;
     private int participationFee;
     private int participationNum;
     private int numPerWeek;
