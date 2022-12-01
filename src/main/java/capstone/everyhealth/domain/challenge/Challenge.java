@@ -4,6 +4,7 @@ import capstone.everyhealth.controller.dto.Challenge.ChallengePostOrUpdateReques
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +25,8 @@ public class Challenge {
     private List<ChallengeRoutine> challengeRoutineList = new ArrayList<>();
 
     private String name;
-    private String startDate;
-    private String endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private int participationFee;
     private int participationNum;
     private int numPerWeek;
