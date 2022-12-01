@@ -4,6 +4,7 @@ import capstone.everyhealth.controller.dto.Challenge.ChallengePostOrUpdateReques
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

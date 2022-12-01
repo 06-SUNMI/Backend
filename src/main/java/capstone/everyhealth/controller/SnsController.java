@@ -11,6 +11,7 @@ import capstone.everyhealth.controller.dto.Sns.SnsCommentRequset;
 import capstone.everyhealth.controller.dto.Sns.SnsCommentResponse;
 import capstone.everyhealth.controller.dto.Sns.SnsFindResponse;
 
+import capstone.everyhealth.controller.dto.Stakeholder.MemberProfileFindResponse;
 import capstone.everyhealth.domain.sns.SnsPostImageOrVideo;
 import capstone.everyhealth.exception.Sns.SnsCommentNotFound;
 import capstone.everyhealth.exception.Sns.SnsPostNotFound;
@@ -129,23 +130,14 @@ public class SnsController {
         return "팔로우 취소 완료";
     }
 
-    @ApiOperation(
-            value = "Sns 작성 글 좋아요 누르기",
-            notes = "Sns 작성 글에 좋아요를 누르면 좋아요 누른 뒤의 좋아요 수(+1)를 반환한다."
-    )
-    @PutMapping("/sns/posts/{snsPostId}/addLike")
-    public int addLike(@ApiParam(value = "좋아요 누른 Sns 작성 글 id 값") @PathVariable Long snsPostId) throws SnsPostNotFound {
-        return snsService.addLike(snsPostId);
+    @ApiOperation(value = "Sns 작성 글 좋아요 누르기", notes = "Sns 작성 글에 좋아요를 누르면 좋아요 누른 뒤의 좋아요 수(+1)를 반환한다.")
+    @PutMapping("/sns/posts/{snsPostId}/likes/members/{memberId}")
+    public int postLike(@ApiParam(value = "좋아요 누른 Sns 작성 글 id 값") @PathVariable Long snsPostId,
+            @ApiParam(value = "좋아요 누른 Member Id 값") @PathVariable Long memberId)
+            throws SnsPostNotFound, MemberNotFound {
+        return snsService.postLike(snsPostId, memberId);
     }
 
-    @ApiOperation(
-            value = "Sns 작성 글 좋아요 취소하기",
-            notes = "이미 좋아요를 누른 Sns 작성 글에 좋아요를 다시 누르면 좋아요 누른 뒤의 좋아요 수(-1)를 반환한다."
-    )
-    @PutMapping("/sns/posts/{snsId}/cancelLike")
-    public int cancelLike(@ApiParam(value = "좋아요 받은 Sns 작성 글 id") @PathVariable Long snsId) throws SnsPostNotFound {
-        return snsService.cancelLike(snsId);
-    }
 
     @ApiOperation(
             value = "댓글 달기",
@@ -200,6 +192,41 @@ public class SnsController {
                                  @ApiParam(value = "신고자 id", example = "1") @PathVariable Long memberId,
                                  @ApiParam(value = "신고 사유", example = "신고 사유") @RequestParam String reportReason) throws MemberNotFound, SnsPostNotFound, SnsCommentNotFound, DuplicateReporter, WriterEqualsReporter {
         return snsService.reportSnsComment(snsCommentId, memberId, reportReason);
+    }
+
+    @ApiOperation(
+            value = "같은 헬스장 다니는 유저 조회",
+            notes = "등록된 헬스장이 같은 유저들을 조회한다.\n"
+                    + "헬스장 이름이 아니라 카카오 로컬 api에서의 id가 같은 조건으로 검색\n"
+    )
+    @GetMapping("/sns/members/{memberId}/same-gym")
+    public List<MemberProfileFindResponse> findAllMemberByGymId(@ApiParam(value = "멤버 id 값", example = "1") @PathVariable Long memberId) throws MemberNotFound {
+
+        List<MemberProfileFindResponse> memberProfileFindResponseList = new ArrayList<>();
+        List<Member> memberList = memberService.findMemberByGymId(memberId);
+
+        for(Member member : memberList){
+            log.info("gym-id : {}",member.getGymId());
+        }
+
+        addMemberProfileFindResponseToList(memberProfileFindResponseList, memberList);
+
+        return memberProfileFindResponseList;
+    }
+
+    private void addMemberProfileFindResponseToList(List<MemberProfileFindResponse> memberProfileFindResponseList, List<Member> memberList) {
+        for (Member member : memberList) {
+
+            MemberProfileFindResponse memberProfileFindResponse = MemberProfileFindResponse.builder()
+                    .memberHeight(member.getHeight())
+                    .memberName(member.getName())
+                    .memberRegisteredGymName(member.getGymName())
+                    .memberWeight(member.getWeight())
+                    .customProfileImageUrl(member.getCustomProfileImageUrl())
+                    .build();
+
+            memberProfileFindResponseList.add(memberProfileFindResponse);
+        }
     }
 
     private SnsFindResponse createSnsFindResponse(SnsPost snsPost) {

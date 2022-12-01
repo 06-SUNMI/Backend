@@ -1,11 +1,13 @@
 package capstone.everyhealth.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import capstone.everyhealth.controller.dto.Sns.SnsCommentUpdateRequset;
 import capstone.everyhealth.domain.report.SnsCommentReport;
 import capstone.everyhealth.domain.report.SnsPostReport;
 import capstone.everyhealth.domain.sns.SnsPostImageOrVideo;
+import capstone.everyhealth.domain.sns.SnsPostLikes;
 import capstone.everyhealth.exception.Sns.SnsCommentNotFound;
 import capstone.everyhealth.exception.Sns.SnsPostNotFound;
 import capstone.everyhealth.exception.report.DuplicateReporter;
@@ -38,6 +40,7 @@ public class SnsService {
     private final FileUploadService fileUploadService;
     private final SnsPostReportRepository snsPostReportRepository;
     private final SnsCommentReportRepository snsCommentReportRepository;
+    private final SnsPostLikesRepository snsPostLikesRepository;
 
     public List<Member> findByName(String userName) {
         return memberRepository.findAllByName(userName);
@@ -45,7 +48,8 @@ public class SnsService {
     }
 
     @Transactional
-    public Long save(String snsPostContent, Long userId, List<MultipartFile> snsPostsImageOrVideoFileList) throws MemberNotFound {
+    public Long save(String snsPostContent, Long userId, List<MultipartFile> snsPostsImageOrVideoFileList)
+            throws MemberNotFound {
 
         Member member = memberService.findMemberById(userId);
         SnsPost snsPost = SnsPost.builder()
@@ -61,7 +65,8 @@ public class SnsService {
     }
 
     @Transactional
-    public void update(Long snsPostId, String snsPostContent, List<MultipartFile> snsPostsImageOrVideoFileList) throws SnsPostNotFound {
+    public void update(Long snsPostId, String snsPostContent, List<MultipartFile> snsPostsImageOrVideoFileList)
+            throws SnsPostNotFound {
 
         SnsPost originSnsPost = snsRepository.findById(snsPostId).orElseThrow(() -> new SnsPostNotFound(snsPostId));
 
@@ -102,18 +107,28 @@ public class SnsService {
     }
 
     @Transactional
-    public int addLike(Long snsId) throws SnsPostNotFound {
-        SnsPost snsPost = snsRepository.findById(snsId).orElseThrow(() -> new SnsPostNotFound(snsId));
-        snsPost.setLikes(snsPost.getLikes() + 1);
+    public int postLike(Long snsPostId, Long memeberId) throws SnsPostNotFound, MemberNotFound {
+
+        SnsPost snsPost = snsRepository.findById(snsPostId).get();
+        Member member = memberRepository.findById(memeberId).get();
+        Optional<SnsPostLikes> snsPostLikes = snsPostLikesRepository.findBySnsPostAndMember(snsPost, member);
+        SnsPostLikes snsPostLikes2 = new SnsPostLikes();
+        snsPostLikes2.setMember(member);
+        snsPostLikes2.setSnsPost(snsPost);
+        if (snsPostLikes.isEmpty()) {
+
+            snsPost.setLikes(snsPost.getLikes() + 1);
+            snsPostLikesRepository.save(snsPostLikes2);
+            return snsPost.getLikes();
+
+        }
+
+        snsPost.setLikes(snsPost.getLikes() - 1);
+        snsPostLikesRepository.deleteById(snsPostLikes.get().getId());
         return snsPost.getLikes();
+
     }
 
-    @Transactional
-    public int cancelLike(Long snsId) throws SnsPostNotFound {
-        SnsPost snsPost = snsRepository.findById(snsId).orElseThrow(() -> new SnsPostNotFound(snsId));
-        snsPost.setLikes(snsPost.getLikes() - 1);
-        return snsPost.getLikes();
-    }
 
     @Transactional
     public Long saveComment(SnsComment snsComment) {
@@ -123,7 +138,6 @@ public class SnsService {
     public List<SnsComment> findAllComment() {
         return snsCommentRepository.findAll();
     }
-
 
     @Transactional
     public void deletePost(Long snsId) {
@@ -136,7 +150,8 @@ public class SnsService {
     }
 
     @Transactional
-    public Long reportSnsPost(Long snsPostId, Long memberId, String reportReason) throws SnsPostNotFound, MemberNotFound, DuplicateReporter, WriterEqualsReporter {
+    public Long reportSnsPost(Long snsPostId, Long memberId, String reportReason)
+            throws SnsPostNotFound, MemberNotFound, DuplicateReporter, WriterEqualsReporter {
 
         SnsPost snsPost = snsRepository.findById(snsPostId).orElseThrow(() -> new SnsPostNotFound(snsPostId));
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
@@ -148,9 +163,11 @@ public class SnsService {
     }
 
     @Transactional
-    public Long reportSnsComment(Long snsCommentId, Long memberId, String reportReason) throws SnsCommentNotFound, MemberNotFound, DuplicateReporter, WriterEqualsReporter {
+    public Long reportSnsComment(Long snsCommentId, Long memberId, String reportReason)
+            throws SnsCommentNotFound, MemberNotFound, DuplicateReporter, WriterEqualsReporter {
 
-        SnsComment snsComment = snsCommentRepository.findById(snsCommentId).orElseThrow(() -> new SnsCommentNotFound(snsCommentId));
+        SnsComment snsComment = snsCommentRepository.findById(snsCommentId)
+                .orElseThrow(() -> new SnsCommentNotFound(snsCommentId));
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
 
         validateSnsCommentReport(snsComment, member);
@@ -164,13 +181,14 @@ public class SnsService {
         snsCommentRepository.deleteById(commentId);
     }
 
-    @Transactional //수정
+    @Transactional // 수정
     public void updateComment(SnsCommentUpdateRequset snsCommentUpdateRequset, Long commentId) {
         SnsComment originComment = snsCommentRepository.findById(commentId).get();
         originComment.setSnsComment(snsCommentUpdateRequset.getSnsComment());
     }
 
-    private void validateSnsCommentReport(SnsComment snsComment, Member member) throws WriterEqualsReporter, DuplicateReporter {
+    private void validateSnsCommentReport(SnsComment snsComment, Member member)
+            throws WriterEqualsReporter, DuplicateReporter {
         if (snsComment.getMember().getId() == member.getId()) {
             throw new WriterEqualsReporter();
         }
@@ -188,15 +206,18 @@ public class SnsService {
         }
     }
 
-    private SnsCommentReport createSnsCommentReport(Long snsCommentId, Long memberId, String reportReason) throws SnsCommentNotFound, MemberNotFound {
+    private SnsCommentReport createSnsCommentReport(Long snsCommentId, Long memberId, String reportReason)
+            throws SnsCommentNotFound, MemberNotFound {
         return SnsCommentReport.builder()
-                .snsComment(snsCommentRepository.findById(snsCommentId).orElseThrow(() -> new SnsCommentNotFound(snsCommentId)))
+                .snsComment(snsCommentRepository.findById(snsCommentId)
+                        .orElseThrow(() -> new SnsCommentNotFound(snsCommentId)))
                 .member(memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId)))
                 .reason(reportReason)
                 .build();
     }
 
-    private SnsPostReport createSnsPostReport(Long snsPostId, Long memberId, String reportReason) throws SnsPostNotFound, MemberNotFound {
+    private SnsPostReport createSnsPostReport(Long snsPostId, Long memberId, String reportReason)
+            throws SnsPostNotFound, MemberNotFound {
         return SnsPostReport.builder()
                 .snsPost(snsRepository.findById(snsPostId).orElseThrow(() -> new SnsPostNotFound(snsPostId)))
                 .member(memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId)))
@@ -204,7 +225,8 @@ public class SnsService {
                 .build();
     }
 
-    private void addSnsPostsOrVideoFileListInSnsPost(List<MultipartFile> snsPostsImageOrVideoFileList, SnsPost snsPost) {
+    private void addSnsPostsOrVideoFileListInSnsPost(List<MultipartFile> snsPostsImageOrVideoFileList,
+            SnsPost snsPost) {
         for (MultipartFile imageOrVideoFile : snsPostsImageOrVideoFileList) {
 
             String imageOrVideoFileUrl = fileUploadService.uploadImage(imageOrVideoFile);

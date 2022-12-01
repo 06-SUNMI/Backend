@@ -48,8 +48,12 @@ public class ChallengeService {
         return challengeRepository.save(challenge).getId();
     }
 
-    public List<Challenge> findAll() {
-        return challengeRepository.findAll();
+    public List<Challenge> findAllOpenChallenges() {
+        return challengeRepository.findByEndDateGreaterThanEqual(LocalDate.now());
+    }
+
+    public List<Challenge> findAllClosedChallenges() {
+        return challengeRepository.findByEndDateLessThan(LocalDate.now());
     }
 
     public Challenge find(Long challengeId) throws ChallengeNotFound {
@@ -318,8 +322,8 @@ public class ChallengeService {
 
     private boolean validateChallengeRoutineProgressDateNotOutOfDate(Challenge challenge, List<String> challengeRoutineProgressDateList) {
 
-        LocalDate startDate = LocalDate.parse(challenge.getStartDate(), DateTimeFormatter.ISO_DATE);
-        LocalDate endDate = LocalDate.parse(challenge.getEndDate(), DateTimeFormatter.ISO_DATE);
+        LocalDate startDate = changeTypeStringToLocalDate(challenge.getStartDate());
+        LocalDate endDate = changeTypeStringToLocalDate(challenge.getEndDate());
 
         for (String challengeRoutineProgressDateInString : challengeRoutineProgressDateList) {
             LocalDate challengeRoutineProgressDate = LocalDate.parse(challengeRoutineProgressDateInString, DateTimeFormatter.ISO_DATE);
@@ -338,7 +342,7 @@ public class ChallengeService {
 
     private boolean validateChallengeRoutineProgressDateNumPerWeek(Challenge challenge, List<String> challengeRoutineProgressDateList) {
 
-        LocalDate startDate = LocalDate.parse(challenge.getStartDate(), DateTimeFormatter.ISO_DATE);
+        LocalDate startDate = changeTypeStringToLocalDate(challenge.getStartDate());
         int count = 0;
 
         for (String challengeRoutineProgressDateInString : challengeRoutineProgressDateList) {
@@ -434,5 +438,13 @@ public class ChallengeService {
         }
 
         prevChallenge.getChallengeRoutineList().clear();
+    }
+
+    private LocalDate changeTypeStringToLocalDate(String localDate){
+        return LocalDate.parse(localDate, DateTimeFormatter.ISO_DATE);
+    }
+
+    private String changeTypeLocalDateToString(LocalDate localDate){
+        return localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 }
