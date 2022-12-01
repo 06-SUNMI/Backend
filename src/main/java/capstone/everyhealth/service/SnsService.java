@@ -1,5 +1,6 @@
 package capstone.everyhealth.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -187,6 +188,19 @@ public class SnsService {
         originComment.setSnsComment(snsCommentUpdateRequset.getSnsComment());
     }
 
+    public List<Long> findFollowingMembers(Long memberId) throws MemberNotFound {
+
+        List<Long> followedMemberIdList = new ArrayList<>();
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
+        List<SnsFollowing> snsFollowingList = snsFollowRepository.findByFollowingMember(member);
+
+        for (SnsFollowing snsFollowing : snsFollowingList){
+            followedMemberIdList.add(snsFollowing.getFollowedMember().getId());
+        }
+
+        return followedMemberIdList;
+    }
+
     private void validateSnsCommentReport(SnsComment snsComment, Member member)
             throws WriterEqualsReporter, DuplicateReporter {
         if (snsComment.getMember().getId() == member.getId()) {
@@ -226,7 +240,7 @@ public class SnsService {
     }
 
     private void addSnsPostsOrVideoFileListInSnsPost(List<MultipartFile> snsPostsImageOrVideoFileList,
-            SnsPost snsPost) {
+                                                     SnsPost snsPost) {
         for (MultipartFile imageOrVideoFile : snsPostsImageOrVideoFileList) {
 
             String imageOrVideoFileUrl = fileUploadService.uploadImage(imageOrVideoFile);

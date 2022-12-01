@@ -25,4 +25,6 @@ public class MemberCreateRequest{
     private String memberRegisteredGymName;
     @ApiModelProperty(value = "동명의 헬스장을 구별하기 위한 유저가 등록한 헬스장의 고유 id 값(카카오 로컬 API서 제공)", example = "13213132")
     private String memberRegisteredGymId;
+    @ApiModelProperty(value="휴대 전화 번호",example = "010-1234-5678")
+    private String memberPhoneNumber;
 }
