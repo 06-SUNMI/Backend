@@ -61,8 +61,8 @@ public class ChallengeController {
     }
 
     @ApiOperation(
-            value = "진행 중인 챌린지 전체 조회 by Member, Admin",
-            notes = "현재 진행 중인 전체 챌린지를 조회한다.\n"
+            value = "챌린지 전체 조회 by Member, Admin",
+            notes = "전체 챌린지를 조회한다.\n"
                     + "관리자는 관리자 페이지서, 사용자는 앱 내 챌린지 페이지서 전체 챌린지를 조회할 때 사용한다.\n"
                     + "여기선 챌린지 목록만 보여주는 거라 겉 내용만. 루틴 및 세부 내용은 X\n"
                     + "상세 내용은 반환 값 중 id를 이용하여 상세 조회\n"
@@ -73,29 +73,6 @@ public class ChallengeController {
 
         List<ChallengeFindResponse> challengeFindResponseList = new ArrayList<>();
         List<Challenge> challengeList = challengeService.findAllOpenChallenges();
-
-        for (Challenge challenge : challengeList) {
-
-            ChallengeFindResponse challengeFindResponse = createChallengeFindResponse(challenge);
-            challengeFindResponseList.add(challengeFindResponse);
-        }
-
-        return challengeFindResponseList;
-    }
-
-    @ApiOperation(
-            value = "종료된 챌린지 전체 조회 by Member, Admin",
-            notes = "종료된 전체 챌린지를 조회한다.\n"
-                    + "관리자는 관리자 페이지서, 사용자는 앱 내 챌린지 페이지서 전체 챌린지를 조회할 때 사용한다.\n"
-                    + "여기선 챌린지 목록만 보여주는 거라 겉 내용만. 루틴 및 세부 내용은 X\n"
-                    + "상세 내용은 반환 값 중 id를 이용하여 상세 조회\n"
-    )
-
-    @GetMapping("/challenges/closed")
-    public List<ChallengeFindResponse> findAllClosedChallenges() {
-
-        List<ChallengeFindResponse> challengeFindResponseList = new ArrayList<>();
-        List<Challenge> challengeList = challengeService.findAllClosedChallenges();
 
         for (Challenge challenge : challengeList) {
 
@@ -241,7 +218,7 @@ public class ChallengeController {
             value = "챌린지 인증 글 신고",
             notes = "다른 멤버가 작성한 챌린지 인증 글을 신고한다."
     )
-    @GetMapping("/challenges/auth/{challengeAuthPostId}/report/members/{memberId}")
+    @PostMapping("/challenges/auth/{challengeAuthPostId}/report/members/{memberId}")
     public Long reportChallengeAuthPost(@ApiParam(value = "챌린지 인증 글 id", example = "1") @PathVariable Long challengeAuthPostId,
                                         @ApiParam(value = "멤버 id", example = "1") @PathVariable Long memberId,
                                         @ApiParam(value = "신고 사유", example = "신고 사유") @RequestParam String reportReason) throws MemberNotFound, ChallengeAuthNotFound, DuplicateReporter, WriterEqualsReporter {

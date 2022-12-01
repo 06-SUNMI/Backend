@@ -49,12 +49,13 @@ public class ChallengeService {
     }
 
     public List<Challenge> findAllOpenChallenges() {
-        return challengeRepository.findByEndDateGreaterThanEqual(LocalDate.now());
+        //return challengeRepository.findByEndDateGreaterThanEqual(LocalDate.now());
+        return challengeRepository.findAll();
     }
 
-    public List<Challenge> findAllClosedChallenges() {
-        return challengeRepository.findByEndDateLessThan(LocalDate.now());
-    }
+//    public List<Challenge> findAllClosedChallenges() {
+//        return challengeRepository.findByEndDateLessThan(LocalDate.now());
+//    }
 
     public Challenge find(Long challengeId) throws ChallengeNotFound {
         return challengeRepository.findById(challengeId).orElseThrow(() -> new ChallengeNotFound(challengeId));
