@@ -263,12 +263,12 @@ public class ChallengeController {
     private ChallengeFindByMemberResponse createChallengeFindByMemberResponse(Challenge challenge, ChallengeParticipant challengeParticipant) {
         return ChallengeFindByMemberResponse.builder()
                 .challengeId(challenge.getId())
-                .endDate(changeTypeLocalDateToString(challenge.getEndDate()))
+                .endDate(challenge.getEndDate())
                 .name(challenge.getName())
                 .numPerWeek(challenge.getNumPerWeek())
                 .participationFee(challenge.getParticipationFee())
                 .participationNum(challenge.getParticipationNum())
-                .startDate(changeTypeLocalDateToString(challenge.getStartDate()))
+                .startDate(challenge.getStartDate())
                 .challengeParticipantStatus(challengeParticipant.getChallengeStatus())
                 .progressRate(100 * challengeParticipant.getCompletedRoutinesNum() / challenge.getChallengeRoutineList().size())
                 .build();
@@ -292,8 +292,8 @@ public class ChallengeController {
                 .numPerWeek(challenge.getNumPerWeek())
                 .participationNum(challenge.getParticipationNum())
                 .participationFee(challenge.getParticipationFee())
-                .startDate(changeTypeLocalDateToString(challenge.getStartDate()))
-                .endDate(changeTypeLocalDateToString(challenge.getEndDate()))
+                .startDate(challenge.getStartDate())
+                .endDate(challenge.getEndDate())
                 .challengeRoutineDataList(challengeRoutineDataList)
                 .build();
     }
@@ -319,12 +319,12 @@ public class ChallengeController {
     private ChallengeFindResponse createChallengeFindResponse(Challenge challenge) {
         return ChallengeFindResponse.builder()
                 .challengeId(challenge.getId())
-                .endDate(changeTypeLocalDateToString(challenge.getEndDate()))
+                .endDate(challenge.getEndDate())
                 .name(challenge.getName())
                 .numPerWeek(challenge.getNumPerWeek())
                 .participationFee(challenge.getParticipationFee())
                 .participationNum(challenge.getParticipationNum())
-                .startDate(changeTypeLocalDateToString(challenge.getStartDate()))
+                .startDate(challenge.getStartDate())
                 .build();
     }
 
@@ -349,8 +349,8 @@ public class ChallengeController {
         }
 
         return Challenge.builder()
-                .endDate(changeTypeStringToLocalDate(challengePostRequest.getChallengeEndDate()))
-                .startDate(changeTypeStringToLocalDate(challengePostRequest.getChallengeStartDate()))
+                .endDate(challengePostRequest.getChallengeEndDate())
+                .startDate(challengePostRequest.getChallengeStartDate())
                 .name(challengePostRequest.getChallengeName())
                 .numPerWeek(challengePostRequest.getChallengeNumPerWeek())
                 .participationFee(challengePostRequest.getChallengeParticipationFee())

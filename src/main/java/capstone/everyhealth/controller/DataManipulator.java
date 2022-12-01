@@ -69,7 +69,7 @@ public class DataManipulator {
 
             // 시작일 - 월요일, 종료일 - 일 ~ 월 넘어가는 자정으로 고정돼 있음
             int currentChallengeWeek = calculateCurrentChallengeWeek(challenge);
-            LocalDate challengeEndDate = challenge.getEndDate();
+            LocalDate challengeEndDate = changeTypeStringToLocalDate(challenge.getEndDate());
 
             for (ChallengeParticipant challengeParticipant : challengeService.findChallengeParticipantListByChallenge(challenge)) {
 
@@ -103,7 +103,7 @@ public class DataManipulator {
 
     private int calculateCurrentChallengeWeek(Challenge challenge) {
 
-        LocalDate challengeStartDate = challenge.getStartDate();
+        LocalDate challengeStartDate = changeTypeStringToLocalDate(challenge.getStartDate());
         int challengeTotalWeek = challenge.getChallengeRoutineList().size() / challenge.getNumPerWeek();
         int currentChallengeWeek = 0;
 
@@ -149,5 +149,13 @@ public class DataManipulator {
 
     private boolean validateIsChallengeFinished(Challenge challenge) {
         return challenge.isFinished();
+    }
+
+    private LocalDate changeTypeStringToLocalDate(String localDate){
+        return LocalDate.parse(localDate, DateTimeFormatter.ISO_DATE);
+    }
+
+    private String changeTypeLocalDateToString(LocalDate localDate){
+        return localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 }
