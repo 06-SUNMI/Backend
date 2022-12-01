@@ -130,23 +130,14 @@ public class SnsController {
         return "팔로우 취소 완료";
     }
 
-    @ApiOperation(
-            value = "Sns 작성 글 좋아요 누르기",
-            notes = "Sns 작성 글에 좋아요를 누르면 좋아요 누른 뒤의 좋아요 수(+1)를 반환한다."
-    )
-    @PutMapping("/sns/posts/{snsPostId}/addLike")
-    public int addLike(@ApiParam(value = "좋아요 누른 Sns 작성 글 id 값") @PathVariable Long snsPostId) throws SnsPostNotFound {
-        return snsService.addLike(snsPostId);
+    @ApiOperation(value = "Sns 작성 글 좋아요 누르기", notes = "Sns 작성 글에 좋아요를 누르면 좋아요 누른 뒤의 좋아요 수(+1)를 반환한다.")
+    @PutMapping("/sns/posts/{snsPostId}/likes/members/{memberId}")
+    public int postLike(@ApiParam(value = "좋아요 누른 Sns 작성 글 id 값") @PathVariable Long snsPostId,
+            @ApiParam(value = "좋아요 누른 Member Id 값") @PathVariable Long memberId)
+            throws SnsPostNotFound, MemberNotFound {
+        return snsService.postLike(snsPostId, memberId);
     }
 
-    @ApiOperation(
-            value = "Sns 작성 글 좋아요 취소하기",
-            notes = "이미 좋아요를 누른 Sns 작성 글에 좋아요를 다시 누르면 좋아요 누른 뒤의 좋아요 수(-1)를 반환한다."
-    )
-    @PutMapping("/sns/posts/{snsId}/cancelLike")
-    public int cancelLike(@ApiParam(value = "좋아요 받은 Sns 작성 글 id") @PathVariable Long snsId) throws SnsPostNotFound {
-        return snsService.cancelLike(snsId);
-    }
 
     @ApiOperation(
             value = "댓글 달기",
