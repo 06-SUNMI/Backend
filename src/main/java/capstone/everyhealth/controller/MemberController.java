@@ -62,6 +62,7 @@ public class MemberController {
             MemberFindResponse memberFindResponse = MemberFindResponse.builder()
                     .loginAt(member.getLoginAt())
                     .socialId(member.getSocialAccountId())
+                    .memberId(member.getId())
                     .build();
 
             memberFindResponseList.add(memberFindResponse);
