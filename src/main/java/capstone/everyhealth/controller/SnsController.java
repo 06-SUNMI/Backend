@@ -46,21 +46,21 @@ public class SnsController {
             value = "유저 이름 검색",
             notes = "검색한 이름과 일치하는 유저들을 조회한다."
     )
-    @GetMapping("/sns/users/{userName}")
-    public List<Member> search(@ApiParam(value = "검색할 유저 이름") @PathVariable String userName) {
-        return snsService.findByName(userName);
+    @GetMapping("/sns/members/{memberName}")
+    public List<Member> search(@ApiParam(value = "검색할 유저 이름") @PathVariable String memberName) {
+        return snsService.findByName(memberName);
     }
 
     @ApiOperation(
             value = "Sns 게시글 작성",
             notes = "유저가 작성한 Sns 게시글을 저장한다."
     )
-    @PostMapping(path = "/sns/posts/users/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(path = "/sns/posts/members/{memberId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public Long save(@ApiParam(value = "게시글 파일 (여러개 가능)") @RequestPart(required = false) List<MultipartFile> snsPostsImageOrVideoFileList,
-                     @ApiParam(value = "사용자 id 값") @PathVariable Long userId,
+                     @ApiParam(value = "사용자 id 값") @PathVariable Long memberId,
             /*@ApiParam(value = "작성 게시글의 내용") @RequestPart SnsPostRequest snsPostRequest)*/
                      @ApiParam(value = "Sns 작성 글 내용") @RequestPart String snsPostContent) throws MemberNotFound {
-        return snsService.save(snsPostContent, userId, snsPostsImageOrVideoFileList);
+        return snsService.save(snsPostContent, memberId, snsPostsImageOrVideoFileList);
     }
 
     @ApiOperation(
@@ -130,7 +130,7 @@ public class SnsController {
         return "팔로우 취소 완료";
     }
 
-    @ApiOperation(value = "Sns 작성 글 좋아요 누르기", notes = "Sns 작성 글에 좋아요를 누르면 좋아요 누른 뒤의 좋아요 수(+1)를 반환한다.")
+    @ApiOperation(value = "Sns 작성 글 좋아요 누르기", notes = "한 번 누르면 좋아요 1 증가, 그 다음 누르면 1 감소, 그 다음 누르면 1 증가, ... (토글 식)")
     @PutMapping("/sns/posts/{snsPostId}/likes/members/{memberId}")
     public int postLike(@ApiParam(value = "좋아요 누른 Sns 작성 글 id 값") @PathVariable Long snsPostId,
             @ApiParam(value = "좋아요 누른 Member Id 값") @PathVariable Long memberId)
@@ -159,6 +159,10 @@ public class SnsController {
         return snsService.saveComment(snsComment);
     }
 
+    @ApiOperation(
+            value = "댓글 조회",
+            notes = "특정 글에 달린 모든 댓글들을 조회한다."
+    )
     @GetMapping("/sns/posts/{snsPostId}/comment")
     public List<SnsCommentResponse> findAllComment() {
 
@@ -212,6 +216,15 @@ public class SnsController {
         addMemberProfileFindResponseToList(memberProfileFindResponseList, memberList);
 
         return memberProfileFindResponseList;
+    }
+
+    @ApiOperation(
+            value = "팔로우 목록 조회",
+            notes = "멤버가 팔로우 한 다른 멤버들의 id를 리스트 형태로 반환한다.\n"
+    )
+    @GetMapping("/sns/members/{memberId}/follow-members")
+    public List<Long> findAllFollowMembers(@ApiParam(value = "멤버 id 값", example = "1") @PathVariable Long memberId) throws MemberNotFound {
+        return snsService.findFollowingMembers(memberId);
     }
 
     private void addMemberProfileFindResponseToList(List<MemberProfileFindResponse> memberProfileFindResponseList, List<Member> memberList) {
