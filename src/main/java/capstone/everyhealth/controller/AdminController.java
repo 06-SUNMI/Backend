@@ -1,24 +1,22 @@
 package capstone.everyhealth.controller;
 
-import capstone.everyhealth.controller.dto.Stakeholder.AdminLoginRequest;
-import capstone.everyhealth.controller.dto.Stakeholder.ReportedChallengeAuthPostResponse;
-import capstone.everyhealth.controller.dto.Stakeholder.ReportedSnsCommentResponse;
-import capstone.everyhealth.controller.dto.Stakeholder.ReportedSnsPostResponse;
+import capstone.everyhealth.controller.dto.Stakeholder.*;
 import capstone.everyhealth.domain.report.ChallengeAuthPostReport;
 import capstone.everyhealth.domain.report.SnsCommentReport;
 import capstone.everyhealth.domain.report.SnsPostReport;
+import capstone.everyhealth.domain.stakeholder.Admin;
 import capstone.everyhealth.exception.stakeholder.AdminLoginFailed;
+import capstone.everyhealth.exception.stakeholder.AdminNotFound;
 import capstone.everyhealth.service.AdminService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,6 +25,38 @@ import java.util.List;
 public class AdminController {
 
     private final AdminService adminService;
+
+    @PostMapping("/admins")
+    public Long registerAdmin(@RequestBody AdminRegisterRequest adminRegisterRequest) {
+
+        Admin admin = Admin.builder()
+                .adminId(adminRegisterRequest.getAdminId())
+                .adminPassword(adminRegisterRequest.getAdminPassword())
+                .adminName(adminRegisterRequest.getAdminName())
+                .adminPhoneNumber(adminRegisterRequest.getAdminPhoneNumber())
+                .build();
+
+        return adminService.save(admin);
+    }
+
+    @GetMapping("/admins")
+    public List<AdminFindResponse> findAdmins() {
+        return adminService.findAllAdmins()
+                .stream()
+                .map(AdminFindResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    @PutMapping("/admins/{adminId}")
+    public void editAdmin(@PathVariable Long adminId,
+                          @RequestBody AdminEditRequest adminEditRequest) throws AdminNotFound {
+        adminService.updateAdmin(adminId, adminEditRequest);
+    }
+
+    @DeleteMapping("/admins/{adminId}")
+    public void editAdmin(@PathVariable Long adminId) {
+        adminService.deleteAdmin(adminId);
+    }
 
     @ApiOperation(
             value = "관리자 로그인",

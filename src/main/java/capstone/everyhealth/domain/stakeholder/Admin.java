@@ -1,6 +1,6 @@
 package capstone.everyhealth.domain.stakeholder;
 
-import lombok.Getter;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,7 +8,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-@Getter
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Admin {
 
     @Id
@@ -16,5 +19,7 @@ public class Admin {
     private Long id;
 
     private String adminId;
-    private String password;
+    private String adminPassword;
+    private String adminName;
+    private String adminPhoneNumber;
 }
