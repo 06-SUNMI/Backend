@@ -6,10 +6,12 @@ import capstone.everyhealth.controller.dto.Challenge.ChallengePostOrUpdateReques
 import capstone.everyhealth.controller.dto.Stakeholder.*;
 import capstone.everyhealth.domain.challenge.Challenge;
 import capstone.everyhealth.domain.report.ChallengeAuthPostReport;
+import capstone.everyhealth.domain.report.ChallengeAuthPostReportPunishment;
 import capstone.everyhealth.domain.report.SnsCommentReport;
 import capstone.everyhealth.domain.report.SnsPostReport;
 import capstone.everyhealth.domain.stakeholder.Admin;
 import capstone.everyhealth.exception.challenge.ChallengeNotFound;
+import capstone.everyhealth.exception.report.ChallengeAuthPostReportNotFound;
 import capstone.everyhealth.exception.stakeholder.AdminLoginFailed;
 import capstone.everyhealth.exception.stakeholder.AdminNotFound;
 import capstone.everyhealth.service.AdminService;
@@ -139,6 +141,23 @@ public class AdminController {
         model.addAttribute("challengeAuthPostReportList", challengeAuthPostReportList);
 
         return "report/challenge_auth";
+    }
+
+    // 챌린지 인증글 신고글에 대한 관리자의 제재
+    @ResponseBody
+    @PostMapping("/admins/report/challenges/auth/{challengeAuthPostReportId}")
+    public String challengeAuthPostReportsPunishment(@PathVariable Long challengeAuthPostReportId,
+                                                   @ModelAttribute ChallengeAuthPostReportPunishRequest challengeAuthPostReportPunishRequest) throws ChallengeAuthPostReportNotFound {
+        ChallengeAuthPostReport challengeAuthPostReport = adminService.findChallengeAuthPostReport(challengeAuthPostReportId);
+        ChallengeAuthPostReportPunishment challengeAuthPostReportPunishment = ChallengeAuthPostReportPunishment.builder()
+                .punishReason(challengeAuthPostReportPunishRequest.getReason())
+                .blockDays(challengeAuthPostReportPunishRequest.getBlockDays())
+                .challengeAuthPostReport(challengeAuthPostReport)
+                .build();
+
+        adminService.punishChallengeAuthPostReport(challengeAuthPostReportPunishment);
+
+        return "등록 완료";
     }
 
     // 챌린지 조회 페이지
