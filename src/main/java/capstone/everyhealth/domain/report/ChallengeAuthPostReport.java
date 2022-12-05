@@ -5,6 +5,7 @@ import lombok.*;
 import capstone.everyhealth.domain.stakeholder.Member;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -26,4 +27,7 @@ public class ChallengeAuthPostReport {
     private ChallengeAuthPost challengeAuthPost;
 
     private String reason;
+    @Builder.Default
+    private boolean isProcessed = false;
+    private LocalDate registeredDate;
 }

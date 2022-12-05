@@ -1,5 +1,6 @@
 package capstone.everyhealth.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -227,6 +228,7 @@ public class SnsService {
                         .orElseThrow(() -> new SnsCommentNotFound(snsCommentId)))
                 .member(memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId)))
                 .reason(reportReason)
+                .registeredDate(LocalDate.now())
                 .build();
     }
 
@@ -236,6 +238,7 @@ public class SnsService {
                 .snsPost(snsRepository.findById(snsPostId).orElseThrow(() -> new SnsPostNotFound(snsPostId)))
                 .member(memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId)))
                 .reason(reportReason)
+                .registeredDate(LocalDate.now())
                 .build();
     }
 

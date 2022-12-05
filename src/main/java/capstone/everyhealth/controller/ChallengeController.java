@@ -72,7 +72,7 @@ public class ChallengeController {
     public List<ChallengeFindResponse> findAllOpenChallenges() {
 
         List<ChallengeFindResponse> challengeFindResponseList = new ArrayList<>();
-        List<Challenge> challengeList = challengeService.findAllOpenChallenges();
+        List<Challenge> challengeList = challengeService.findAllChallenges();
 
         for (Challenge challenge : challengeList) {
 
