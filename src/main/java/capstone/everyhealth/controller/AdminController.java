@@ -17,6 +17,7 @@ import capstone.everyhealth.exception.stakeholder.AdminNotFound;
 import capstone.everyhealth.service.AdminService;
 import capstone.everyhealth.service.ChallengeService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -132,6 +133,26 @@ public class AdminController {
         return "report/sns_comment";
     }
 
+    // Sns 댓글 신고글에 대한 관리자의 제재
+    /*@ApiOperation(
+            notes =
+    )
+    @ResponseBody
+    @PostMapping("/admins/report/sns/comments/{snsCommentReportId}")
+    public String snsCommentReportsPunishment(@PathVariable Long snsCommentReportId,
+                                              @ModelAttribute SnsCommentReportPunishRequest snsCommentReportPunishRequest) {
+        SnsCommentReport snsCommentReport = adminService.findSnsCommentReport(snsCommentId);
+        ChallengeAuthPostReportPunishment challengeAuthPostReportPunishment = ChallengeAuthPostReportPunishment.builder()
+                .punishReason(challengeAuthPostReportPunishRequest.getReason())
+                .blockDays(challengeAuthPostReportPunishRequest.getBlockDays())
+                .challengeAuthPostReport(challengeAuthPostReport)
+                .build();
+
+        adminService.punishChallengeAuthPostReport(challengeAuthPostReportPunishment);
+
+        return "등록 완료";
+    }*/
+
     // 챌린지 인증글 신고글 조회 페이지
     @GetMapping("/admins/report/challenges/auth")
     public String findChallengeAuthPostReports(Model model) {
@@ -147,7 +168,7 @@ public class AdminController {
     @ResponseBody
     @PostMapping("/admins/report/challenges/auth/{challengeAuthPostReportId}")
     public String challengeAuthPostReportsPunishment(@PathVariable Long challengeAuthPostReportId,
-                                                   @ModelAttribute ChallengeAuthPostReportPunishRequest challengeAuthPostReportPunishRequest) throws ChallengeAuthPostReportNotFound {
+                                                     @ModelAttribute ChallengeAuthPostReportPunishRequest challengeAuthPostReportPunishRequest) throws ChallengeAuthPostReportNotFound {
         ChallengeAuthPostReport challengeAuthPostReport = adminService.findChallengeAuthPostReport(challengeAuthPostReportId);
         ChallengeAuthPostReportPunishment challengeAuthPostReportPunishment = ChallengeAuthPostReportPunishment.builder()
                 .punishReason(challengeAuthPostReportPunishRequest.getReason())
@@ -157,7 +178,7 @@ public class AdminController {
 
         adminService.punishChallengeAuthPostReport(challengeAuthPostReportPunishment);
 
-        return "등록 완료";
+        return "제재 완료";
     }
 
     // 챌린지 조회 페이지
@@ -238,21 +259,21 @@ public class AdminController {
 
     @PostMapping("/test")
     public String test12345(Model model, @ModelAttribute BooksCreationDto form) {
-        for (Book book : form.getBooks()){
-            log.info("book = {}",book.getTitle());
-            log.info("book = {}",book.getAuthor());
+        for (Book book : form.getBooks()) {
+            log.info("book = {}", book.getTitle());
+            log.info("book = {}", book.getAuthor());
             log.info(" ");
         }
         return "home";
     }
 
     @GetMapping("/test22")
-    public String test12341234(){
+    public String test12341234() {
         return "test2";
     }
 
     @GetMapping("/test33")
-    public String test123412345(){
+    public String test123412345() {
         return "test3";
     }
 
