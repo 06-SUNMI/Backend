@@ -20,4 +20,6 @@ public class SnsFindResponse {
     private List<String> snsImageOrVideoLinkList = new ArrayList<>();
     private String snsContent;
     private int snsLikesNum;
+    private String memberName;
+    private String memberProfilePhotoUrl;
 }
