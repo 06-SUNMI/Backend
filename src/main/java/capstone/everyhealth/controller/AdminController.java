@@ -5,13 +5,12 @@ import capstone.everyhealth.BooksCreationDto;
 import capstone.everyhealth.controller.dto.Challenge.ChallengePostOrUpdateRequest;
 import capstone.everyhealth.controller.dto.Stakeholder.*;
 import capstone.everyhealth.domain.challenge.Challenge;
-import capstone.everyhealth.domain.report.ChallengeAuthPostReport;
-import capstone.everyhealth.domain.report.ChallengeAuthPostReportPunishment;
-import capstone.everyhealth.domain.report.SnsCommentReport;
-import capstone.everyhealth.domain.report.SnsPostReport;
+import capstone.everyhealth.domain.report.*;
 import capstone.everyhealth.domain.stakeholder.Admin;
 import capstone.everyhealth.exception.challenge.ChallengeNotFound;
 import capstone.everyhealth.exception.report.ChallengeAuthPostReportNotFound;
+import capstone.everyhealth.exception.report.SnsCommentReportNotFound;
+import capstone.everyhealth.exception.report.SnsPostReportNotFound;
 import capstone.everyhealth.exception.stakeholder.AdminLoginFailed;
 import capstone.everyhealth.exception.stakeholder.AdminNotFound;
 import capstone.everyhealth.service.AdminService;
@@ -122,6 +121,26 @@ public class AdminController {
         return "report/sns_post";
     }
 
+    // Sns 작성글 신고글에 대한 관리자의 제재
+    @ApiOperation(
+            value = "Sns 작성글 신고글에 대한 관리자의 제재"
+    )
+    @ResponseBody
+    @PostMapping("/admins/report/sns/posts/{snsPostReportId}")
+    public String snsCommentReportsPunishment(@ApiParam(value = "sns 작성글 신고글 id") @PathVariable Long snsPostReportId,
+                                              @ModelAttribute SnsPostReportPunishRequest snsPostReportPunishRequest) throws SnsPostReportNotFound {
+        SnsPostReport snsPostReport = adminService.findSnsPostReport(snsPostReportId);
+        SnsPostReportPunishment snsPostReportPunishment = SnsPostReportPunishment.builder()
+                .punishReason(snsPostReportPunishRequest.getReason())
+                .blockDays(snsPostReportPunishRequest.getBlockDays())
+                .snsPostReport(snsPostReport)
+                .build();
+
+        adminService.savePunishSnsPostReport(snsPostReportPunishment);
+
+        return "제재 완료";
+    }
+
     // sns 댓글 신고글 조회 페이지
     @GetMapping("/admins/report/sns/comments")
     public String findSnsCommentReports(Model model) {
@@ -135,21 +154,24 @@ public class AdminController {
     }
 
     // Sns 댓글 신고글에 대한 관리자의 제재
-    /*@ResponseBody
+    @ApiOperation(
+            value = "Sns 댓글 신고글에 대한 관리자의 제재"
+    )
+    @ResponseBody
     @PostMapping("/admins/report/sns/comments/{snsCommentReportId}")
-    public String snsCommentReportsPunishment(@ApiParam(value="sns 댓글 신고글 id") @PathVariable Long snsCommentReportId,
-                                              @ModelAttribute SnsCommentReportPunishRequest snsCommentReportPunishRequest) {
-        SnsCommentReport snsCommentReport = adminService.findSnsCommentReport(snsCommentId);
-        ChallengeAuthPostReportPunishment challengeAuthPostReportPunishment = ChallengeAuthPostReportPunishment.builder()
-                .punishReason(challengeAuthPostReportPunishRequest.getReason())
-                .blockDays(challengeAuthPostReportPunishRequest.getBlockDays())
-                .challengeAuthPostReport(challengeAuthPostReport)
+    public String snsCommentReportsPunishment(@ApiParam(value = "sns 댓글 신고글 id") @PathVariable Long snsCommentReportId,
+                                              @ModelAttribute SnsCommentReportPunishRequest snsCommentReportPunishRequest) throws SnsCommentReportNotFound {
+        SnsCommentReport snsCommentReport = adminService.findSnsCommentReport(snsCommentReportId);
+        SnsCommentReportPunishment snsCommentReportPunishment = SnsCommentReportPunishment.builder()
+                .punishReason(snsCommentReportPunishRequest.getReason())
+                .blockDays(snsCommentReportPunishRequest.getBlockDays())
+                .snsCommentReport(snsCommentReport)
                 .build();
 
-        adminService.punishChallengeAuthPostReport(challengeAuthPostReportPunishment);
+        adminService.savePunishSnsCommentReport(snsCommentReportPunishment);
 
-        return "등록 완료";
-    }*/
+        return "제재 완료";
+    }
 
     // 챌린지 인증글 신고글 조회 페이지
     @GetMapping("/admins/report/challenges/auth")
@@ -183,7 +205,8 @@ public class AdminController {
                 .challengeAuthPostReport(challengeAuthPostReport)
                 .build();
 
-        adminService.punishChallengeAuthPostReport(challengeAuthPostReportPunishment);
+        adminService.updateIsProcessedOnChallengeAuthPostReport(challengeAuthPostReportId);
+        adminService.savePunishChallengeAuthPostReport(challengeAuthPostReportPunishment);
 
         return "제재 완료";
     }

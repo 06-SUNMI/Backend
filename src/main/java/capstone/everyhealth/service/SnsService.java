@@ -137,8 +137,9 @@ public class SnsService {
         return snsCommentRepository.save(snsComment).getId();
     }
 
-    public List<SnsComment> findAllComment() {
-        return snsCommentRepository.findAll();
+    public List<SnsComment> findAllComment(Long snsPostId) throws SnsPostNotFound {
+        SnsPost snsPost = snsRepository.findById(snsPostId).orElseThrow(()->new SnsPostNotFound(snsPostId));
+        return snsCommentRepository.findAllBySnsPost(snsPost);
     }
 
     @Transactional
