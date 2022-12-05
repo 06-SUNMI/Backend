@@ -163,6 +163,15 @@ public class AdminController {
     }
 
     // 챌린지 인증글 신고글에 대한 관리자의 제재
+    @GetMapping("/admins/report/challenges/auth/{challengeAuthPostReportId}")
+    public String punishReport(Model model, @PathVariable String challengeAuthPostReportId) throws ChallengeAuthPostReportNotFound {
+        log.info("챌린지 수정 페이지");
+        ChallengeAuthPostReport challengeAuthPostReport = adminService.findChallengeAuthPostReport(Long.valueOf(challengeAuthPostReportId));
+        model.addAttribute("ChallengeAuthPostReportPunishRequest", new ChallengeAuthPostReportPunishRequest());
+        model.addAttribute("challengeAuthPostReport", challengeAuthPostReport);
+        return "report/punish_report";
+    }
+
     @ResponseBody
     @PostMapping("/admins/report/challenges/auth/{challengeAuthPostReportId}")
     public String challengeAuthPostReportsPunishment(@PathVariable Long challengeAuthPostReportId,
