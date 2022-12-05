@@ -133,7 +133,7 @@ public class SnsController {
     @ApiOperation(value = "Sns 작성 글 좋아요 누르기", notes = "한 번 누르면 좋아요 1 증가, 그 다음 누르면 1 감소, 그 다음 누르면 1 증가, ... (토글 식)")
     @PutMapping("/sns/posts/{snsPostId}/likes/members/{memberId}")
     public int postLike(@ApiParam(value = "좋아요 누른 Sns 작성 글 id 값") @PathVariable Long snsPostId,
-            @ApiParam(value = "좋아요 누른 Member Id 값") @PathVariable Long memberId)
+                        @ApiParam(value = "좋아요 누른 Member Id 값") @PathVariable Long memberId)
             throws SnsPostNotFound, MemberNotFound {
         return snsService.postLike(snsPostId, memberId);
     }
@@ -164,10 +164,10 @@ public class SnsController {
             notes = "특정 글에 달린 모든 댓글들을 조회한다."
     )
     @GetMapping("/sns/posts/{snsPostId}/comment")
-    public List<SnsCommentResponse> findAllComment() {
+    public List<SnsCommentResponse> findAllComment(@ApiParam(value = "sns 작성글 id", example = "1") @PathVariable Long snsPostId) throws SnsPostNotFound {
 
         List<SnsCommentResponse> snsCommentResponsesList = new ArrayList<>();
-        List<SnsComment> snsCommentsList = snsService.findAllComment();
+        List<SnsComment> snsCommentsList = snsService.findAllComment(snsPostId);
 
         for (SnsComment snsComment : snsCommentsList) {
             SnsCommentResponse snsCommentResponse = createSnsCommentResponse(snsComment);
@@ -209,8 +209,8 @@ public class SnsController {
         List<MemberProfileFindResponse> memberProfileFindResponseList = new ArrayList<>();
         List<Member> memberList = memberService.findMemberByGymId(memberId);
 
-        for(Member member : memberList){
-            log.info("gym-id : {}",member.getGymId());
+        for (Member member : memberList) {
+            log.info("gym-id : {}", member.getGymId());
         }
 
         addMemberProfileFindResponseToList(memberProfileFindResponseList, memberList);
