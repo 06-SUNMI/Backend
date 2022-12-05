@@ -97,7 +97,7 @@ public class ChallengeService {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
         Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(() -> new ChallengeNotFound(challengeId));
 
-        // validateChallengeParticipation(challengeRoutineProgressDateList, challenge, member);
+        validateChallengeParticipation(challengeRoutineProgressDateList, challenge, member);
 
         for (ChallengeRoutine challengeRoutine : challenge.getChallengeRoutineList()) {
 
