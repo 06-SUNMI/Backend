@@ -19,4 +19,5 @@ public class ChallengeFindAllAuthPostData {
     private Long challengeAuthPostId;
     private Long memberId;
     private String photoUrl;
+    private int reportedNum;
 }
