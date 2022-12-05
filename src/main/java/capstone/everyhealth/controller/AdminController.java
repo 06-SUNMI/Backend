@@ -196,6 +196,7 @@ public class AdminController {
                 .challengeAuthPostReport(challengeAuthPostReport)
                 .build();
 
+        adminService.updateIsProcessedOnChallengeAuthPostReport(challengeAuthPostReportId);
         adminService.savePunishChallengeAuthPostReport(challengeAuthPostReportPunishment);
 
         return "제재 완료";

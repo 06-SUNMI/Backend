@@ -103,4 +103,10 @@ public class AdminService {
     private void validateAdminLoginRequest(AdminLoginRequest adminLoginRequest) throws AdminLoginFailed {
         adminRepository.findByAdminIdAndAdminPassword(adminLoginRequest.getAdminId(), adminLoginRequest.getAdminPassword()).orElseThrow(() -> new AdminLoginFailed());
     }
+
+    @Transactional
+    public void updateIsProcessedOnChallengeAuthPostReport(Long challengeAuthPostReportId) throws ChallengeAuthPostReportNotFound {
+        ChallengeAuthPostReport challengeAuthPostReport = challengeAuthPostReportRepository.findById(challengeAuthPostReportId).orElseThrow(()->new ChallengeAuthPostReportNotFound(challengeAuthPostReportId));
+        challengeAuthPostReport.setProcessed(true);
+    }
 }
