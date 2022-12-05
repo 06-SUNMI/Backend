@@ -251,10 +251,12 @@ public class SnsController {
 
         SnsFindResponse snsFindResponse = SnsFindResponse.builder()
                 .snsPostId(snsPost.getId())
-                .memberId(snsPost.getId())
+                .memberId(snsPost.getMember().getId())
                 .snsContent(snsPost.getContent())
                 .snsImageOrVideoLinkList(snsPostImageOrVideoLinkList)
                 .snsLikesNum(snsPost.getLikes())
+                .memberName(snsPost.getMember().getName())
+                .memberProfilePhotoUrl(snsPost.getMember().getCustomProfileImageUrl())
                 .build();
 
         return snsFindResponse;
