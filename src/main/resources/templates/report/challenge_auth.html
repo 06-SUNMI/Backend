@@ -33,7 +33,7 @@
             <tbody id="challenge-auth-report-list-body">
             <tr th:each="challengeAuthPostReport : ${challengeAuthPostReportList}">
                 <td th:text="${challengeAuthPostReport.isProcessed}"></td>
-                <td th:text="${challengeAuthPostReport.challengeAuthPost.photoUrl}">의 사진</td>
+                <td><img th:src="${challengeAuthPostReport.challengeAuthPost.photoUrl}" width="120" height="120"/></td>
                 <td th:text="${challengeAuthPostReport.member.name}"></td>
                 <td th:text="${challengeAuthPostReport.registeredDate}"></td>
                 <td th:text="${challengeAuthPostReport.reason}"></td>
