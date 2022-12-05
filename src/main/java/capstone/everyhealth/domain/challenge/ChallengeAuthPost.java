@@ -13,7 +13,7 @@ import javax.persistence.*;
 public class ChallengeAuthPost {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
@@ -25,5 +25,6 @@ public class ChallengeAuthPost {
     private Member member;
 
     private String photoUrl;
-    private int reportedNum;
+    @Builder.Default
+    private int reportedNum = 0;
 }
