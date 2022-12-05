@@ -96,13 +96,16 @@ public class ChallengeService {
 
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
         Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(() -> new ChallengeNotFound(challengeId));
+        List<String> changedChallengeRoutineProgressDateList = new ArrayList<>();
 
-        validateChallengeParticipation(challengeRoutineProgressDateList, challenge, member);
+        convertDate(challengeRoutineProgressDateList, changedChallengeRoutineProgressDateList);
+
+        validateChallengeParticipation(changedChallengeRoutineProgressDateList, challenge, member);
 
         for (ChallengeRoutine challengeRoutine : challenge.getChallengeRoutineList()) {
 
-            String challengeRoutineProgressDate = challengeRoutineProgressDateList.get(0);
-            challengeRoutineProgressDateList.remove(0);
+            String challengeRoutineProgressDate = changedChallengeRoutineProgressDateList.get(0);
+            changedChallengeRoutineProgressDateList.remove(0);
             MemberRoutine memberRoutine = createMemberRoutine(member, challengeRoutineProgressDate, challengeRoutine);
 
             for (ChallengeRoutineContent challengeRoutineContent : challengeRoutine.getChallengeRoutineContentList()) {
@@ -123,6 +126,27 @@ public class ChallengeService {
         challengeParticipantRepository.save(newChallengeParticipant);
 
         return 1;
+    }
+
+    private void convertDate(List<String> challengeRoutineProgressDateList, List<String> changedChallengeRoutineProgressDateList) {
+        for (String challengeRoutineProgressDate : challengeRoutineProgressDateList) {
+
+            int secondHyphenIndex = challengeRoutineProgressDate.indexOf("-", challengeRoutineProgressDate.indexOf("-") + 1);
+            log.info("secondHyphenIndex = {}",secondHyphenIndex);
+            String changedChallengeRoutineProgressDate;
+            if (secondHyphenIndex == challengeRoutineProgressDate.length() - 2) {
+                log.info("equals - {}",challengeRoutineProgressDate);
+                changedChallengeRoutineProgressDate = challengeRoutineProgressDate.substring(0, secondHyphenIndex + 1) + "0" + challengeRoutineProgressDate.substring(secondHyphenIndex + 1);
+                changedChallengeRoutineProgressDateList.add(changedChallengeRoutineProgressDate);
+            } else {
+                log.info("not equals - {}",challengeRoutineProgressDate);
+                changedChallengeRoutineProgressDateList.add(challengeRoutineProgressDate);
+            }
+        }
+
+        for (String date : changedChallengeRoutineProgressDateList){
+            log.info("date = {}",date);
+        }
     }
 
     public List<ChallengeParticipant> findChallengeParticipantListByMemberId(Long memberId) throws MemberNotFound {
@@ -310,9 +334,9 @@ public class ChallengeService {
             throw new DuplicateChallengeParticipant();
         }
 
-        if (!validateChallengeRoutineProgressDateNotOutOfDate(challenge, challengeRoutineProgressDateList)) {
-            throw new ChallengeRoutineProgressDateOutOfDate();
-        }
+//        if (!validateChallengeRoutineProgressDateNotOutOfDate(challenge, challengeRoutineProgressDateList)) {
+//            throw new ChallengeRoutineProgressDateOutOfDate();
+//        }
 
         if (!validateChallengeRoutineProgressDateNum(challenge, challengeRoutineProgressDateList)) {
             throw new SelectedDatesNumNotEqualsWithChallenge();
@@ -323,20 +347,20 @@ public class ChallengeService {
         }
     }
 
-    private boolean validateChallengeRoutineProgressDateNotOutOfDate(Challenge challenge, List<String> challengeRoutineProgressDateList) {
-
-        LocalDate startDate = changeTypeStringToLocalDate(challenge.getStartDate());
-        LocalDate endDate = changeTypeStringToLocalDate(challenge.getEndDate());
-
-        for (String challengeRoutineProgressDateInString : challengeRoutineProgressDateList) {
-            LocalDate challengeRoutineProgressDate = LocalDate.parse(challengeRoutineProgressDateInString, DateTimeFormatter.ISO_DATE);
-
-            if (challengeRoutineProgressDate.isBefore(startDate) || challengeRoutineProgressDate.isAfter(endDate)) {
-                return false;
-            }
-        }
-        return true;
-    }
+//    private boolean validateChallengeRoutineProgressDateNotOutOfDate(Challenge challenge, List<String> challengeRoutineProgressDateList) {
+//
+//        LocalDate startDate = changeTypeStringToLocalDate(challenge.getStartDate());
+//        LocalDate endDate = changeTypeStringToLocalDate(challenge.getEndDate());
+//
+//        for (String challengeRoutineProgressDateInString : challengeRoutineProgressDateList) {
+//            LocalDate challengeRoutineProgressDate = LocalDate.parse(challengeRoutineProgressDateInString, DateTimeFormatter.ISO_DATE);
+//
+//            if (challengeRoutineProgressDate.isBefore(startDate) || challengeRoutineProgressDate.isAfter(endDate)) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
     private boolean validateChallengeRoutineProgressDateNum(Challenge challenge, List<String> challengeRoutineProgressDateList) {
 
@@ -443,11 +467,11 @@ public class ChallengeService {
         prevChallenge.getChallengeRoutineList().clear();
     }
 
-    private LocalDate changeTypeStringToLocalDate(String localDate){
+    private LocalDate changeTypeStringToLocalDate(String localDate) {
         return LocalDate.parse(localDate, DateTimeFormatter.ISO_DATE);
     }
 
-    private String changeTypeLocalDateToString(LocalDate localDate){
+    private String changeTypeLocalDateToString(LocalDate localDate) {
         return localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 

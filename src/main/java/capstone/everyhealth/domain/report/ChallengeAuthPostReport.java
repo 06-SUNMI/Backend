@@ -27,6 +27,7 @@ public class ChallengeAuthPostReport {
     private ChallengeAuthPost challengeAuthPost;
 
     private String reason;
+
     @Builder.Default
     private boolean isProcessed = false;
     private LocalDate registeredDate;
