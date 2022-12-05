@@ -1,12 +1,11 @@
 package capstone.everyhealth.service;
 
 import capstone.everyhealth.controller.dto.Stakeholder.*;
-import capstone.everyhealth.domain.report.ChallengeAuthPostReport;
-import capstone.everyhealth.domain.report.ChallengeAuthPostReportPunishment;
-import capstone.everyhealth.domain.report.SnsCommentReport;
-import capstone.everyhealth.domain.report.SnsPostReport;
+import capstone.everyhealth.domain.report.*;
 import capstone.everyhealth.domain.stakeholder.Admin;
 import capstone.everyhealth.exception.report.ChallengeAuthPostReportNotFound;
+import capstone.everyhealth.exception.report.SnsCommentReportNotFound;
+import capstone.everyhealth.exception.report.SnsPostReportNotFound;
 import capstone.everyhealth.exception.stakeholder.AdminLoginFailed;
 import capstone.everyhealth.exception.stakeholder.AdminNotFound;
 import capstone.everyhealth.repository.*;
@@ -28,6 +27,8 @@ public class AdminService {
     private final SnsCommentReportRepository snsCommentReportRepository;
     private final ChallengeAuthPostReportRepository challengeAuthPostReportRepository;
     private final ChallengeAuthPostReportPunishmentRepository challengeAuthPostReportPunishmentRepository;
+    private final SnsCommentReportPunishmentRepository snsCommentReportPunishmentRepository;
+    private final SnsPostReportPunishmentRepository snsPostReportPunishmentRepository;
 
     @Transactional
     public Long save(Admin admin) {
@@ -65,14 +66,17 @@ public class AdminService {
         return snsPostReportRepository.findAll();
     }
 
-//    public SnsPostReport findSnsPostReport(Long snsPostReportId){
-//        return snsPostReportRepository.findById(snsPostReportId).orElseThrow();
-//    }
+    public SnsPostReport findSnsPostReport(Long snsPostReportId) throws SnsPostReportNotFound {
+        return snsPostReportRepository.findById(snsPostReportId).orElseThrow(()->new SnsPostReportNotFound(snsPostReportId));
+    }
 
     public List<SnsCommentReport> findAllSnsCommentReports() {
         return snsCommentReportRepository.findAll();
     }
 
+    public SnsCommentReport findSnsCommentReport(Long snsCommentReportId) throws SnsCommentReportNotFound {
+        return snsCommentReportRepository.findById(snsCommentReportId).orElseThrow(()->new SnsCommentReportNotFound(snsCommentReportId));
+    }
     public List<ChallengeAuthPostReport> findAllChallengeAuthPostReports() {
         return challengeAuthPostReportRepository.findAll();
     }
@@ -82,7 +86,17 @@ public class AdminService {
     }
 
     @Transactional
-    public void punishChallengeAuthPostReport(ChallengeAuthPostReportPunishment challengeAuthPostReportPunishment) {
+    public void savePunishSnsPostReport(SnsPostReportPunishment snsPostReportPunishment) {
+        snsPostReportPunishmentRepository.save(snsPostReportPunishment);
+    }
+
+    @Transactional
+    public void savePunishSnsCommentReport(SnsCommentReportPunishment snsCommentReportPunishment) {
+        snsCommentReportPunishmentRepository.save(snsCommentReportPunishment);
+    }
+
+    @Transactional
+    public void savePunishChallengeAuthPostReport(ChallengeAuthPostReportPunishment challengeAuthPostReportPunishment) {
         challengeAuthPostReportPunishmentRepository.save(challengeAuthPostReportPunishment);
     }
 
