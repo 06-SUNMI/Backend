@@ -104,8 +104,8 @@ public class ChallengeService {
 
         for (ChallengeRoutine challengeRoutine : challenge.getChallengeRoutineList()) {
 
-            String challengeRoutineProgressDate = changedChallengeRoutineProgressDateList.get(0);
-            changedChallengeRoutineProgressDateList.remove(0);
+            String challengeRoutineProgressDate = challengeRoutineProgressDateList.get(0);
+            challengeRoutineProgressDateList.remove(0);
             MemberRoutine memberRoutine = createMemberRoutine(member, challengeRoutineProgressDate, challengeRoutine);
 
             for (ChallengeRoutineContent challengeRoutineContent : challengeRoutine.getChallengeRoutineContentList()) {
