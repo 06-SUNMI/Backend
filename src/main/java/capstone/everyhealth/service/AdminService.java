@@ -2,15 +2,14 @@ package capstone.everyhealth.service;
 
 import capstone.everyhealth.controller.dto.Stakeholder.*;
 import capstone.everyhealth.domain.report.ChallengeAuthPostReport;
+import capstone.everyhealth.domain.report.ChallengeAuthPostReportPunishment;
 import capstone.everyhealth.domain.report.SnsCommentReport;
 import capstone.everyhealth.domain.report.SnsPostReport;
 import capstone.everyhealth.domain.stakeholder.Admin;
+import capstone.everyhealth.exception.report.ChallengeAuthPostReportNotFound;
 import capstone.everyhealth.exception.stakeholder.AdminLoginFailed;
 import capstone.everyhealth.exception.stakeholder.AdminNotFound;
-import capstone.everyhealth.repository.AdminRepository;
-import capstone.everyhealth.repository.ChallengeAuthPostReportRepository;
-import capstone.everyhealth.repository.SnsCommentReportRepository;
-import capstone.everyhealth.repository.SnsPostReportRepository;
+import capstone.everyhealth.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,6 +27,7 @@ public class AdminService {
     private final SnsPostReportRepository snsPostReportRepository;
     private final SnsCommentReportRepository snsCommentReportRepository;
     private final ChallengeAuthPostReportRepository challengeAuthPostReportRepository;
+    private final ChallengeAuthPostReportPunishmentRepository challengeAuthPostReportPunishmentRepository;
 
     @Transactional
     public Long save(Admin admin) {
@@ -65,6 +65,10 @@ public class AdminService {
         return snsPostReportRepository.findAll();
     }
 
+//    public SnsPostReport findSnsPostReport(Long snsPostReportId){
+//        return snsPostReportRepository.findById(snsPostReportId).orElseThrow();
+//    }
+
     public List<SnsCommentReport> findAllSnsCommentReports() {
         return snsCommentReportRepository.findAll();
     }
@@ -73,7 +77,16 @@ public class AdminService {
         return challengeAuthPostReportRepository.findAll();
     }
 
+    public ChallengeAuthPostReport findChallengeAuthPostReport(Long challengeAuthPostReportId) throws ChallengeAuthPostReportNotFound {
+        return challengeAuthPostReportRepository.findById(challengeAuthPostReportId).orElseThrow(()->new ChallengeAuthPostReportNotFound(challengeAuthPostReportId));
+    }
+
+    @Transactional
+    public void punishChallengeAuthPostReport(ChallengeAuthPostReportPunishment challengeAuthPostReportPunishment) {
+        challengeAuthPostReportPunishmentRepository.save(challengeAuthPostReportPunishment);
+    }
+
     private void validateAdminLoginRequest(AdminLoginRequest adminLoginRequest) throws AdminLoginFailed {
-        adminRepository.findByAdminIdAndAdminPassword(adminLoginRequest.getAdminId(), adminLoginRequest.getAdminPassword()).orElseThrow(()->new AdminLoginFailed());
+        adminRepository.findByAdminIdAndAdminPassword(adminLoginRequest.getAdminId(), adminLoginRequest.getAdminPassword()).orElseThrow(() -> new AdminLoginFailed());
     }
 }
