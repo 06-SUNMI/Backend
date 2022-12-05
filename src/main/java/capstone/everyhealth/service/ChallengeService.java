@@ -224,6 +224,7 @@ public class ChallengeService {
         validateChallengeAuthPostReport(challengeAuthPost, member);
 
         ChallengeAuthPostReport challengeAuthPostReport = createChallengeAuthPostReport(reportReason, challengeAuthPost, member);
+        challengeAuthPost.setReportedNum(challengeAuthPost.getReportedNum() + 1);
 
         return challengeAuthPostReportRepository.save(challengeAuthPostReport).getId();
     }
