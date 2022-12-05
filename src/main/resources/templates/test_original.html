@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form role="form" action="/test" th:object="${form}" method="post">
+    <div class="container" id="bookContainer">
+        <th:block th:each="book, itemStat : *{books}">
+            <div th:id="|book${itemStat.index}|">
+                <div class="form-group">
+                    <label th:for="list0" th:text="${itemStat.index}">타이틀</label>
+                    <input type="text" th:field="*{books[__${itemStat.index}__].title}" class="form-control"
+                           placeholder="타이틀 입력"/>
+                </div>
+                <div class="form-group">
+                    <label th:for="list0" th:text="${itemStat.index}">작가</label>
+                    <input type="text" th:field="*{books[__${itemStat.index}__].author}" class="form-control"
+                           placeholder="작가 입력"/>
+                </div>
+            </div>
+            <div id="bookAdd">
+                <input type="button" value="추가"  th:attr="onclick=|addBook('${itemStat.index}')|" >
+            </div>
+        </th:block>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var query = [[${form.books[0].title}]];
+    console.log(query);
+    /*]]>*/
+
+    const addBook = () => {
+        const box = document.getElementById("bookContainer");
+        const newP = document.createElement('p');
+        newP.innerHTML = "<div th:id=\"|book${itemStat.index}|\">\n" +
+            "                <div class=\"form-group\">\n" +
+            "                    <label th:for=\"list0\" th:text=\"${itemStat.index}\">타이틀</label>\n" +
+            "                    <input type=\"text\" th:field=\"*{books[__${itemStat.index}__].title}\" class=\"form-control\"\n" +
+            "                           placeholder=\"타이틀 입력\"/>\n" +
+            "                </div>\n" +
+            "                <div class=\"form-group\">\n" +
+            "                    <label th:for=\"list0\" th:text=\"${itemStat.index}\">작가</label>\n" +
+            "                    <input type=\"text\" th:field=\"*{books[__${itemStat.index}__].author}\" class=\"form-control\"\n" +
+            "                           placeholder=\"작가 입력\"/>\n" +
+            "                </div>\n" +
+            "            </div>";
+        box.appendChild(newP);
+    }
+
+    const removeBook = (obj) => {
+        if (query == null) {
+            query = "A";
+        }
+        query += "B";
+        console.log(query);
+        document.getElementById('box').removeChild(obj.parentNode);
+    }
+
+</script>
+
+</body>
+</html>

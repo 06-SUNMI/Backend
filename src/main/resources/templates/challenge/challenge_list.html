@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header :: header"/>
+
+<script>
+    function createChallenge() {
+        var form = document.createElement("form");
+        form.setAttribute("method", "get");
+        form.setAttribute("action", "/admins/challenges/new");
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function updateChallenge(id) {
+        var form = document.createElement("form");
+        form.setAttribute("method", "get");
+        form.setAttribute("action", "/admins/challenges/" + id + "/update");
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function deleteChallenge(id) {
+        var form = document.createElement("form");
+        form.setAttribute("method", "delete");
+        form.setAttribute("action", "/admins/challenge/" + id);
+        document.body.appendChild(form);
+        form.submit();
+    }
+</script>
+
+<body>
+<div class="container-fluid">
+    <div th:replace="fragments/bodyHeader :: bodyHeader"/>
+    <div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>이름</th>
+                <th>시작일</th>
+                <th>종료일</th>
+                <th>주당 루틴 수</th>
+                <th>참가 비용</th>
+                <th>참가자 수</th>
+                <th></th>
+                <th>
+                    <a href="#" th:href="'javascript:createChallenge()'"
+                       class="btn btn-primary"
+                       style="vertical-align:middle">생성</a>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="challenge : ${challengeList}">
+                <td th:text="${challenge.name}"></td>
+                <td th:text="${challenge.startDate}"></td>
+                <td th:text="${challenge.endDate}"></td>
+                <td th:text="${challenge.numPerWeek}"></td>
+                <td th:text="${challenge.participationFee}"></td>
+                <td th:text="${challenge.participationNum}"></td>
+                <td>
+                    <a href="#" th:href="'javascript:updateChallenge('+${challenge.id}+')'"
+                       class="btn btn-warning">수정</a>
+                </td>
+                <td>
+                    <a href="#" th:href="'javascript:deleteChallenge('+${challenge.id}+')'"
+                       class="btn btn-danger">삭제</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"/>
+
+</div>
+</body>
+</html>

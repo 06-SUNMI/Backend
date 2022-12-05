@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form role="form" action="/test" th:object="${form}" method="post">
+    <div class="container" id="bookContainer">
+        <div th:id="book_0">
+            <div class="form-group">
+                <label th:for="title_0" th:text="0">타이틀</label>
+                <input type="text" th:field="*{books[0].title}" class="form-control"
+                       placeholder="타이틀 입력"/>
+            </div>
+            <div class="form-group">
+                <label th:for="author_0" th:text="0">작가</label>
+                <input type="text" th:field="*{books[0].author}" class="form-control"
+                       placeholder="작가 입력"/>
+            </div>
+        </div>
+        <div id="bookAdd_0">
+            <input type="button" value="추가" th:attr="onclick=|addBook(0)|">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var query = [[${form.books[0].title}]];
+    console.log(query);
+    /*]]>*/
+
+    const addBook = (id) => {
+        console.log("id = " + id);
+        // let addtlRow = document.getElementById('addtl_country_0');
+        // // let table = document.getElementById('input_values');
+        // // let clone = addtlRow.cloneNode(true);
+        // let container = document.getElementById("bookContainer");
+        // let bookId = document.getElementById("book_" + String(id));
+        // let clonedBookId = bookId.cloneNode(true);
+        // const button = clonedBookId.getElementById("id", "bookAdd_" + String(id));
+        // clonedBookId.setAttribute("id", "book_" + String(id + 1));
+        // button.setAttribute("id", "bookAdd_" + String(id + 1));
+
+        const box = document.getElementById("bookContainer");
+        const newP = document.createElement('p');
+        newP.innerHTML = "<div th:id=\"book_" + String(id + 1) + "\">\n" +
+            "            <div class=\"form-group\">\n" +
+            "                <label th:for=\"title_" + String(id + 1) + "\" th:text=\"" + String(id + 1) + "\">타이틀</label>\n" +
+            "                <input type=\"text\" th:field=\"*{books[" + String(id + 1) + "].title}\" class=\"form-control\"\n" +
+            "                       placeholder=\"타이틀 입력\"/>\n" +
+            "            </div>\n" +
+            "            <div class=\"form-group\">\n" +
+            "                <label th:for=\"author_" + String(id + 1) + "\" th:text=\"" + String(id + 1) + "\">작가</label>\n" +
+            "                <input type=\"text\" th:field=\"*{books[" + String(id + 1) + "].author}\" class=\"form-control\"\n" +
+            "                       placeholder=\"작가 입력\"/>\n" +
+            "            </div>\n" +
+            "        </div>\n" +
+            "        <div id=\"bookAdd_" + String(id + 1) + "\">\n" +
+            "            <input type=\"button\" value=\"추가\" onclick=addBook(" + (id + 1) + ")" + ">\n" +
+            "        </div>";
+        box.appendChild(newP);
+    }
+
+    const removeBook = (obj) => {
+        if (query == null) {
+            query = "A";
+        }
+        query += "B";
+        console.log(query);
+        document.getElementById('box').removeChild(obj.parentNode);
+    }
+
+</script>
+
+</body>
+</html>

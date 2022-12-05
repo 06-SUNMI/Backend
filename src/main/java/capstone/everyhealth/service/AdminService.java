@@ -1,8 +1,6 @@
 package capstone.everyhealth.service;
 
-import capstone.everyhealth.controller.dto.Stakeholder.AdminEditRequest;
-import capstone.everyhealth.controller.dto.Stakeholder.AdminFindResponse;
-import capstone.everyhealth.controller.dto.Stakeholder.AdminLoginRequest;
+import capstone.everyhealth.controller.dto.Stakeholder.*;
 import capstone.everyhealth.domain.report.ChallengeAuthPostReport;
 import capstone.everyhealth.domain.report.SnsCommentReport;
 import capstone.everyhealth.domain.report.SnsPostReport;

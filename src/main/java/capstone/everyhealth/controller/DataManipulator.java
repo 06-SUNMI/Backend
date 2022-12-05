@@ -60,7 +60,7 @@ public class DataManipulator {
 
         //
 
-        for (Challenge challenge : challengeService.findAllOpenChallenges()) {
+        for (Challenge challenge : challengeService.findAllChallenges()) {
 
             // 종료된 챌린지는 검사 X
             if (validateIsChallengeFinished(challenge)) {

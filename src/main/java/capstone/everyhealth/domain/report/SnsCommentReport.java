@@ -6,6 +6,7 @@ import capstone.everyhealth.domain.stakeholder.Member;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -27,4 +28,7 @@ public class SnsCommentReport {
     private SnsComment snsComment;
 
     private String reason;
+    @Builder.Default
+    private boolean isProcessed = false;
+    private LocalDate registeredDate;
 }

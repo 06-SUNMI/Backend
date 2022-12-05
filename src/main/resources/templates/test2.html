@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<form>
+    <div id="test">
+        <div id="box">
+            <input type="text" id="hi"> <input type="button" value="추가" onclick="add_textbox()">
+        </div>
+    </div>
+</form>
+
+<script>
+    var count = 1;
+
+    function add_textbox() {
+        if(count == 5){
+            console.log("count는 5 이하여야함.");
+            return;
+        }
+        count++;
+        console.log("count : " + count);
+        const box = document.getElementById("box");
+        const newP = document.createElement('p');
+        newP.innerHTML = "<input type='text'> <input type='button' value='삭제' onclick='remove(this)'>";
+        box.appendChild(newP);
+    }
+
+    const remove = (obj) => {
+        count--;
+        console.log("count : " + count);
+        console.log(obj);
+        console.log(obj.parentNode);
+        document.getElementById('box').removeChild(obj.parentNode);
+    }
+</script>
+</body>
+</html>
