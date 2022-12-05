@@ -5,6 +5,7 @@ import capstone.everyhealth.domain.sns.SnsPost;
 import capstone.everyhealth.domain.stakeholder.Member;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -26,4 +27,7 @@ public class SnsPostReport {
     private SnsPost snsPost;
 
     private String reason;
+    @Builder.Default
+    private boolean isProcessed = false;
+    private LocalDate registeredDate;
 }

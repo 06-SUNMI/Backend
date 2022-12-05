@@ -48,7 +48,7 @@ public class ChallengeService {
         return challengeRepository.save(challenge).getId();
     }
 
-    public List<Challenge> findAllOpenChallenges() {
+    public List<Challenge> findAllChallenges() {
         //return challengeRepository.findByEndDateGreaterThanEqual(LocalDate.now());
         return challengeRepository.findAll();
     }
@@ -97,7 +97,7 @@ public class ChallengeService {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
         Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(() -> new ChallengeNotFound(challengeId));
 
-        //validateChallengeParticipation(challengeRoutineProgressDateList, challenge, member);
+        // validateChallengeParticipation(challengeRoutineProgressDateList, challenge, member);
 
         for (ChallengeRoutine challengeRoutine : challenge.getChallengeRoutineList()) {
 
@@ -265,6 +265,7 @@ public class ChallengeService {
                 .challengeAuthPost(challengeAuthPost)
                 .member(member)
                 .reason(reportReason)
+                .registeredDate(LocalDate.now())
                 .build();
     }
 
@@ -448,4 +449,5 @@ public class ChallengeService {
     private String changeTypeLocalDateToString(LocalDate localDate){
         return localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
+
 }

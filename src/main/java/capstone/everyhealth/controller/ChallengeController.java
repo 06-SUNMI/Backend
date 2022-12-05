@@ -72,7 +72,7 @@ public class ChallengeController {
     public List<ChallengeFindResponse> findAllOpenChallenges() {
 
         List<ChallengeFindResponse> challengeFindResponseList = new ArrayList<>();
-        List<Challenge> challengeList = challengeService.findAllOpenChallenges();
+        List<Challenge> challengeList = challengeService.findAllChallenges();
 
         for (Challenge challenge : challengeList) {
 
@@ -224,7 +224,6 @@ public class ChallengeController {
                                         @ApiParam(value = "신고 사유", example = "신고 사유") @RequestParam String reportReason) throws MemberNotFound, ChallengeAuthNotFound, DuplicateReporter, WriterEqualsReporter {
         return challengeService.reportChallengeAuthPost(challengeAuthPostId, memberId, reportReason);
     }
-
     private ChallengeFindAllAuthPostData createChallengeFindAllAuthPostData(ChallengeAuthPost challengeAuthPost) {
         return ChallengeFindAllAuthPostData.builder()
                 .memberId(challengeAuthPost.getMember().getId())

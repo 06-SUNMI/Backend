@@ -15,4 +15,5 @@ import java.util.List;
 public class ChallengeFindAllAuthPostResponse {
 
     private List<ChallengeFindAllAuthPostData> challengeFindAllAuthPostDataList = new ArrayList<>();
+
 }

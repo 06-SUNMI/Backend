@@ -1,13 +1,21 @@
 package capstone.everyhealth.controller.dto.Stakeholder;
 
-import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotBlank;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AdminLoginRequest {
 
-    @ApiModelProperty(value = "관리자 id",example = "admin")
+    @NotBlank(message = "아이디를 입력해 주세요.")
     private String adminId;
-    @ApiModelProperty(value = "관리자 pw",example = "1234")
+
+    @NotBlank(message = "비밀번호를 입력해 주세요.")
     private String adminPassword;
 }
