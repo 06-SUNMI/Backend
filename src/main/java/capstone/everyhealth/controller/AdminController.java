@@ -18,6 +18,7 @@ import capstone.everyhealth.service.AdminService;
 import capstone.everyhealth.service.ChallengeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -134,12 +135,9 @@ public class AdminController {
     }
 
     // Sns 댓글 신고글에 대한 관리자의 제재
-    /*@ApiOperation(
-            notes =
-    )
-    @ResponseBody
+    /*@ResponseBody
     @PostMapping("/admins/report/sns/comments/{snsCommentReportId}")
-    public String snsCommentReportsPunishment(@PathVariable Long snsCommentReportId,
+    public String snsCommentReportsPunishment(@ApiParam(value="sns 댓글 신고글 id") @PathVariable Long snsCommentReportId,
                                               @ModelAttribute SnsCommentReportPunishRequest snsCommentReportPunishRequest) {
         SnsCommentReport snsCommentReport = adminService.findSnsCommentReport(snsCommentId);
         ChallengeAuthPostReportPunishment challengeAuthPostReportPunishment = ChallengeAuthPostReportPunishment.builder()
