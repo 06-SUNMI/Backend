@@ -18,11 +18,11 @@
 
 <img src=images/summary.png  width="50%"/>
 
-* 온도 센서, 자이로 센서, GPS 센서 등을 활용한 컨테이너 상태 데이터 수집
+* 운동 루틴을 Todo List 형식으로 관리
 
-* 펠티어 소자(냉동장치)를 이용한 컨테이너 내부 온도 유지
+* 헬스인들을 위한 SNS 기능
 
-* 컨테이너 상태 및 위치 가시성을 제공하는 웹 페이지
+* 의지력이 부족한 사람들을 위한 운동 챌린지
 
   <br>
 
@@ -52,9 +52,10 @@
 
   <br>
 
-### Web
+### Front-End
 
 <img src="https://img.shields.io/badge/Language-PHP-green?style=flat"/><img src="https://img.shields.io/badge/Platform-RaspberryPi-blue?style=flat"/><img src="https://img.shields.io/badge/DB-MySQL-yellow?style=flat"/>
+
 
 * 사용자 / 관리자로 로그인
 
@@ -64,7 +65,7 @@
 
   <br>
 
-### BE
+### Back-End
 
 <img src="https://img.shields.io/badge/Language-C-green?style=flat"/><img src="https://img.shields.io/badge/DB-MySQL-yellow?style=flat"/>
 
