@@ -21,4 +21,5 @@ public class ChallengeFindByMemberResponse {
     private int numPerWeek;
     private int progressRate;
     private ChallengeStatus challengeParticipantStatus;
+    private int individualReward;
 }

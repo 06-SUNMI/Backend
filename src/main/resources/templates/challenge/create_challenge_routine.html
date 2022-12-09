@@ -12,7 +12,7 @@
             <div th:each="num : ${numPerWeekList}">
                 <h2>[[${week}]]주차 [[${num}]]번째 루틴</h2>
                 <!--                <div class="form-group" th:with="challengeNumPerWeek=*{challengeNumPerWeek},week=${week},num=${num}">-->
-                <p th:id="box${week}${num}">
+                <p th:id="|box${week}${num}|">
                     <span th:id="|${week}${num}1|">
                     <input id="btn" type="button" value="추가" th:attr="onclick=|add_textbox(${week},${num})|"/>
                     <select th:id="'selectTarget' + ${week} + ${num} + '1'" name="selectTarget"
@@ -38,33 +38,41 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    var query = [[${week}]];
+    var week = [[${weekCount}]];
+    var numPerWeek = [[${numPerWeekCount}]];
     /*]]>*/
-    var numGen = 1;
+    //var numGen = 1;
+    var numGenArr = new Array();
+    for (var i = 0; i < week * numPerWeek; i++) {
+        numGenArr[i] = 1;
+    }
 
     console.log("===========");
-    console.log(query);
+    console.log(week);
+    console.log(numPerWeek);
     console.log("===========");
 
     var count = 1;
-    var numGen = 1;
 
     function add_textbox(week, num) {
-        numGen += 1;
+        var n = num;
+        console.log(n);
+        numGenArr[n - 1] += 1;
         console.log("numGen = " + numGen);
         if (count == 5) {
             console.log("count는 5 이하여야함.");
+            javascript.alert("5개 이하의 루틴만 등록할 수 있습니다.");
             return;
         }
         count++;
         console.log("count : " + count);
-        const box = document.getElementById("box"+String(week)+String(num));
+        const box = document.getElementById("box" + String(week) + String(num));
         const newSpan = document.createElement('span');
-        newSpan.setAttribute("id", String(week) + String(num) + String(numGen));
-        console.log("id = " + String(week) + String(num) + String(numGen));
+        newSpan.setAttribute("id", String(week) + String(num) + String(numGenArr[]));
+        console.log("id = " + String(week) + String(num) + String(numGenArr[]));
         const clone = box.cloneNode(true);
         newSpan.innerHTML = "<br><input type=\"button\" value=\"삭제\" onclick=\"remove(this," + String(week) + "," + String(num) + ")\">\n" +
-            "                    <select id=\"selectTarget" + String(week) + String(num) + String(numGen) + "\" name=\"selectTarget\"\n" +
+            "                    <select id=\"selectTarget" + String(week) + String(num) + String(numGenArr[]) + "\" name=\"selectTarget\"\n" +
             "                            onchange=\"addWorkoutName(" + String(week) + "," + String(num) + "," + String(numGen) + ")\">\n" +
             "                        <option value=\"\" selected disabled>운동 부위</option>\n" +
             "                        <option value=\"CHEST\">가슴</option>\n" +
@@ -80,13 +88,13 @@
         box.appendChild(newSpan);
     }
 
-    const remove = (obj) => {
+    const remove = (obj, week, num) => {
         count--;
         console.log("count : " + count);
         console.log(obj);
         console.log(obj.parentNode);
-        document.getElementById('box').removeChild(obj.parentNode);
-        document.getElementById('')
+        document.getElementById('box' + String(week) + String(num)).removeChild(obj.parentNode);
+        document.getElementById('selectWorkoutName' + String() + String())
     }
 
     function addWorkoutName(week, num, numGen) {

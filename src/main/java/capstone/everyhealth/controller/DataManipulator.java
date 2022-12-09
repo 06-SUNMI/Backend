@@ -69,22 +69,29 @@ public class DataManipulator {
 
             // 시작일 - 월요일, 종료일 - 일 ~ 월 넘어가는 자정으로 고정돼 있음
             int currentChallengeWeek = calculateCurrentChallengeWeek(challenge);
-            LocalDate challengeEndDate = changeTypeStringToLocalDate(challenge.getEndDate());
+            String challengeEndDateInString = challenge.getEndDate();
+            int targetIndex = challengeEndDateInString.length() - 2;
+
+            if (challengeEndDateInString.charAt(targetIndex) == '-') {
+                challengeEndDateInString = challengeEndDateInString.substring(0, targetIndex + 1) + '0' + challengeEndDateInString.substring(targetIndex + 1);
+            }
+
+            LocalDate challengeEndDate = changeTypeStringToLocalDate(challengeEndDateInString);
 
             for (ChallengeParticipant challengeParticipant : challengeService.findChallengeParticipantListByChallenge(challenge)) {
 
                 // 챌린지 실패자 마지막날 종료 처리
                 if (challengeParticipant.getChallengeStatus() == ChallengeStatus.FAIL
-                        && LocalDate.now().isEqual(challengeEndDate.plusDays(1))) {
-
+                        && LocalDate.now().isEqual(challengeEndDate)) {
+                    log.info("챌린지 실패자 마지막날 종료 처리");
                     challengeService.updateChallengeStatusFinished(challengeParticipant.getChallenge().getId());
                     break;
                 }
 
                 // 그 주에 인증 해야하는 루틴 수
                 int targetCompletedRoutinesNum = currentChallengeWeek * challenge.getNumPerWeek();
-                log.info("LocalDate.now() = {}",LocalDate.now());
-                log.info("challengeEndDate.plusDays(0) = {}",challengeEndDate.plusDays(0));
+                log.info("LocalDate.now() = {}", LocalDate.now());
+                log.info("challengeEndDate.plusDays(0) = {}", challengeEndDate.plusDays(0));
                 // ex) 총 2주, 주 3회 루틴의 경우 1주차에 3개, 2주차에 6개 완료해야 성공 그 미만은 실패 처리
                 if (challengeParticipant.getCompletedRoutinesNum() < targetCompletedRoutinesNum) {
                     challengeService.updateChallengeParticipantStatus(challengeParticipant.getId(), ChallengeStatus.FAIL);
@@ -151,11 +158,11 @@ public class DataManipulator {
         return challenge.isFinished();
     }
 
-    private LocalDate changeTypeStringToLocalDate(String localDate){
+    private LocalDate changeTypeStringToLocalDate(String localDate) {
         return LocalDate.parse(localDate, DateTimeFormatter.ISO_DATE);
     }
 
-    private String changeTypeLocalDateToString(LocalDate localDate){
+    private String changeTypeLocalDateToString(LocalDate localDate) {
         return localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 }
