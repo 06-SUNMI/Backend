@@ -27,4 +27,6 @@ public class MemberCreateRequest{
     private String memberRegisteredGymId;
     @ApiModelProperty(value="휴대 전화 번호",example = "010-1234-5678")
     private String memberPhoneNumber;
+    @ApiModelProperty(value="프로필 사진 이미지 url")
+    private String memberProfileUrl;
 }
