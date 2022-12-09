@@ -157,7 +157,8 @@ public class AdminController {
     @ApiOperation(
             value = "Sns 댓글 신고글에 대한 관리자의 제재"
     )
-    @ResponseBody
+
+
     @PostMapping("/admins/report/sns/comments/{snsCommentReportId}")
     public String snsCommentReportsPunishment(@ApiParam(value = "sns 댓글 신고글 id") @PathVariable Long snsCommentReportId,
                                               @ModelAttribute SnsCommentReportPunishRequest snsCommentReportPunishRequest) throws SnsCommentReportNotFound {
@@ -194,7 +195,7 @@ public class AdminController {
         return "report/punish_report";
     }
 
-    @ResponseBody
+
     @PostMapping("/admins/report/challenges/auth/{challengeAuthPostReportId}")
     public String challengeAuthPostReportsPunishment(@PathVariable Long challengeAuthPostReportId,
                                                      @ModelAttribute ChallengeAuthPostReportPunishRequest challengeAuthPostReportPunishRequest) throws ChallengeAuthPostReportNotFound {
@@ -208,7 +209,7 @@ public class AdminController {
         adminService.updateIsProcessedOnChallengeAuthPostReport(challengeAuthPostReportId);
         adminService.savePunishChallengeAuthPostReport(challengeAuthPostReportPunishment);
 
-        return "제재 완료";
+        return "redirect:http://localhost:8080/admins/report/challenges/auth";
     }
 
     // 챌린지 조회 페이지
