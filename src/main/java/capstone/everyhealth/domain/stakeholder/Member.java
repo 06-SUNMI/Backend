@@ -25,4 +25,6 @@ public class Member {
     private String gymName;
     private String gymId;
     private String customProfileImageUrl;
+    @Builder.Default
+    private int point = 0;
 }
