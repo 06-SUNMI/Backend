@@ -1,5 +1,6 @@
 package capstone.everyhealth.controller;
 
+import capstone.everyhealth.config.KakaoLocalConfig;
 import capstone.everyhealth.controller.dto.Stakeholder.MemberCreateRequest;
 import capstone.everyhealth.controller.dto.Stakeholder.MemberEditProfileRequest;
 import capstone.everyhealth.controller.dto.Stakeholder.MemberFindResponse;
@@ -12,8 +13,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -26,6 +33,7 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
+    private final KakaoLocalConfig kakaoLocalConfig;
 
     @ApiOperation(
             value = "멤버 데이터 등록",
@@ -110,6 +118,28 @@ public class MemberController {
         memberService.deleteMember(memberId);
 
         return memberId + "번 멤버 삭제 완료";
+    }
+
+    @ApiOperation(
+            value = "헬스장 검색",
+            notes = "헬스장 검색 결과를 불러온다."
+    )
+    @GetMapping("/gyms")
+    public Object findGymByText(@RequestParam String text){
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "KakaoAK "+kakaoLocalConfig.getCliendId());
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("query",text);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+        String url = kakaoLocalConfig.getUrl();
+
+        ResponseEntity<Object> res = new RestTemplate().postForEntity(url, request, Object.class);
+
+        return res.getBody();
     }
 
     private MemberProfileFindResponse createMemberProfileFindResponse(Member member) {
