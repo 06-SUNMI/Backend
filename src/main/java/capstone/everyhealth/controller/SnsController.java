@@ -231,6 +231,7 @@ public class SnsController {
         for (Member member : memberList) {
 
             MemberProfileFindResponse memberProfileFindResponse = MemberProfileFindResponse.builder()
+                    .memberId(member.getId())
                     .memberHeight(member.getHeight())
                     .memberName(member.getName())
                     .memberRegisteredGymName(member.getGymName())
