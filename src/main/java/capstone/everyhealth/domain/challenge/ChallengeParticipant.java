@@ -35,4 +35,7 @@ public class ChallengeParticipant {
 
     @OneToOne(mappedBy = "challengeParticipant")
     private ChallengeTransaction challengeTransaction;
+
+    @Builder.Default
+    private boolean isRewarded = false;
 }

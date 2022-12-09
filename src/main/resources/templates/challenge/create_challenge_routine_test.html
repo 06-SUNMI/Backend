@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header :: header"/>
+<head>
+</head>
+<body>
+<div th:replace="fragments/bodyHeader :: bodyHeader"/>
+<form role="form" action="/admins/challenges/new" th:object="${challengePostOrUpdateRequest}" method="post">
+    <div class="container-fluid">
+        <th:block th:each="week : ${weekList}">
+            <div id="mainDiv" th:each="num : ${numPerWeekList}">
+                <h2>[[${week}]]주차 [[${num}]]번째 루틴</h2>
+                <div>
+                    <input type='button' value='추가' onclick='add()'>
+                    <select onchange='addWorkoutName(this)'>
+                        <option value="" selected disabled>운동 부위</option>
+                        <option value="CHEST">가슴</option>
+                        <option value="BACK">등</option>
+                        <option value="LOWER_BODY">하체</option>
+                        <option value="SHOULDER">어깨</option>
+                        <option value="TRICEPS">삼두근</option>
+                        <option value="BICEPS">이두근</option>
+                        <option value="CORE">코어</option>
+                        <option value="FOREARM">전완근</option>
+                        <option value="AEROBIC">유산소</option>
+                    </select>
+                </div>
+            </div>
+            <br><br>
+        </th:block>
+    </div>
+</form>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var week = [[${weekCount}]];
+    var numPerWeek = [[${numPerWeekCount}]];
+    /*]]>*/
+
+    console.log("===========");
+    console.log(week);
+    console.log(numPerWeek);
+    console.log("===========");
+
+    function add() {
+        var mainDiv = document.getElementById('mainDiv');
+        var newDiv = document.createElement('div');
+        newDiv.innerHTML = "<input type='button' value='삭제' onclick='remove(this)'>" +
+            "<select onchange=addWorkoutName(this)>\n" +
+            "                        <option value=\"\" selected disabled>운동 부위</option>\n" +
+            "                        <option value=\"CHEST\">가슴</option>\n" +
+            "                        <option value=\"BACK\">등</option>\n" +
+            "                        <option value=\"LOWER_BODY\">하체</option>\n" +
+            "                        <option value=\"SHOULDER\">어깨</option>\n" +
+            "                        <option value=\"TRICEPS\">삼두근</option>\n" +
+            "                        <option value=\"BICEPS\">이두근</option>\n" +
+            "                        <option value=\"CORE\">코어</option>\n" +
+            "                        <option value=\"FOREARM\">전완근</option>\n" +
+            "                        <option value=\"AEROBIC\">유산소</option>\n" +
+            "                    </select>"
+        mainDiv.appendChild(newDiv);
+    }
+
+    const remove = (obj) => {
+        var removeDiv = obj.parentNode;
+        removeDiv.remove();
+    }
+
+    function addWorkoutName(obj) {
+        var div = obj.parentNode;
+        var select = document.createElement("select");
+        // 기존 반응되는 select 제거
+        if (div.getElementsByTagName('select')[1] != null) {
+            div.getElementsByTagName('select')[1].remove();
+        }
+
+        var selectValue = select.options[select.selectedIndex].value;
+        var selectText = select.options[select.selectedIndex].text;
+        console.log(selectValue);
+        console.log(selectText);
+
+        const newSelect = document.createElement('select');
+
+        if (selectValue == "CHEST") {
+            newSelect.innerHTML =
+                "        <option value=\"\" selected disabled>운동 이름</option>\n" +
+                "        <option value=\"BENCH_PRESS_DUMBBELL\">벤치 프레스 (덤벨)</option>\n" +
+                "        <option value=\"CHEST_PRESS_MACHINE\">체스트 프레스 (머신)</option>\n" +
+                "        <option value=\"PUSH_UP\">푸시 업</option>\n";
+        } else if (selectValue == "BACK") {
+            newSelect.innerHTML =
+                "        <option value=\"\" selected disabled>운동 이름</option>\n" +
+                "        <option value=\"LAT_PULL_DOWN\">렛 풀 다운</option>\n" +
+                "        <option value=\"ONE_ARM_DUMBBELL_ROW\">원 암 덤벨 로우</option>\n" +
+                "        <option value=\"SEATED_ROW_CABLE\">시티드 로우 (케이블)</option>\n";
+        } else if (selectValue == "LOWER_BODY") {
+            newSelect.innerHTML =
+                "        <option value=\"\" selected disabled>운동 이름</option>\n" +
+                "        <option value=\"SQUAT\">스쿼트</option>\n" +
+                "        <option value=\"WIDE_SQUAT\">와이드 스쿼트</option>\n" +
+                "        <option value=\"LEG_EXTENSION\">레그 익스텐션</option>\n";
+        } else if (selectValue == "SHOULDER") {
+            newSelect.innerHTML =
+                "        <option value=\"\" selected disabled>운동 이름</option>\n" +
+                "        <option value=\"SHOULDER_PRESS_DUMBBELL\">숄더 프레스 (덤벨)</option>\n" +
+                "        <option value=\"LATERAL_RAISE_DUMBBELL\">레터럴 레이즈 (덤벨)</option>\n" +
+                "        <option value=\"SHOULDER_PRESS_MACHINE\">숄더 프레스 (머신)</option>\n";
+        } else if (selectValue == "TRICEPS") {
+            newSelect.innerHTML =
+                "        <option value=\"\" selected disabled>운동 이름</option>\n" +
+                "        <option value=\"BENCH_DIPS\">벤치 딥스</option>\n" +
+                "        <option value=\"TRICEP_PUSH_DOWN_CABLE\">프리셉 푸시 다운</option>\n" +
+                "        <option value=\"ONE_ARM_TRICEP_EXTENSION_DUMBBELL\">원 암 트리셉 익스텐션 (덤벨)</option>\n";
+        } else if (selectValue == "BICEPS") {
+            newSelect.innerHTML =
+                "<option value=\"\" selected disabled>운동 이름</option>\n" +
+                "        <option value=\"BICEP_CURL_DUMBBELL\">바이셉 컬 (덤벨)</option>\n" +
+                "        <option value=\"HAMMER_CURL_DUMBBELL\">해머 컬 (덤벨)</option>\n" +
+                "        <option value=\"BICEP_CURL_CABLE\">바이셉 컬 (케이블)</option>\n";
+        } else if (selectValue == "CORE") {
+            newSelect.innerHTML =
+                "<option value=\"\" selected disabled>운동 이름</option>\n" +
+                "        <option value=\"CRUNCH\">크런치</option>\n" +
+                "        <option value=\"PLANK\">플랭크</option>\n" +
+                "        <option value=\"LEG_RAISE\">레그 레이즈</option>\n";
+        } else if (selectValue == "FOREARM") {
+            newSelect.innerHTML =
+                "<option value=\"\" selected disabled>운동 이름</option>\n" +
+                "        <option value=\"WRIST_CURL_DUMBBELL\">리스트 컬 (덤벨)</option>\n" +
+                "        <option value=\"REVERSE_WRIST_CURL_DUMBBELL\">리버스 리스트 컬 (덤벨)</option>\n" +
+                "        <option value=\"WRIST_CURL_BARBELL\">리스트 컬 (바벨)</option>\n";
+        } else {
+            newSelect.innerHTML =
+                "<option value=\"\" selected disabled>운동 이름</option>\n" +
+                "        <option value=\"TREADMILL_RUNNING\">트레드 밀 런닝</option>\n" +
+                "        <option value=\"SLOW_BURPEE\">슬로우 버피</option>\n" +
+                "        <option value=\"CRISS_CROSS_JUMP\">크리스 크로스 점프</option>\n";
+        }
+        p.appendChild(newSelect);
+    }
+</script>
+
+</body>
+</html>

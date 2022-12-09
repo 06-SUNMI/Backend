@@ -18,4 +18,5 @@ public class MemberFindResponse {
     private String loginAt;
     @ApiModelProperty(value="소셜 로그인한 곳 고유 id",example = "12313131")
     private String socialId;
+    private int point;
 }

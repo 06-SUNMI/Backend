@@ -63,6 +63,7 @@ public class MemberController {
                     .loginAt(member.getLoginAt())
                     .socialId(member.getSocialAccountId())
                     .memberId(member.getId())
+                    .point(member.getPoint())
                     .build();
 
             memberFindResponseList.add(memberFindResponse);

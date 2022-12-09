@@ -1,10 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<head th:replace="fragments/header :: header"/>
+<script>
+    function punishReport(id){
+        var form = document.createElement("form");
+        form.setAttribute("method", "get");
+        form.setAttribute("action", "/admins/report/challenges/auth/"+id);
+        document.body.appendChild(form);
+        form.submit();
+    }
 
+    function passReport(id){
+
+    }
+</script>
+<body>
+<div class="container-fluid" id="challenge-auth-container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader"/>
+    <div>
+        <table class="table table-striped" id="challenge-auth-list">
+            <thead>
+            <tr>
+                <th>처리 여부</th>
+                <th>사진</th>
+                <th>신고자</th>
+                <th>신고 날짜</th>
+                <th>신고 사유</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="challenge-auth-report-list-body">
+            <tr th:each="challengeAuthPostReport : ${challengeAuthPostReportList}">
+                <td th:text="${challengeAuthPostReport.isProcessed}"></td>
+                <td th:text="${challengeAuthPostReport.challengeAuthPost.photoUrl}">의 사진</td>
+                <td th:text="${challengeAuthPostReport.member.name}"></td>
+                <td th:text="${challengeAuthPostReport.registeredDate}"></td>
+                <td th:text="${challengeAuthPostReport.reason}"></td>
+                <td>
+                    <a href="#" th:href="'javascript:punishReport('+${challengeAuthPostReport.id}+')'"
+                       class="btn btn-warning">제재</a>
+                </td>
+                <td>
+                    <a href="#" th:href="'javascript:passReport('+${challengeAuthPostReport.id}+')'"
+                       class="btn btn-primary">넘어가기</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"/>
+
+</div>
 </body>
 </html>
