@@ -133,6 +133,7 @@ public class MemberController {
                 .weight(memberCreateRequest.getMemberWeight())
                 .gymName(memberCreateRequest.getMemberRegisteredGymName())
                 .gymId(memberCreateRequest.getMemberRegisteredGymId())
+                .customProfileImageUrl(memberCreateRequest.getMemberProfileUrl())
                 .build();
     }
 }
