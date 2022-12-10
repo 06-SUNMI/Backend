@@ -60,18 +60,13 @@ public class ChallengeService {
         return challengeRepository.findById(challengeId).orElseThrow(() -> new ChallengeNotFound(challengeId));
     }
 
-    /*@Transactional
-    public Long update(Challenge challenge, Long challengeId) {
+    @Transactional
+    public Long update(Challenge challenge, Long challengeId) throws ChallengeNotFound {
 
-        Challenge prevChallenge = challengeRepository.findById(challengeId).get();
+        Challenge prevChallenge = challengeRepository.findById(challengeId).orElseThrow(()->new ChallengeNotFound(challengeId));
 
         updateExceptChallengeRoutineList(prevChallenge, challenge);
         clearRelation(prevChallenge);
-
-        // 1. 기존 ch 전체 연결 끊기 o
-        // 2. 새 ch-rou for - 기존 ch와 연결 o
-        // 3. 새 ch와 ch-rou 연결 끊기 o
-        // 4. 새 ch-rou-con for - 새 ch-rou와 연결 o
 
         for (ChallengeRoutine challengeRoutine : challenge.getChallengeRoutineList()) {
 
@@ -82,7 +77,7 @@ public class ChallengeService {
         challenge.getChallengeRoutineList().clear();
 
         return challengeId;
-    }*/
+    }
 
     @Transactional
     public Long delete(Long challengeId) {
@@ -456,7 +451,7 @@ public class ChallengeService {
                 .build();
     }
 
-    public void updateExceptChallengeRoutineList(Challenge prevChallenge, Challenge challenge) {
+    private void updateExceptChallengeRoutineList(Challenge prevChallenge, Challenge challenge) {
 
         prevChallenge.setName(challenge.getName());
         prevChallenge.setStartDate(challenge.getStartDate());
@@ -464,6 +459,7 @@ public class ChallengeService {
         prevChallenge.setParticipationNum(challenge.getParticipationNum());
         prevChallenge.setParticipationFee(challenge.getParticipationFee());
         prevChallenge.setNumPerWeek(challenge.getNumPerWeek());
+        prevChallenge.setFinished(challenge.isFinished());
     }
 
     private void clearRelation(Challenge prevChallenge) {
@@ -474,6 +470,7 @@ public class ChallengeService {
             }
 
             challengeRoutine.getChallengeRoutineContentList().clear();
+            challengeRoutine.setChallenge(null);
         }
 
         prevChallenge.getChallengeRoutineList().clear();

@@ -2,8 +2,7 @@ package capstone.everyhealth.controller;
 
 import capstone.everyhealth.Book;
 import capstone.everyhealth.BooksCreationDto;
-import capstone.everyhealth.controller.dto.Challenge.ChallengeCompletedResponse;
-import capstone.everyhealth.controller.dto.Challenge.ChallengePostOrUpdateRequest;
+import capstone.everyhealth.controller.dto.Challenge.*;
 import capstone.everyhealth.controller.dto.Stakeholder.*;
 import capstone.everyhealth.domain.challenge.Challenge;
 import capstone.everyhealth.domain.report.*;
@@ -234,42 +233,68 @@ public class AdminController {
     }
 
     @PostMapping("/admins/challenges/new")
-    public String aaaa(Model model,
-                       ChallengePostOrUpdateRequest challengePostOrUpdateRequest) {
+    public String createChallengeRoutine(Model model,
+                                         ChallengePostOrUpdateRequest challengePostOrUpdateRequest) {
 
         LocalDateTime startDate = LocalDate.parse(challengePostOrUpdateRequest.getChallengeStartDate(), DateTimeFormatter.ISO_DATE).atStartOfDay();
         LocalDateTime endDate = LocalDate.parse(challengePostOrUpdateRequest.getChallengeEndDate(), DateTimeFormatter.ISO_DATE).atStartOfDay();
         int betweenDays = (int) Duration.between(startDate, endDate).toDays();
         int week = (betweenDays + 1) / 7;
-        log.info("betweenDays = {}", betweenDays);
-        log.info("week = {}", week);
 
         List<Integer> weekList = new ArrayList<>();
         List<Integer> numPerWeekList = new ArrayList<>();
 
-        for (int i = 0; i < week; i++) {
-            weekList.add(i + 1);
-        }
-        for (int i = 0; i < challengePostOrUpdateRequest.getChallengeNumPerWeek(); i++) {
-            numPerWeekList.add(i + 1);
-        }
+        setWeekListAndNumPerWeekList(challengePostOrUpdateRequest.getChallengeNumPerWeek(), week, weekList, numPerWeekList);
+
         model.addAttribute("challengePostOrUpdateRequest", challengePostOrUpdateRequest);
         model.addAttribute("weekList", weekList);
         model.addAttribute("numPerWeekList", numPerWeekList);
-        model.addAttribute("weekCount", weekList.size());
-        model.addAttribute("numPerWeekCount", numPerWeekList.size());
-        return "challenge/create_challenge_routine_test";
+
+        return "challenge/create_challenge_routine";
     }
 
+    /*
     // 챌린지 수정 페이지
     @GetMapping("/admins/challenges/{challengeId}/update")
     public String updateChallenge(Model model, @PathVariable String challengeId) throws ChallengeNotFound {
 
         log.info("챌린지 수정 페이지");
         Challenge challenge = challengeService.find(Long.valueOf(challengeId));
-        model.addAttribute("challenge", challenge);
+        ChallengeDto challengeDto = new ChallengeDto(challenge);
+        model.addAttribute("challengeDto", challengeDto);
+        model.addAttribute("challengeId", challengeId);
 
         return "challenge/edit_challenge";
+    }
+
+    @PostMapping("/admins/challenges/{challengeId}/update")
+    public String updateChallengeRoutine(Model model,
+                                         ChallengeDto challengeDto) {
+
+        LocalDateTime startDate = LocalDate.parse(challengeDto.getStartDate(), DateTimeFormatter.ISO_DATE).atStartOfDay();
+        LocalDateTime endDate = LocalDate.parse(challengeDto.getEndDate(), DateTimeFormatter.ISO_DATE).atStartOfDay();
+        int betweenDays = (int) Duration.between(startDate, endDate).toDays();
+        int week = (betweenDays + 1) / 7;
+
+        List<Integer> weekList = new ArrayList<>();
+        List<Integer> numPerWeekList = new ArrayList<>();
+
+        setWeekListAndNumPerWeekList(challengeDto.getNumPerWeek(), week, weekList, numPerWeekList);
+
+        model.addAttribute("challengeDto", challengeDto);
+        model.addAttribute("weekList", weekList);
+        model.addAttribute("numPerWeekList", numPerWeekList);
+
+        return "challenge/edit_challenge_routine";
+    }*/
+
+    private void setWeekListAndNumPerWeekList(int numPerWeek, int week, List<Integer> weekList, List<Integer> numPerWeekList) {
+        for (int i = 0; i < week; i++) {
+            weekList.add(i + 1);
+        }
+        for (int i = 0; i < numPerWeek; i++) {
+            numPerWeekList.add(i + 1);
+        }
     }
 
     @DeleteMapping("/admins/challenges/{challengeId}")
@@ -364,6 +389,12 @@ public class AdminController {
     @GetMapping("/testa")
     public String testaaaa() {
         return "challenge/jquery_test";
+    }
+
+    @ApiIgnore
+    @GetMapping("/test444")
+    public String testaaaa4() {
+        return "challenge/test4";
     }
 
     private void addReportedChallengeAuthPostList(List<ChallengeAuthPostReport> challengeAuthPostReportList, List<ReportedChallengeAuthPostResponse> reportedChallengeAuthPostResponseList) {

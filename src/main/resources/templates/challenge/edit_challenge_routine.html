@@ -6,7 +6,6 @@
 </head>
 <body>
 <div th:replace="fragments/bodyHeader :: bodyHeader"/>
-<form role="form" action="/admins/challenges/new" th:object="${challengePostOrUpdateRequest}" method="post">
     <div id="container" class="container-fluid">
         <th:block th:each="week : ${weekList}">
             <th:block th:each="num : ${numPerWeekList}">
@@ -33,18 +32,38 @@
         </th:block>
         <input type='button' value='등록하기' onclick='saveChallenge(this)'>
     </div>
-</form>
 
 <script th:inline="javascript">
     /*<![CDATA[*/
+    var challengeId = [[${challengePostOrUpdateRequest.id}]]
     var challengeName = [[${challengePostOrUpdateRequest.challengeName}]];
     var challengeStartDate = [[${challengePostOrUpdateRequest.challengeStartDate}]];
     var challengeEndDate = [[${challengePostOrUpdateRequest.challengeEndDate}]];
     var challengeParticipationFee = [[${challengePostOrUpdateRequest.challengeParticipationFee}]];
     var challengeNumPerWeek = [[${challengePostOrUpdateRequest.challengeNumPerWeek}]];
+    var challengeRoutineDataList = [[${challengePostOrUpdateRequest.challengeRoutineDataList}]];
     /*]]>*/
 
+    var week = 1;
+    var num = 1;
+
+    for (let challengeRoutineData of challengeRoutineDataList) {
+
+        for (let challengeRoutineContentData of challengeRoutineData.challengeRoutineContentDataList) {
+
+            var mainDiv = document.getElementById("mainDiv" + String(week) + String(num));
+            var workoutTargetSelect = mainDiv.getElementsByTagName("select")[0];
+            var workoutTargetName = mainDiv.getElementsByTagName("select")[1];
+
+            workoutTargetSelect.value = "CHEST";
+            workoutTargetName.value = "BENCH_PRESS_DUMBBELL";
+            num++;
+        }
+        week++;
+    }
+
     console.log("challengeName = " + challengeName);
+
 
     function add(obj) {
         var mainDiv = obj.parentNode.parentNode;
@@ -226,8 +245,8 @@
         console.log(challenge);
 
         jQuery.ajax({
-            url: "/challenges",
-            method: "POST",
+            url: "/challenges/" + challengeId,
+            method: "PUT",
             headers: {"Content-Type": "application/json"},
             data: JSON.stringify(challenge),
             success: function (data) {
