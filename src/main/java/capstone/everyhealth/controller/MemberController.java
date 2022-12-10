@@ -71,6 +71,7 @@ public class MemberController {
                     .loginAt(member.getLoginAt())
                     .socialId(member.getSocialAccountId())
                     .memberId(member.getId())
+                    .gymId(member.getGymId())
                     .point(member.getPoint())
                     .build();
 
