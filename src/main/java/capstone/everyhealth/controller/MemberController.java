@@ -151,6 +151,8 @@ public class MemberController {
                 .memberWeight(member.getWeight())
                 .memberRegisteredGymName(member.getGymName())
                 .customProfileImageUrl(member.getCustomProfileImageUrl())
+                .point(member.getPoint())
+                .memberRegisteredGymId(member.getGymId())
                 .build();
     }
 
