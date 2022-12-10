@@ -9,6 +9,8 @@ import lombok.*;
 @NoArgsConstructor
 public class MemberProfileFindResponse {
 
+    @ApiModelProperty(value = "유저 id", example = "1")
+    private Long memberId;
     @ApiModelProperty(value = "유저 이름", example = "홍길동")
     private String memberName;
     @ApiModelProperty(value = "유저 키", example = "178")
@@ -17,6 +19,10 @@ public class MemberProfileFindResponse {
     private int memberWeight;
     @ApiModelProperty(value = "유저가 등록한 헬스장", example = "OO 헬스장")
     private String memberRegisteredGymName;
+    @ApiModelProperty(value = "유저가 등록한 헬스장 고유 id 값", example = "12123")
+    private String memberRegisteredGymId;
     @ApiModelProperty(value = "유저 프로필 사진 url (null 이면 asset의 기본 프로필 불러오기)", example = "profile_image_saved_url")
     private String customProfileImageUrl;
+    @ApiModelProperty(value = "포인트", example = "123")
+    private int point;
 }
