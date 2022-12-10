@@ -14,6 +14,7 @@ import capstone.everyhealth.controller.dto.Sns.SnsFindResponse;
 import capstone.everyhealth.controller.dto.Stakeholder.MemberProfileFindResponse;
 import capstone.everyhealth.domain.sns.SnsPostImageOrVideo;
 import capstone.everyhealth.exception.Sns.SnsCommentNotFound;
+import capstone.everyhealth.exception.Sns.SnsFollowingNotFound;
 import capstone.everyhealth.exception.Sns.SnsPostNotFound;
 import capstone.everyhealth.exception.report.DuplicateReporter;
 import capstone.everyhealth.exception.report.WriterEqualsReporter;
@@ -113,7 +114,7 @@ public class SnsController {
     )
     @PostMapping("/sns/follow/{followingMemberId}/{followedMemberId}")
     public Long follow(@ApiParam(value = "팔로우 하는 사람 id") @PathVariable Long followingMemberId,
-                       @ApiParam(value = "팔로우 받는 사람 id") @PathVariable Long followedMemberId) throws MemberNotFound {
+                       @ApiParam(value = "팔로우 받는 사람 id") @PathVariable Long followedMemberId) throws MemberNotFound, SnsFollowingNotFound {
         return snsService.follow(followedMemberId, followingMemberId);
     }
 
@@ -123,7 +124,7 @@ public class SnsController {
     )
     @DeleteMapping("/sns/follow/{followingMemberId}/{followedMemberId}")
     public String unFollow(@ApiParam(value = "팔로우 취소 하는 사람 id") @PathVariable Long followingMemberId,
-                           @ApiParam(value = "팔로우 취소 받는 사람 id") @PathVariable Long followedMemberId) throws MemberNotFound {
+                           @ApiParam(value = "팔로우 취소 받는 사람 id") @PathVariable Long followedMemberId) throws MemberNotFound, SnsFollowingNotFound {
 
         snsService.unFollow(followedMemberId, followingMemberId);
 

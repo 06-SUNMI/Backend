@@ -23,6 +23,7 @@ public class ChallengeRoutine {
     @JoinColumn(name="challenge_id")
     private Challenge challenge;
 
+    @Builder.Default
     @OneToMany(mappedBy = "challengeRoutine", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChallengeRoutineContent> challengeRoutineContentList = new ArrayList<>();
 

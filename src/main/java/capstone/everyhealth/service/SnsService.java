@@ -11,6 +11,7 @@ import capstone.everyhealth.domain.report.SnsPostReport;
 import capstone.everyhealth.domain.sns.SnsPostImageOrVideo;
 import capstone.everyhealth.domain.sns.SnsPostLikes;
 import capstone.everyhealth.exception.Sns.SnsCommentNotFound;
+import capstone.everyhealth.exception.Sns.SnsFollowingNotFound;
 import capstone.everyhealth.exception.Sns.SnsPostNotFound;
 import capstone.everyhealth.exception.report.DuplicateReporter;
 import capstone.everyhealth.exception.report.WriterEqualsReporter;
@@ -94,17 +95,28 @@ public class SnsService {
     MemberService memberService;
 
     @Transactional
-    public Long follow(Long followedMemberId, Long followingMemberId) throws MemberNotFound { // 저장
-        SnsFollowing snsFollowing = new SnsFollowing(); // 객체생성
-        snsFollowing.setFollowedMember(memberService.findMemberById(followedMemberId));
-        snsFollowing.setFollowingMember(memberService.findMemberById(followingMemberId)); // 필드에 값채우기
-        return snsFollowRepository.save(snsFollowing).getId();// 저장
+    public Long follow(Long followedMemberId, Long followingMemberId) throws MemberNotFound, SnsFollowingNotFound { // 저장
+
+        Member followedMember = memberRepository.findById(followedMemberId).orElseThrow(() -> new MemberNotFound(followedMemberId));
+        Member followingMember = memberRepository.findById(followingMemberId).orElseThrow(() -> new MemberNotFound(followingMemberId));
+        try {
+            snsFollowRepository.findByFollowedMemberAndFollowingMember(followedMember, followingMember).orElseThrow(() -> new SnsFollowingNotFound(followedMemberId, followedMemberId));
+        } catch (SnsFollowingNotFound e) {
+            SnsFollowing snsFollowing = new SnsFollowing(); // 객체생성
+            snsFollowing.setFollowedMember(memberService.findMemberById(followedMemberId));
+            snsFollowing.setFollowingMember(memberService.findMemberById(followingMemberId)); // 필드에 값채우기
+            return snsFollowRepository.save(snsFollowing).getId();// 저장
+        }
+        return -1L;
     }
 
     @Transactional
-    public void unFollow(Long followedMemberId, Long followingMemberId) throws MemberNotFound {
-        Member followedMember = memberService.findMemberById(followedMemberId);
-        Member followingMember = memberService.findMemberById(followingMemberId);
+    public void unFollow(Long followedMemberId, Long followingMemberId) throws MemberNotFound, SnsFollowingNotFound {
+
+        Member followedMember = memberRepository.findById(followedMemberId).orElseThrow(() -> new MemberNotFound(followedMemberId));
+        Member followingMember = memberRepository.findById(followingMemberId).orElseThrow(() -> new MemberNotFound(followingMemberId));
+        snsFollowRepository.findByFollowedMemberAndFollowingMember(followedMember, followingMember).orElseThrow(() -> new SnsFollowingNotFound(followedMember.getId(), followingMember.getId()));
+
         snsFollowRepository.deleteByFollowedMemberAndFollowingMember(followedMember, followingMember);
     }
 
@@ -138,7 +150,7 @@ public class SnsService {
     }
 
     public List<SnsComment> findAllComment(Long snsPostId) throws SnsPostNotFound {
-        SnsPost snsPost = snsRepository.findById(snsPostId).orElseThrow(()->new SnsPostNotFound(snsPostId));
+        SnsPost snsPost = snsRepository.findById(snsPostId).orElseThrow(() -> new SnsPostNotFound(snsPostId));
         return snsCommentRepository.findAllBySnsPost(snsPost);
     }
 
@@ -196,7 +208,7 @@ public class SnsService {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
         List<SnsFollowing> snsFollowingList = snsFollowRepository.findByFollowingMember(member);
 
-        for (SnsFollowing snsFollowing : snsFollowingList){
+        for (SnsFollowing snsFollowing : snsFollowingList) {
             followedMemberIdList.add(snsFollowing.getFollowedMember().getId());
         }
 
