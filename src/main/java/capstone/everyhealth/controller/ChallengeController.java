@@ -113,19 +113,18 @@ public class ChallengeController {
         return challengeFindDetailResponse;
     }
 
-    /*@ApiOperation(
+    @ApiOperation(
             value = "챌린지 수정 by Admin",
             notes = "등록한 챌린지의 내용을 수정한다."
     )
-    @Transactional
     @PutMapping("/challenges/{challengeId}")
     public Long update(@ApiParam(value = "챌린지 수정 내용") @RequestBody ChallengePostOrUpdateRequest challengePostOrUpdateRequest,
-                       @ApiParam(value = "챌린지 id값", example = "1") @PathVariable Long challengeId) {
-        Challenge challenge = createChallenge(challengePostOrUpdateRequest);
-        setupRelation(challenge);
+                       @ApiParam(value = "챌린지 id값", example = "1") @PathVariable Long challengeId) throws ChallengeNotFound {
+        Challenge updatedChallenge = createChallenge(challengePostOrUpdateRequest);
+        setupRelation(updatedChallenge);
 
-        return challengeService.update(challenge, challengeId);
-    }*/
+        return challengeService.update(updatedChallenge, challengeId);
+    }
 
 
     @ApiOperation(
