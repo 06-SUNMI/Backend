@@ -13,13 +13,13 @@
         </div>
         <div class="form-group">
             <label th:for="challengeStartDate">챌린지 시작일</label>
-            <input type="text" th:field="*{challengeStartDate}" class="form-control" placeholder="yyyy-mm-dd"
+            <input type="date" th:field="*{challengeStartDate}" class="form-control" placeholder="yyyy-mm-dd"
                    th:class="${#fields.hasErrors('challengeStartDate')}? 'form-control fieldError' : 'form-control'">
             <p th:if="${#fields.hasErrors('challengeStartDate')}" th:errors="*{challengeStartDate}">Incorrect date</p>
         </div>
         <div class="form-group">
             <label th:for="challengeEndDate">챌린지 종료일</label>
-            <input type="text" th:field="*{challengeEndDate}" class="form-control" placeholder="yyyy-mm-dd"
+            <input type="date" th:field="*{challengeEndDate}" class="form-control" placeholder="yyyy-mm-dd"
                    th:class="${#fields.hasErrors('challengeEndDate')}? 'form-control fieldError' : 'form-control'">
             <p th:if="${#fields.hasErrors('challengeEndDate')}" th:errors="*{challengeEndDate}">Incorrect date</p>
         </div>
