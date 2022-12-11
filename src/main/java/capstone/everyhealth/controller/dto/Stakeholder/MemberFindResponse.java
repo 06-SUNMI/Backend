@@ -18,8 +18,5 @@ public class MemberFindResponse {
     private String loginAt;
     @ApiModelProperty(value="소셜 로그인한 곳 고유 id",example = "12313131")
     private String socialId;
-    @ApiModelProperty(value="헬스장 고유 id",example = "123123")
-    private String gymId;
-    @ApiModelProperty(value="챌린지 참가로 획득한 포인트",example = "10000")
     private int point;
 }

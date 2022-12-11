@@ -73,7 +73,7 @@ public class MemberService {
         try {
             customProfileImageUrl = fileUploadService.uploadImage(memberProfileImageFile);
         } catch (NullPointerException e) {
-            customProfileImageUrl = null;
+            customProfileImageUrl = member.getCustomProfileImageUrl();
         }
 
         member.setName(memberEditProfileRequest.getMemberName());
