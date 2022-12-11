@@ -9,6 +9,8 @@ import lombok.*;
 @NoArgsConstructor
 public class MemberProfileFindResponse {
 
+    @ApiModelProperty(value = "유저 id", example = "1")
+    private Long memberId;
     @ApiModelProperty(value = "유저 이름", example = "홍길동")
     private String memberName;
     @ApiModelProperty(value = "유저 키", example = "178")
