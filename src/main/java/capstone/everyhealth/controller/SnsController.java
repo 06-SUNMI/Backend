@@ -261,6 +261,7 @@ public class SnsController {
                     .memberRegisteredGymName(member.getGymName())
                     .memberWeight(member.getWeight())
                     .customProfileImageUrl(member.getCustomProfileImageUrl())
+                    .memberId(member.getId())
                     .build();
 
             memberProfileFindResponseList.add(memberProfileFindResponse);
