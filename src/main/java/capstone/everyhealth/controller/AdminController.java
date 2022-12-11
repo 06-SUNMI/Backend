@@ -159,7 +159,8 @@ public class AdminController {
     @ApiOperation(
             value = "Sns 댓글 신고글에 대한 관리자의 제재"
     )
-    @ResponseBody
+
+
     @PostMapping("/admins/report/sns/comments/{snsCommentReportId}")
     public String snsCommentReportsPunishment(@ApiParam(value = "sns 댓글 신고글 id") @PathVariable Long snsCommentReportId,
                                               @ModelAttribute SnsCommentReportPunishRequest snsCommentReportPunishRequest) throws SnsCommentReportNotFound {
@@ -196,7 +197,6 @@ public class AdminController {
         return "report/punish_report";
     }
 
-    @ResponseBody
     @PostMapping("/admins/report/challenges/auth/{challengeAuthPostReportId}")
     public String challengeAuthPostReportsPunishment(@PathVariable Long challengeAuthPostReportId,
                                                      @ModelAttribute ChallengeAuthPostReportPunishRequest challengeAuthPostReportPunishRequest) throws ChallengeAuthPostReportNotFound, ChallengeParticipantNotFound {
@@ -210,7 +210,7 @@ public class AdminController {
         adminService.updateIsProcessedOnChallengeAuthPostReport(challengeAuthPostReportPunishRequest.getBlockDays(), challengeAuthPostReportId);
         adminService.savePunishChallengeAuthPostReport(challengeAuthPostReportPunishment);
 
-        return "제재 완료";
+        return "redirect:http://localhost:8080/admins/report/challenges/auth";
     }
 
     // 챌린지 조회 페이지
@@ -304,9 +304,9 @@ public class AdminController {
         return "redirect:/admins/challenges";
     }
 
-    // 완료된 챌린지들 가져오기
-    @GetMapping("/asdf")
-    public void findByCompletedChallengesAndChallengeStatus(Model model) throws ChallengeNotFound {
+    // 완료된 챌린지 페이지
+    @GetMapping("/admins/completed-challenges")
+    public String findByCompletedChallengesAndChallengeStatus(Model model) throws ChallengeNotFound {
 
         List<Challenge> challengeList = challengeService.findAllClosedChallenges();
         List<ChallengeCompletedResponse> challengeCompletedResponseList = new ArrayList<>();
@@ -336,13 +336,14 @@ public class AdminController {
 
         model.addAttribute("challengeCompletedResponseList", challengeCompletedResponseList);
 
-        // return "challengeCompleted 리스트를 전달할 뷰 이름";
+         return "challenge/completed_challenge_list";
     }
 
     // 챌린지 정산 : 정산된 멤버 id 반환
     @PostMapping("/admins/challenges/{challengeId}/calculate")
-    public List<Long> calculateChallenge(@PathVariable Long challengeId) throws ChallengeNotFound {
-        return adminService.calculateChallenge(challengeId);
+    public String calculateChallenge(@PathVariable Long challengeId) throws ChallengeNotFound {
+        adminService.calculateChallenge(challengeId);
+        return "redirect:/admins/main";
     }
 
 
