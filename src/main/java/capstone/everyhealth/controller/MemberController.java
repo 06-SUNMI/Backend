@@ -61,17 +61,16 @@ public class MemberController {
             notes = "각 멤버의 loginAt(ex)카카오)과 socialId를 전달한다."
     )
     @GetMapping("/members")
-    public List<MemberFindResponse> findAllMember(){
+    public List<MemberFindResponse> findAllMember() {
 
         List<MemberFindResponse> memberFindResponseList = new ArrayList<>();
         List<Member> memberList = memberService.findAllMember();
 
-        for(Member member:memberList){
+        for (Member member : memberList) {
             MemberFindResponse memberFindResponse = MemberFindResponse.builder()
                     .loginAt(member.getLoginAt())
                     .socialId(member.getSocialAccountId())
                     .memberId(member.getId())
-                    .gymId(member.getGymId())
                     .point(member.getPoint())
                     .build();
 
@@ -100,13 +99,13 @@ public class MemberController {
             notes = "멤버의 프로필 정보를 수정한다.\n"
                     + "헬스장 이름, 헬스장 id는 카카오 로컬 api서 같이 가져올 수 있다."
     )
-    @PutMapping(path = "/members/{memberId}")
+    @PutMapping(path = "/members/{memberId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public String updateMember(@ApiParam(value = "유저 id 값", example = "1") @PathVariable Long memberId,
-                               @ApiParam(value = "수정한 유저 프로필 정보") @ModelAttribute MemberEditProfileRequest memberEditProfileRequest
-                               /*@ApiParam(value = "프로필 이미지 파일") @RequestPart MultipartFile memberProfileImageFile*/) throws MemberNotFound {
+                               @ApiParam(value = "수정한 유저 프로필 정보") @RequestPart MemberEditProfileRequest memberEditProfileRequest,
+                               @ApiParam(value = "프로필 이미지 파일") @RequestPart(required = false) MultipartFile memberProfileImageFile) throws MemberNotFound {
 
-        log.info("MemberEditProfileRequest = {}",memberEditProfileRequest);
-        memberService.updateMemberProfile(memberId, memberEditProfileRequest, memberEditProfileRequest.getMemberProfileImageFile());
+        log.info("MemberEditProfileRequest = {}", memberEditProfileRequest);
+        memberService.updateMemberProfile(memberId, memberEditProfileRequest, memberProfileImageFile);
 
         return "수정 완료";
     }
@@ -127,13 +126,13 @@ public class MemberController {
             notes = "헬스장 검색 결과를 불러온다."
     )
     @GetMapping("/gyms")
-    public Object findGymByText(@RequestParam String text){
+    public Object findGymByText(@RequestParam String text) {
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "KakaoAK "+kakaoLocalConfig.getCliendId());
+        headers.add("Authorization", "KakaoAK " + kakaoLocalConfig.getCliendId());
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("query",text);
+        params.add("query", text);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
