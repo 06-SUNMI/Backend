@@ -158,6 +158,7 @@ public class AdminService {
             if (challengeParticipant.getChallengeStatus() == ChallengeStatus.SUCCESS
                     && challengeParticipant.isRewarded() == false) {
                 member.setPoint(member.getPoint() + challenge.getParticipationFee() + individualReward);
+                challengeParticipant.setRewarded(true);
                 memberIdList.add(member.getId());
             }
         }

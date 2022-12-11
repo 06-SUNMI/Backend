@@ -273,8 +273,11 @@ public class ChallengeService {
         int failedParticipantNum = totalParticipantNum - succeededParticipantNum;
         int sumRewardAndCommission = failedParticipantNum * participationFee;
         int totalReward = sumRewardAndCommission / 2;
-
-        return participationFee + (totalReward / succeededParticipantNum);
+        int individualReward = 0;
+        if(succeededParticipantNum != 0){
+            individualReward = (totalReward / succeededParticipantNum);
+        }
+        return individualReward;
     }
 
     private void validateChallengeAuthPostReport(ChallengeAuthPost challengeAuthPost, Member member) throws DuplicateReporter, WriterEqualsReporter {
