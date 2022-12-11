@@ -30,14 +30,6 @@
                 <td th:text="${challenge.numPerWeek}"></td>
                 <td th:text="${challenge.participationFee}"></td>
                 <td th:text="${challenge.participationNum}"></td>
-                <td>
-                    <a href="#" th:href="'javascript:updateChallenge('+${challenge.id}+')'"
-                       class="btn btn-warning">수정</a>
-                </td>
-                <td>
-                    <a href="#" th:href="'javascript:deleteChallenge('+${challenge.id}+')'"
-                       class="btn btn-danger">삭제</a>
-                </td>
             </tr>
             </tbody>
         </table>
