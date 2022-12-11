@@ -1,39 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head th:replace="fragments/header :: header"/>
-<head>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
-</head>
+<style>
+    label{
+        margin-top:10px;
+    }
+</style>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <body>
 <div th:replace="fragments/bodyHeader :: bodyHeader"/>
-<form role="form" action="/admins/challenges/new" th:object="${challengePostOrUpdateRequest}" method="post">
-    <div id="container" class="container-fluid">
-        <th:block th:each="week : ${weekList}">
-            <th:block th:each="num : ${numPerWeekList}">
-                <div th:id="|mainDiv${week}${num}|" th:class="mainDiv">
-                    <h2>[[${week}]]주차 [[${num}]]번째 루틴</h2>
-                    <div>
-                        <input type='button' value='추가' onclick='add(this)'>
-                        <select onchange='addSelect(this)'>
-                            <option value="" selected disabled>운동 부위</option>
-                            <option value="CHEST">가슴</option>
-                            <option value="BACK">등</option>
-                            <option value="LOWER_BODY">하체</option>
-                            <option value="SHOULDER">어깨</option>
-                            <option value="TRICEPS">삼두근</option>
-                            <option value="BICEPS">이두근</option>
-                            <option value="CORE">코어</option>
-                            <option value="FOREARM">전완근</option>
-                            <option value="AEROBIC">유산소</option>
-                        </select>
+<div id="container" class="container-fluid">
+    <th:block th:each="week : ${weekList}">
+        <th:block th:each="num : ${numPerWeekList}">
+            <div th:id="|mainDiv${week}${num}|" th:class="mainDiv">
+                <div class="form-group">
+                    <label th:for="routine" style="margin-left : 24px; font-size : 20px">[[${week}]]주차 [[${num}]]번째 루틴</label>
+                    <div style="width:1200px; display:flex;">
+                        <div style="width:16%; margin: 2% 2%">
+                            <button class="btn btn-primary" onclick='add(this)' style="margin:10px auto; text-align: center">추가</button><br>
+                            <label>운동 부위</label>
+                            <select onchange='addSelect(this)' class="form-control" name="notSelectedYet">
+                                <option value="" disabled>운동 부위</option>
+                                <option value="CHEST">가슴</option>
+                                <option value="BACK">등</option>
+                                <option value="LOWER_BODY">하체</option>
+                                <option value="SHOULDER">어깨</option>
+                                <option value="TRICEPS">삼두근</option>
+                                <option value="BICEPS">이두근</option>
+                                <option value="CORE">코어</option>
+                                <option value="FOREARM">전완근</option>
+                                <option value="AEROBIC">유산소</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-            </th:block>
-            <br><br>
+                <hr>
+            </div>
         </th:block>
-        <input type='button' value='등록하기' onclick='saveChallenge(this)'>
-    </div>
-</form>
+        <br><br>
+    </th:block>
+    <button class="btn btn-primary" onclick='saveChallenge(this)' value='등록하기' style="margin-left : 24px">등록 하기</button>
+</div>
 
 <script th:inline="javascript">
     /*<![CDATA[*/
@@ -47,12 +54,25 @@
     console.log("challengeName = " + challengeName);
 
     function add(obj) {
-        var mainDiv = obj.parentNode.parentNode;
+
+        var formGroupDiv = obj.parentNode.parentNode.parentNode;
+        var childDiv = formGroupDiv.getElementsByTagName("div")[0];
+
+        console.log("a = " + childDiv.getElementsByTagName("div"));
+        console.log("size = " + childDiv.getElementsByTagName("div").length);
+
+        if (childDiv.getElementsByTagName("div").length == 5) {
+            alert("운동은 5개까지 등록 가능합니다.");
+            return;
+        }
+
         var newDiv = document.createElement('div');
-        newDiv.innerHTML = "<input type='button' value='삭제' onclick='remove(this)'>" +
-            "<select onchange=addSelect(this)>\n" +
-            "                        <option value=\"\" selected disabled>운동 부위</option>\n" +
-            "                        <option value=\"CHEST\">가슴</option>\n" +
+
+        newDiv.setAttribute("style", "width:16%; margin: 2% 2%");
+        newDiv.innerHTML = "<button class ='btn btn-danger' onclick='remove(this)' style=\"margin:10px auto; text-align: center\">삭제</button><br>" +
+            "<label>운동 부위</label>" +
+            "<select onchange=addSelect(this) class='form-control'>\n" +
+            "                        <option value=\"CHEST\" selected=\"selected\">가슴</option>\n" +
             "                        <option value=\"BACK\">등</option>\n" +
             "                        <option value=\"LOWER_BODY\">하체</option>\n" +
             "                        <option value=\"SHOULDER\">어깨</option>\n" +
@@ -62,7 +82,7 @@
             "                        <option value=\"FOREARM\">전완근</option>\n" +
             "                        <option value=\"AEROBIC\">유산소</option>\n" +
             "                    </select>"
-        mainDiv.appendChild(newDiv);
+        childDiv.appendChild(newDiv);
     }
 
     const remove = (obj) => {
@@ -73,76 +93,76 @@
     function addSelect(obj) {
         var div = obj.parentNode;
         var workoutTargetSelect = div.getElementsByTagName('select')[0];
-        console.log("0 = " + div.getElementsByTagName('select')[0]);
-        console.log("1 = " + div.getElementsByTagName('select')[1]);
+        var workoutNameSelectBox = div.getElementsByTagName('select')[1];
         // 기존 반응되는 select 및 input 제거
-        if (div.getElementsByTagName('select')[1] != undefined) {
-            div.getElementsByTagName('select')[1].remove();
-            div.getElementsByTagName('p')[0].remove();
+        if (workoutNameSelectBox != undefined) {
+            workoutNameSelectBox.remove();
         }
         var selectValue = workoutTargetSelect.options[workoutTargetSelect.selectedIndex].value;
 
+        const workoutNameLabel = document.createElement('label');
+        workoutNameLabel.setAttribute("style","margin-top: 10px");
+        workoutNameLabel.innerHTML = "운동 이름";
+
         const workoutNameSelect = document.createElement('select');
-        workoutNameSelect.setAttribute("class", "workoutName");
+        workoutNameSelect.setAttribute("name", "workoutName");
+        workoutNameSelect.setAttribute("class", "form-control");
 
         if (selectValue == "CHEST") {
             workoutNameSelect.innerHTML =
-                "        <option value=\"\" selected disabled>운동 이름</option>\n" +
-                "        <option value=\"BENCH_PRESS_DUMBBELL\">벤치 프레스 (덤벨)</option>\n" +
+                "        <option value=\"BENCH_PRESS_DUMBBELL\" selected=\"selected\">벤치 프레스 (덤벨)</option>\n" +
                 "        <option value=\"CHEST_PRESS_MACHINE\">체스트 프레스 (머신)</option>\n" +
                 "        <option value=\"PUSH_UP\">푸시 업</option>\n";
         } else if (selectValue == "BACK") {
             workoutNameSelect.innerHTML =
-                "        <option value=\"\" selected disabled>운동 이름</option>\n" +
-                "        <option value=\"LAT_PULL_DOWN\">렛 풀 다운</option>\n" +
+                "        <option value=\"LAT_PULL_DOWN\" selected=\"selected\">렛 풀 다운</option>\n" +
                 "        <option value=\"ONE_ARM_DUMBBELL_ROW\">원 암 덤벨 로우</option>\n" +
                 "        <option value=\"SEATED_ROW_CABLE\">시티드 로우 (케이블)</option>\n";
         } else if (selectValue == "LOWER_BODY") {
             workoutNameSelect.innerHTML =
-                "        <option value=\"\" selected disabled>운동 이름</option>\n" +
-                "        <option value=\"SQUAT\">스쿼트</option>\n" +
+                "        <option value=\"SQUAT\" selected=\"selected\">스쿼트</option>\n" +
                 "        <option value=\"WIDE_SQUAT\">와이드 스쿼트</option>\n" +
                 "        <option value=\"LEG_EXTENSION\">레그 익스텐션</option>\n";
         } else if (selectValue == "SHOULDER") {
             workoutNameSelect.innerHTML =
-                "        <option value=\"\" selected disabled>운동 이름</option>\n" +
-                "        <option value=\"SHOULDER_PRESS_DUMBBELL\">숄더 프레스 (덤벨)</option>\n" +
+                "        <option value=\"SHOULDER_PRESS_DUMBBELL\" selected=\"selected\">숄더 프레스 (덤벨)</option>\n" +
                 "        <option value=\"LATERAL_RAISE_DUMBBELL\">레터럴 레이즈 (덤벨)</option>\n" +
                 "        <option value=\"SHOULDER_PRESS_MACHINE\">숄더 프레스 (머신)</option>\n";
         } else if (selectValue == "TRICEPS") {
             workoutNameSelect.innerHTML =
-                "        <option value=\"\" selected disabled>운동 이름</option>\n" +
-                "        <option value=\"BENCH_DIPS\">벤치 딥스</option>\n" +
+                "        <option value=\"BENCH_DIPS\" selected=\"selected\">벤치 딥스</option>\n" +
                 "        <option value=\"TRICEP_PUSH_DOWN_CABLE\">프리셉 푸시 다운</option>\n" +
                 "        <option value=\"ONE_ARM_TRICEP_EXTENSION_DUMBBELL\">원 암 트리셉 익스텐션 (덤벨)</option>\n";
         } else if (selectValue == "BICEPS") {
             workoutNameSelect.innerHTML =
-                "<option value=\"\" selected disabled>운동 이름</option>\n" +
-                "        <option value=\"BICEP_CURL_DUMBBELL\">바이셉 컬 (덤벨)</option>\n" +
+                "        <option value=\"BICEP_CURL_DUMBBELL\" selected=\"selected\">바이셉 컬 (덤벨)</option>\n" +
                 "        <option value=\"HAMMER_CURL_DUMBBELL\">해머 컬 (덤벨)</option>\n" +
                 "        <option value=\"BICEP_CURL_CABLE\">바이셉 컬 (케이블)</option>\n";
         } else if (selectValue == "CORE") {
             workoutNameSelect.innerHTML =
-                "<option value=\"\" selected disabled>운동 이름</option>\n" +
-                "        <option value=\"CRUNCH\">크런치</option>\n" +
+                "        <option value=\"CRUNCH\" selected=\"selected\">크런치</option>\n" +
                 "        <option value=\"PLANK\">플랭크</option>\n" +
                 "        <option value=\"LEG_RAISE\">레그 레이즈</option>\n";
         } else if (selectValue == "FOREARM") {
             workoutNameSelect.innerHTML =
-                "<option value=\"\" selected disabled>운동 이름</option>\n" +
-                "        <option value=\"WRIST_CURL_DUMBBELL\">리스트 컬 (덤벨)</option>\n" +
+                "        <option value=\"WRIST_CURL_DUMBBELL\" selected=\"selected\">리스트 컬 (덤벨)</option>\n" +
                 "        <option value=\"REVERSE_WRIST_CURL_DUMBBELL\">리버스 리스트 컬 (덤벨)</option>\n" +
                 "        <option value=\"WRIST_CURL_BARBELL\">리스트 컬 (바벨)</option>\n";
         } else {
             workoutNameSelect.innerHTML =
-                "<option value=\"\" selected disabled>운동 이름</option>\n" +
-                "        <option value=\"TREADMILL_RUNNING\">트레드 밀 런닝</option>\n" +
+                "        <option value=\"TREADMILL_RUNNING\" selected=\"selected\">트레드 밀 런닝</option>\n" +
                 "        <option value=\"SLOW_BURPEE\">슬로우 버피</option>\n" +
                 "        <option value=\"CRISS_CROSS_JUMP\">크리스 크로스 점프</option>\n";
         }
-        div.appendChild(workoutNameSelect);
 
-        var p = document.createElement('p');
+        workoutTargetSelect.after(workoutNameSelect);
+        workoutTargetSelect.after(workoutNameLabel);
+
+        if (workoutTargetSelect.getAttribute("name") == "hasSelected"){
+            return;
+        }
+
+        workoutTargetSelect.setAttribute("name","hasSelected");
 
         var workoutWeightLabel = document.createElement('label');
         var workoutCountLabel = document.createElement('label');
@@ -154,29 +174,48 @@
         var workoutTime = document.createElement('input');
         var workoutSet = document.createElement('input');
 
-        workoutWeightLabel.innerHTML = "중량";
+        workoutWeightLabel.innerHTML = "중량(kg)";
         workoutCountLabel.innerHTML = "횟수";
-        workoutTimeLabel.innerHTML = "시간";
+        workoutTimeLabel.innerHTML = "시간(초)";
         workoutSetLabel.innerHTML = "세트";
 
+        workoutWeightLabel.setAttribute("for", "workoutWeight");
+        workoutWeightLabel.setAttribute("style", "display: block; margin-top: 10px");
+        workoutCountLabel.setAttribute("for", "workoutCount");
+        workoutCountLabel.setAttribute("style", "display: block; margin-top: 10px");
+        workoutTimeLabel.setAttribute("for", "workoutTime");
+        workoutTimeLabel.setAttribute("style", "display: block; margin-top: 10px");
+        workoutSetLabel.setAttribute("for", "workoutSet");
+        workoutSetLabel.setAttribute("style", "display: block; margin-top: 10px");
+
         workoutWeight.setAttribute("type", "number");
+        workoutWeight.setAttribute("value", "1");
+        workoutWeight.setAttribute("class", "form-control");
+        workoutWeight.setAttribute("min", "0");
         workoutCount.setAttribute("type", "number");
+        workoutCount.setAttribute("value", "1");
+        workoutCount.setAttribute("class", "form-control");
+        workoutCount.setAttribute("min", "0");
         workoutTime.setAttribute("type", "number");
+        workoutTime.setAttribute("value", "1");
+        workoutTime.setAttribute("class", "form-control");
+        workoutTime.setAttribute("min", "0");
         workoutSet.setAttribute("type", "number");
+        workoutSet.setAttribute("value", "1");
+        workoutSet.setAttribute("class", "form-control");
+        workoutSet.setAttribute("min", "0");
 
-        p.appendChild(workoutWeightLabel);
-        p.appendChild(workoutWeight);
+        div.appendChild(workoutWeightLabel);
+        div.appendChild(workoutWeight);
 
-        p.appendChild(workoutCountLabel);
-        p.appendChild(workoutCount);
+        div.appendChild(workoutCountLabel);
+        div.appendChild(workoutCount);
 
-        p.appendChild(workoutTimeLabel);
-        p.appendChild(workoutTime);
+        div.appendChild(workoutSetLabel);
+        div.appendChild(workoutSet);
 
-        p.appendChild(workoutSetLabel);
-        p.appendChild(workoutSet);
-
-        div.appendChild(p);
+        div.appendChild(workoutTimeLabel);
+        div.appendChild(workoutTime);
     }
 
     function saveChallenge(obj) {
@@ -196,21 +235,59 @@
         var currentChallengeProgressWeek = 1;
 
         for (let mainDivListIndex = 0; mainDivListIndex < mainDivListLength; mainDivListIndex++) {
-            var selectList = mainDivList[mainDivListIndex].getElementsByClassName("workoutName");
-            var pList = mainDivList[mainDivListIndex].getElementsByTagName('p');
-            currentChallengeProgressWeek = parseInt(mainDivListIndex / 3);
+
+            var prevSelectList = mainDivList[mainDivListIndex].getElementsByTagName("select");
+            var selectList = [];
+            for (let select of prevSelectList) {
+                if (select.getAttribute("onchange") == null) {
+                    selectList.push(select);
+                }
+            }
+
+            var divList = mainDivList[mainDivListIndex].getElementsByTagName('div')[0].getElementsByTagName('div')[0].getElementsByTagName('div');
+            currentChallengeProgressWeek = parseInt(mainDivListIndex / challengeNumPerWeek) + 1;
 
             var challengeRoutineData = {
                 challengeProgressWeek: currentChallengeProgressWeek,
                 challengeRoutineContentDataList: []
             }
 
+            var routineOrder = (mainDivListIndex % challengeNumPerWeek) + 1;
+            var workoutOrder = 1;
+
             for (let selectListIndex = 0; selectListIndex < selectList.length; selectListIndex++) {
+
+                workoutOrder = selectListIndex + 1;
+
+                console.log("====");
+                console.log(mainDivListIndex);
+                console.log(selectListIndex);
+                console.log(routineOrder);
+                console.log(workoutOrder);
+                console.log("====");
+
                 var workoutName = selectList[selectListIndex].options[selectList[selectListIndex].selectedIndex].value;
-                var workoutWeight = Number(pList[selectListIndex].getElementsByTagName("input")[0].value);
-                var workoutCount = Number(pList[selectListIndex].getElementsByTagName("input")[1].value);
-                var workoutSet = Number(pList[selectListIndex].getElementsByTagName("input")[2].value);
-                var workoutTime = Number(pList[selectListIndex].getElementsByTagName("input")[3].value);
+                var workoutWeight = Number(divList[selectListIndex].getElementsByTagName("input")[0].value);
+                var workoutCount = Number(divList[selectListIndex].getElementsByTagName("input")[1].value);
+                var workoutSet = Number(divList[selectListIndex].getElementsByTagName("input")[2].value);
+                var workoutTime = Number(divList[selectListIndex].getElementsByTagName("input")[3].value);
+
+                if (workoutWeight < 0) {
+                    alert(currentChallengeProgressWeek + "주차 " + routineOrder + "번째 루틴 중 " + workoutOrder + "번째 운동의 중량이 음수로 입력되었습니다.");
+                    return;
+                }
+                if (workoutCount < 0) {
+                    alert(currentChallengeProgressWeek + "주차 " + routineOrder + "번째 루틴 중 " + workoutOrder + "번째 운동의 횟수가 음수로 입력되었습니다.");
+                    return;
+                }
+                if (workoutSet < 0) {
+                    alert(currentChallengeProgressWeek + "주차 " + routineOrder + "번째 루틴 중 " + workoutOrder + "번째 운동의 세트가 음수로 입력되었습니다.");
+                    return;
+                }
+                if (workoutTime < 0) {
+                    alert(currentChallengeProgressWeek + "주차 " + routineOrder + "번째 루틴 중 " + workoutOrder + "번째 운동의 시간이 음수로 입력되었습니다.");
+                    return;
+                }
 
                 var challengeRoutineContentData = {
                     challengeRoutineWorkoutName: workoutName,
@@ -232,14 +309,14 @@
             data: JSON.stringify(challenge),
             success: function (data) {
                 console.log("success", data);
+                alert("챌린지 등록 완료");
             },
             error: function (data) {
                 console.log("fail", data);
+                alert("챌린지 등록 실패");
             }
         })
     }
-
 </script>
-
 </body>
 </html>
