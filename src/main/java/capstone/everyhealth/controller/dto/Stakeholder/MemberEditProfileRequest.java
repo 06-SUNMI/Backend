@@ -24,6 +24,4 @@ public class MemberEditProfileRequest {
     private String memberRegisteredGymName;
     @ApiModelProperty(value = "유저가 등록한 헬스장 id",example = "1124152")
     private String memberRegisteredGymId;
-    @ApiModelProperty(value = "프로필 이미지 파일")
-    private MultipartFile memberProfileImageFile;
 }

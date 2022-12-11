@@ -11,6 +11,8 @@ import capstone.everyhealth.controller.dto.Sns.SnsCommentRequset;
 import capstone.everyhealth.controller.dto.Sns.SnsCommentResponse;
 import capstone.everyhealth.controller.dto.Sns.SnsFindResponse;
 
+import capstone.everyhealth.controller.dto.Stakeholder.MemberFindByNameResponse;
+import capstone.everyhealth.controller.dto.Stakeholder.MemberFindResponse;
 import capstone.everyhealth.controller.dto.Stakeholder.MemberProfileFindResponse;
 import capstone.everyhealth.domain.sns.SnsPostImageOrVideo;
 import capstone.everyhealth.exception.Sns.SnsCommentNotFound;
@@ -48,8 +50,30 @@ public class SnsController {
             notes = "검색한 이름과 일치하는 유저들을 조회한다."
     )
     @GetMapping("/sns/members/{memberName}")
-    public List<Member> search(@ApiParam(value = "검색할 유저 이름") @PathVariable String memberName) {
-        return snsService.findByName(memberName);
+    public List<MemberFindByNameResponse> search(@ApiParam(value = "검색할 유저 이름") @PathVariable String memberName) {
+
+        List<Member> memberList = snsService.findByName(memberName);
+        List<MemberFindByNameResponse> memberFindByNameResponseList = new ArrayList<>();
+
+        for(Member member: memberList){
+            MemberFindByNameResponse memberFindByNameResponse = MemberFindByNameResponse.builder()
+                    .name(member.getName())
+                    .gymName(member.getGymName())
+                    .email(member.getEmail())
+                    .gymId(member.getGymId())
+                    .loginAt(member.getLoginAt())
+                    .height(member.getHeight())
+                    .customProfileImageUrl(member.getCustomProfileImageUrl())
+                    .memberId(member.getId())
+                    .point(member.getPoint())
+                    .socialId(member.getSocialAccountId())
+                    .weight(member.getWeight())
+                    .build();
+
+            memberFindByNameResponseList.add(memberFindByNameResponse);
+        }
+
+        return memberFindByNameResponseList;
     }
 
     @ApiOperation(
@@ -232,7 +256,6 @@ public class SnsController {
         for (Member member : memberList) {
 
             MemberProfileFindResponse memberProfileFindResponse = MemberProfileFindResponse.builder()
-                    .memberId(member.getId())
                     .memberHeight(member.getHeight())
                     .memberName(member.getName())
                     .memberRegisteredGymName(member.getGymName())
