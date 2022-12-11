@@ -4,6 +4,7 @@ import capstone.everyhealth.controller.dto.Challenge.*;
 import capstone.everyhealth.controller.dto.Challenge.auth.ChallengeFindAllAuthPostData;
 import capstone.everyhealth.controller.dto.Challenge.auth.ChallengeFindAllAuthPostResponse;
 import capstone.everyhealth.domain.challenge.*;
+import capstone.everyhealth.domain.enums.ChallengeStatus;
 import capstone.everyhealth.domain.routine.Workout;
 import capstone.everyhealth.domain.routine.WorkoutName;
 import capstone.everyhealth.exception.challenge.*;
@@ -169,12 +170,6 @@ public class ChallengeController {
             ChallengeFindByMemberResponse challengeFindByMemberResponse = createChallengeFindByMemberResponse(challenge, challengeParticipant);
             challengeFindByMemberResponseList.add(challengeFindByMemberResponse);
         }
-        /*for (Map.Entry<Challenge, Integer> entry : challengeAndCompletedRoutinesNumMap.entrySet()) {
-
-            ChallengeFindByMemberResponse challengeFindByMemberResponse = createChallengeFindByMemberResponse(entry.getKey());
-            challengeFindByMemberResponse.setProgressRate(calculateProgressRate(entry.getKey(), entry.getValue()));
-            challengeFindByMemberResponseList.add(challengeFindByMemberResponse);
-        }*/
 
         return challengeFindByMemberResponseList;
     }
@@ -224,6 +219,15 @@ public class ChallengeController {
                                         @ApiParam(value = "신고 사유", example = "신고 사유") @RequestParam String reportReason) throws MemberNotFound, ChallengeAuthNotFound, DuplicateReporter, WriterEqualsReporter {
         return challengeService.reportChallengeAuthPost(challengeAuthPostId, memberId, reportReason);
     }
+
+    @ApiOperation(
+            value = "특정 챌린지 성공자 수 조회"
+    )
+    @GetMapping("/challenges/{challengeId}/success")
+    public int findChallengeSucceededParticipantNum(@ApiParam(value = "챌린지 id 값") @PathVariable Long challengeId) throws ChallengeNotFound {
+        return challengeService.findChallengeSucceededParticipantNum(challengeId);
+    }
+
     private ChallengeFindAllAuthPostData createChallengeFindAllAuthPostData(ChallengeAuthPost challengeAuthPost) {
         return ChallengeFindAllAuthPostData.builder()
                 .memberId(challengeAuthPost.getMember().getId())
@@ -236,7 +240,15 @@ public class ChallengeController {
         return 100 * completedChallengeRoutineNum / challenge.getChallengeRoutineList().size();
     }
 
-    private ChallengeFindByMemberResponse createChallengeFindByMemberResponse(Challenge challenge, ChallengeParticipant challengeParticipant) {
+    private ChallengeFindByMemberResponse createChallengeFindByMemberResponse(Challenge challenge, ChallengeParticipant challengeParticipant) throws ChallengeNotFound {
+        int totalParticipantNum = challenge.getParticipationNum();
+        int succeededParticipantNum = challengeService.findChallengeSucceededParticipantNum(challenge.getId());
+        int individualReward = 0;
+
+        if (challengeParticipant.getChallengeStatus() == ChallengeStatus.SUCCESS) {
+            individualReward = challengeService.calculateIndividualReward(totalParticipantNum, succeededParticipantNum, challenge.getParticipationFee());
+        }
+
         return ChallengeFindByMemberResponse.builder()
                 .challengeId(challenge.getId())
                 .endDate(challenge.getEndDate())
@@ -247,6 +259,7 @@ public class ChallengeController {
                 .startDate(challenge.getStartDate())
                 .challengeParticipantStatus(challengeParticipant.getChallengeStatus())
                 .progressRate(100 * challengeParticipant.getCompletedRoutinesNum() / challenge.getChallengeRoutineList().size())
+                .individualReward(individualReward)
                 .build();
     }
 
@@ -357,11 +370,11 @@ public class ChallengeController {
         return workoutService.findByWorkoutName(workoutName);
     }
 
-    private LocalDate changeTypeStringToLocalDate(String localDate){
+    private LocalDate changeTypeStringToLocalDate(String localDate) {
         return LocalDate.parse(localDate, DateTimeFormatter.ISO_DATE);
     }
 
-    private String changeTypeLocalDateToString(LocalDate localDate){
+    private String changeTypeLocalDateToString(LocalDate localDate) {
         return localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 }

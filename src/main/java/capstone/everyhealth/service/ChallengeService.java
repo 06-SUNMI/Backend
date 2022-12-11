@@ -49,13 +49,12 @@ public class ChallengeService {
     }
 
     public List<Challenge> findAllChallenges() {
-        //return challengeRepository.findByEndDateGreaterThanEqual(LocalDate.now());
         return challengeRepository.findAll();
     }
 
-//    public List<Challenge> findAllClosedChallenges() {
-//        return challengeRepository.findByEndDateLessThan(LocalDate.now());
-//    }
+    public List<Challenge> findAllClosedChallenges() {
+        return challengeRepository.findByIsFinished(true);
+    }
 
     public Challenge find(Long challengeId) throws ChallengeNotFound {
         return challengeRepository.findById(challengeId).orElseThrow(() -> new ChallengeNotFound(challengeId));
@@ -275,6 +274,17 @@ public class ChallengeService {
         return challengeTransactionList;
     }
 
+    public int calculateIndividualReward(int totalParticipantNum, int succeededParticipantNum, int participationFee) {
+        int failedParticipantNum = totalParticipantNum - succeededParticipantNum;
+        int sumRewardAndCommission = failedParticipantNum * participationFee;
+        int totalReward = sumRewardAndCommission / 2;
+        int individualReward = 0;
+        if(succeededParticipantNum != 0){
+            individualReward = (totalReward / succeededParticipantNum);
+        }
+        return individualReward;
+    }
+
     private void validateChallengeAuthPostReport(ChallengeAuthPost challengeAuthPost, Member member) throws DuplicateReporter, WriterEqualsReporter {
         if (challengeAuthPost.getMember().getId() == member.getId()) {
             throw new WriterEqualsReporter();
@@ -283,6 +293,11 @@ public class ChallengeService {
         if (challengeAuthPostReportRepository.findByChallengeAuthPostAndMember(challengeAuthPost, member).isPresent()) {
             throw new DuplicateReporter();
         }
+    }
+
+    public int findChallengeSucceededParticipantNum(Long challengeId) throws ChallengeNotFound {
+        Challenge challenge = challengeRepository.findById(challengeId).orElseThrow(()->new ChallengeNotFound(challengeId));
+        return challengeParticipantRepository.findByChallengeAndChallengeStatus(challenge,ChallengeStatus.SUCCESS).size();
     }
 
     private ChallengeAuthPostReport createChallengeAuthPostReport(String reportReason, ChallengeAuthPost challengeAuthPost, Member member) {
@@ -474,5 +489,4 @@ public class ChallengeService {
     private String changeTypeLocalDateToString(LocalDate localDate) {
         return localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
-
 }

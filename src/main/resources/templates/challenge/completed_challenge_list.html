@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/header :: header"/>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+          crossorigin="anonymous">
+  </script>
+</head>
+
+<script>
+  function calculateChallenge(id, isCompleted){
+    if(isCompleted){
+      var form = document.createElement("form");
+      form.setAttribute("method", "post");
+      form.setAttribute("action", "/admins/challenges/"+id+"/calculate");
+      document.body.appendChild(form);
+      form.submit();
+    } else {
+      alert("정산 실패");
+    }
+  }
+</script>
+
+<body>
+<div class="container-fluid">
+  <div th:replace="fragments/bodyHeader :: bodyHeader"/>
+  <div>
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>이름</th>
+        <th>종료일</th>
+        <th>참여</th>
+        <th>성공</th>
+        <th>실패</th>
+        <th>총액</th>
+        <th>실패한 금액</th>
+        <th>1인당 상금</th>
+        <th>정산 가능</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="challengeCompleted : ${challengeCompletedResponseList}">
+        <td th:text="${challengeCompleted.challengeName}"></td>
+        <td th:text="${challengeCompleted.finishedDate}"></td>
+        <td th:text="${challengeCompleted.totalParticipated}"></td>
+        <td th:text="${challengeCompleted.totalSuccessed}"></td>
+        <td th:text="${challengeCompleted.totalFailed}"></td>
+        <td th:text="${challengeCompleted.participateFee*challengeCompleted.totalParticipated}"></td>
+        <td th:text="${challengeCompleted.participateFee*challengeCompleted.totalFailed}"></td>
+        <td th:text="${challengeCompleted.individulReward}"></td>
+        <td th:text="${challengeCompleted.isCompleted}"></td>
+        <td>
+          <a href="#" th:href="'javascript:calculateChallenge('+${challengeCompleted.challengeId}+','+${challengeCompleted.isCompleted}+')'"
+             class="btn btn-warning">정산</a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div th:replace="fragments/footer :: footer"/>
+
+</div>
+</body>
+</html>

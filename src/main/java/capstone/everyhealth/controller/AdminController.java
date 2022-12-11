@@ -2,12 +2,14 @@ package capstone.everyhealth.controller;
 
 import capstone.everyhealth.Book;
 import capstone.everyhealth.BooksCreationDto;
+import capstone.everyhealth.controller.dto.Challenge.ChallengeCompletedResponse;
 import capstone.everyhealth.controller.dto.Challenge.ChallengePostOrUpdateRequest;
 import capstone.everyhealth.controller.dto.Stakeholder.*;
 import capstone.everyhealth.domain.challenge.Challenge;
 import capstone.everyhealth.domain.report.*;
 import capstone.everyhealth.domain.stakeholder.Admin;
 import capstone.everyhealth.exception.challenge.ChallengeNotFound;
+import capstone.everyhealth.exception.challenge.ChallengeParticipantNotFound;
 import capstone.everyhealth.exception.report.ChallengeAuthPostReportNotFound;
 import capstone.everyhealth.exception.report.SnsCommentReportNotFound;
 import capstone.everyhealth.exception.report.SnsPostReportNotFound;
@@ -25,6 +27,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.time.Duration;
@@ -195,10 +198,9 @@ public class AdminController {
         return "report/punish_report";
     }
 
-
     @PostMapping("/admins/report/challenges/auth/{challengeAuthPostReportId}")
     public String challengeAuthPostReportsPunishment(@PathVariable Long challengeAuthPostReportId,
-                                                     @ModelAttribute ChallengeAuthPostReportPunishRequest challengeAuthPostReportPunishRequest) throws ChallengeAuthPostReportNotFound {
+                                                     @ModelAttribute ChallengeAuthPostReportPunishRequest challengeAuthPostReportPunishRequest) throws ChallengeAuthPostReportNotFound, ChallengeParticipantNotFound {
         ChallengeAuthPostReport challengeAuthPostReport = adminService.findChallengeAuthPostReport(challengeAuthPostReportId);
         ChallengeAuthPostReportPunishment challengeAuthPostReportPunishment = ChallengeAuthPostReportPunishment.builder()
                 .punishReason(challengeAuthPostReportPunishRequest.getReason())
@@ -206,7 +208,7 @@ public class AdminController {
                 .challengeAuthPostReport(challengeAuthPostReport)
                 .build();
 
-        adminService.updateIsProcessedOnChallengeAuthPostReport(challengeAuthPostReportId);
+        adminService.updateIsProcessedOnChallengeAuthPostReport(challengeAuthPostReportPunishRequest.getBlockDays(), challengeAuthPostReportId);
         adminService.savePunishChallengeAuthPostReport(challengeAuthPostReportPunishment);
 
         return "redirect:http://localhost:8080/admins/report/challenges/auth";
@@ -254,7 +256,9 @@ public class AdminController {
         model.addAttribute("challengePostOrUpdateRequest", challengePostOrUpdateRequest);
         model.addAttribute("weekList", weekList);
         model.addAttribute("numPerWeekList", numPerWeekList);
-        return "challenge/create_challenge_routine";
+        model.addAttribute("weekCount", weekList.size());
+        model.addAttribute("numPerWeekCount", numPerWeekList.size());
+        return "challenge/create_challenge_routine_test";
     }
 
     // 챌린지 수정 페이지
@@ -275,6 +279,52 @@ public class AdminController {
         return "redirect:/admins/challenges";
     }
 
+    // 완료된 챌린지 페이지
+    @GetMapping("/admins/completed-challenges")
+    public String findByCompletedChallengesAndChallengeStatus(Model model) throws ChallengeNotFound {
+
+        List<Challenge> challengeList = challengeService.findAllClosedChallenges();
+        List<ChallengeCompletedResponse> challengeCompletedResponseList = new ArrayList<>();
+        for (Challenge challenge : challengeList) {
+
+            log.info("ch-fin : {}", challenge.isFinished());
+            List<ChallengeAuthPostReport> challengeAuthPostReportList = adminService.findAllChallengeAuthPostReportsByChallenge(challenge);
+            boolean isCompleted = challengeAuthPostReportList.isEmpty() ? true : false;
+            int totalParticipantNum = challenge.getParticipationNum();
+            int succeededParticipantNum = challengeService.findChallengeSucceededParticipantNum(challenge.getId());
+            int reward = challengeService.calculateIndividualReward(totalParticipantNum, succeededParticipantNum, challenge.getParticipationFee());
+
+            ChallengeCompletedResponse challengeCompletedResponse = ChallengeCompletedResponse.builder()
+                    .challengeId(challenge.getId())
+                    .challengeName(challenge.getName())
+                    .isCompleted(isCompleted)
+                    .finishedDate(challenge.getEndDate())
+                    .individulReward(reward)
+                    .participateFee(challenge.getParticipationFee())
+                    .totalFailed(totalParticipantNum - succeededParticipantNum)
+                    .totalParticipated(totalParticipantNum)
+                    .totalSuccessed(succeededParticipantNum)
+                    .build();
+
+            challengeCompletedResponseList.add(challengeCompletedResponse);
+        }
+
+        model.addAttribute("challengeCompletedResponseList", challengeCompletedResponseList);
+
+         return "challenge/completed_challenge_list";
+    }
+
+    // 챌린지 정산 : 정산된 멤버 id 반환
+    @PostMapping("/admins/challenges/{challengeId}/calculate")
+    public String calculateChallenge(@PathVariable Long challengeId) throws ChallengeNotFound {
+        adminService.calculateChallenge(challengeId);
+        return "redirect:/admins/main";
+    }
+
+
+    /////////////////// 밑에 ApiIgnore는 테스트용으로 무시하셔도 됩니다 /////////////////////
+
+    @ApiIgnore
     @GetMapping("/test")
     public String test1234(Model model) {
         BooksCreationDto booksForm = new BooksCreationDto();
@@ -288,6 +338,7 @@ public class AdminController {
         return "test";
     }
 
+    @ApiIgnore
     @PostMapping("/test")
     public String test12345(Model model, @ModelAttribute BooksCreationDto form) {
         for (Book book : form.getBooks()) {
@@ -298,14 +349,22 @@ public class AdminController {
         return "home";
     }
 
+    @ApiIgnore
     @GetMapping("/test22")
     public String test12341234() {
         return "test2";
     }
 
+    @ApiIgnore
     @GetMapping("/test33")
     public String test123412345() {
         return "test3";
+    }
+
+    @ApiIgnore
+    @GetMapping("/testa")
+    public String testaaaa() {
+        return "challenge/jquery_test";
     }
 
     private void addReportedChallengeAuthPostList(List<ChallengeAuthPostReport> challengeAuthPostReportList, List<ReportedChallengeAuthPostResponse> reportedChallengeAuthPostResponseList) {

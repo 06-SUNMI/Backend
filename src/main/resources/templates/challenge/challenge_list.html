@@ -7,33 +7,6 @@
             crossorigin="anonymous">
     </script>
 </head>
-
-<script>
-    function createChallenge() {
-        var form = document.createElement("form");
-        form.setAttribute("method", "get");
-        form.setAttribute("action", "/admins/challenges/new");
-        document.body.appendChild(form);
-        form.submit();
-    }
-
-    function updateChallenge(id) {
-        var form = document.createElement("form");
-        form.setAttribute("method", "get");
-        form.setAttribute("action", "/admins/challenges/" + id + "/update");
-        document.body.appendChild(form);
-        form.submit();
-    }
-
-    function deleteChallenge(id) {
-        var form = document.createElement("form");
-        form.setAttribute("method", "delete");
-        form.setAttribute("action", "/admins/challenge/" + id);
-        document.body.appendChild(form);
-        form.submit();
-    }
-</script>
-
 <body>
 <div class="container-fluid">
     <div th:replace="fragments/bodyHeader :: bodyHeader"/>
@@ -79,5 +52,30 @@
     <div th:replace="fragments/footer :: footer"/>
 
 </div>
+<script th:inline="javascript">
+    function createChallenge() {
+        var form = document.createElement("form");
+        form.setAttribute("method", "get");
+        form.setAttribute("action", "/admins/challenges/new");
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function updateChallenge(id) {
+        var form = document.createElement("form");
+        form.setAttribute("method", "get");
+        form.setAttribute("action", "/admins/challenges/" + id + "/update");
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function deleteChallenge(id) {
+        var form = document.createElement("form");
+        form.setAttribute("method", "delete");
+        form.setAttribute("action", "/admins/challenge/" + id);
+        document.body.appendChild(form);
+        form.submit();
+    }
+</script>
 </body>
 </html>
