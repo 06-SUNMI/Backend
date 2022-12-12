@@ -20,7 +20,8 @@ class RoutineControllerTest {
     private MemberRoutineController memberRoutineController;
 
     @Autowired
-    private MockMvc mvc;
+    private MockMv
+   c mvc;
 
     @MockBean
     private MemberRoutineService routineService;
