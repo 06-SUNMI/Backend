@@ -12,6 +12,7 @@ import capstone.everyhealth.exception.challenge.ChallengeParticipantNotFound;
 import capstone.everyhealth.exception.report.ChallengeAuthPostReportNotFound;
 import capstone.everyhealth.exception.report.SnsCommentReportNotFound;
 import capstone.everyhealth.exception.report.SnsPostReportNotFound;
+import capstone.everyhealth.exception.stakeholder.AdminIdNotFound;
 import capstone.everyhealth.exception.stakeholder.AdminLoginFailed;
 import capstone.everyhealth.exception.stakeholder.AdminNotFound;
 import capstone.everyhealth.repository.*;
@@ -65,7 +66,6 @@ public class AdminService {
     private void updateAdminField(AdminEditRequest adminEditRequest, Admin admin) {
         admin.setAdminPassword(adminEditRequest.getAdminPassword());
         admin.setAdminName(adminEditRequest.getAdminName());
-        admin.setAdminPhoneNumber(adminEditRequest.getAdminPhoneNumber());
     }
 
     public void adminLoginValidation(AdminLoginRequest adminLoginRequest) throws AdminLoginFailed {
@@ -163,5 +163,9 @@ public class AdminService {
             }
         }
         return memberIdList;
+    }
+
+    public Admin findAdminById(String adminId) throws AdminIdNotFound {
+        return adminRepository.findByAdminId(adminId).orElseThrow(()-> new AdminIdNotFound(adminId));
     }
 }

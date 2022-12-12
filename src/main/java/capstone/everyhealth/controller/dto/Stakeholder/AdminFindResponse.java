@@ -19,6 +19,5 @@ public class AdminFindResponse {
         this.adminId = admin.getAdminId();
         this.adminPassword = admin.getAdminPassword();
         this.adminName = admin.getAdminName();
-        this.adminPhoneNumber = admin.getAdminPhoneNumber();
     }
 }

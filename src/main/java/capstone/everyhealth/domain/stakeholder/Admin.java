@@ -21,5 +21,6 @@ public class Admin {
     private String adminId;
     private String adminPassword;
     private String adminName;
-    private String adminPhoneNumber;
+    @Builder.Default
+    private boolean isSuperAdmin = false;
 }

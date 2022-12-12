@@ -5,6 +5,7 @@ import capstone.everyhealth.BooksCreationDto;
 import capstone.everyhealth.controller.dto.Challenge.*;
 import capstone.everyhealth.controller.dto.Stakeholder.*;
 import capstone.everyhealth.domain.challenge.Challenge;
+import capstone.everyhealth.domain.challenge.ChallengeAuthPost;
 import capstone.everyhealth.domain.report.*;
 import capstone.everyhealth.domain.stakeholder.Admin;
 import capstone.everyhealth.exception.challenge.ChallengeNotFound;
@@ -12,6 +13,7 @@ import capstone.everyhealth.exception.challenge.ChallengeParticipantNotFound;
 import capstone.everyhealth.exception.report.ChallengeAuthPostReportNotFound;
 import capstone.everyhealth.exception.report.SnsCommentReportNotFound;
 import capstone.everyhealth.exception.report.SnsPostReportNotFound;
+import capstone.everyhealth.exception.stakeholder.AdminIdNotFound;
 import capstone.everyhealth.exception.stakeholder.AdminLoginFailed;
 import capstone.everyhealth.exception.stakeholder.AdminNotFound;
 import capstone.everyhealth.service.AdminService;
@@ -26,6 +28,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
@@ -53,7 +56,6 @@ public class AdminController {
                 .adminId(adminRegisterRequest.getAdminId())
                 .adminPassword(adminRegisterRequest.getAdminPassword())
                 .adminName(adminRegisterRequest.getAdminName())
-                .adminPhoneNumber(adminRegisterRequest.getAdminPhoneNumber())
                 .build();
 
         return adminService.save(admin);
@@ -88,8 +90,9 @@ public class AdminController {
 
     // 로그인 정보 검증
     @PostMapping("/admins/login")
-    public String adminLoginValidation(@Valid AdminLoginRequest adminLoginRequest,
-                                       BindingResult result) {
+    public String adminLoginValidation(Model model,
+                                       @Valid AdminLoginRequest adminLoginRequest,
+                                       BindingResult result) throws AdminIdNotFound {
 
         if (result.hasErrors()) {
             return "admin_login";
@@ -102,12 +105,11 @@ public class AdminController {
             return "admin_login";
         }
 
-        //return "redirect:/main_page";
-        return "main_page";
+        return "redirect:/admins/main";
     }
 
     @GetMapping("/admins/main")
-    public String adminMainPage() {
+    public String adminMainPage(Model model) throws AdminIdNotFound {
         return "main_page";
     }
 
@@ -336,7 +338,7 @@ public class AdminController {
 
         model.addAttribute("challengeCompletedResponseList", challengeCompletedResponseList);
 
-         return "challenge/completed_challenge_list";
+        return "challenge/completed_challenge_list";
     }
 
     // 챌린지 정산 : 정산된 멤버 id 반환
