@@ -2,11 +2,10 @@
 <html lang="en">
 <head th:replace="fragments/header :: header"/>
 <style>
-    label{
-        margin-top:10px;
+    label {
+        margin-top: 10px;
     }
 </style>
-<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <body>
 <div th:replace="fragments/bodyHeader :: bodyHeader"/>
 <div id="container" class="container-fluid">
@@ -14,13 +13,17 @@
         <th:block th:each="num : ${numPerWeekList}">
             <div th:id="|mainDiv${week}${num}|" th:class="mainDiv">
                 <div class="form-group">
-                    <label th:for="routine" style="margin-left : 24px; font-size : 20px">[[${week}]]주차 [[${num}]]번째 루틴</label>
+                    <label th:for="routine" style="margin-left : 24px; font-size : 20px">[[${week}]]주차 [[${num}]]번째
+                        루틴</label>
                     <div style="width:1200px; display:flex;">
                         <div style="width:16%; margin: 2% 2%">
-                            <button class="btn btn-primary" onclick='add(this)' style="margin:10px auto; text-align: center">추가</button><br>
+                            <button class="btn btn-primary" onclick='add(this)'
+                                    style="margin:10px auto; text-align: center">추가
+                            </button>
+                            <br>
                             <label>운동 부위</label>
                             <select onchange='addSelect(this)' class="form-control" name="notSelectedYet">
-                                <option value="" disabled>운동 부위</option>
+                                <option value=" " selected="true" disabled> 운동 부위</option>
                                 <option value="CHEST">가슴</option>
                                 <option value="BACK">등</option>
                                 <option value="LOWER_BODY">하체</option>
@@ -72,7 +75,8 @@
         newDiv.innerHTML = "<button class ='btn btn-danger' onclick='remove(this)' style=\"margin:10px auto; text-align: center\">삭제</button><br>" +
             "<label>운동 부위</label>" +
             "<select onchange=addSelect(this) class='form-control'>\n" +
-            "                        <option value=\"CHEST\" selected=\"selected\">가슴</option>\n" +
+            "                        <option value=' ' selected='true' disabled> 운동 부위</option>" +
+            "                        <option value=\"CHEST\">가슴</option>\n" +
             "                        <option value=\"BACK\">등</option>\n" +
             "                        <option value=\"LOWER_BODY\">하체</option>\n" +
             "                        <option value=\"SHOULDER\">어깨</option>\n" +
@@ -97,11 +101,12 @@
         // 기존 반응되는 select 및 input 제거
         if (workoutNameSelectBox != undefined) {
             workoutNameSelectBox.remove();
+            div.getElementsByTagName('label')[1].remove();
         }
         var selectValue = workoutTargetSelect.options[workoutTargetSelect.selectedIndex].value;
 
         const workoutNameLabel = document.createElement('label');
-        workoutNameLabel.setAttribute("style","margin-top: 10px");
+        workoutNameLabel.setAttribute("style", "margin-top: 10px");
         workoutNameLabel.innerHTML = "운동 이름";
 
         const workoutNameSelect = document.createElement('select');
@@ -158,11 +163,11 @@
         workoutTargetSelect.after(workoutNameSelect);
         workoutTargetSelect.after(workoutNameLabel);
 
-        if (workoutTargetSelect.getAttribute("name") == "hasSelected"){
+        if (workoutTargetSelect.getAttribute("name") == "hasSelected") {
             return;
         }
 
-        workoutTargetSelect.setAttribute("name","hasSelected");
+        workoutTargetSelect.setAttribute("name", "hasSelected");
 
         var workoutWeightLabel = document.createElement('label');
         var workoutCountLabel = document.createElement('label');
@@ -189,19 +194,19 @@
         workoutSetLabel.setAttribute("style", "display: block; margin-top: 10px");
 
         workoutWeight.setAttribute("type", "number");
-        workoutWeight.setAttribute("value", "1");
+        workoutWeight.setAttribute("value", "0");
         workoutWeight.setAttribute("class", "form-control");
         workoutWeight.setAttribute("min", "0");
         workoutCount.setAttribute("type", "number");
-        workoutCount.setAttribute("value", "1");
+        workoutCount.setAttribute("value", "0");
         workoutCount.setAttribute("class", "form-control");
         workoutCount.setAttribute("min", "0");
         workoutTime.setAttribute("type", "number");
-        workoutTime.setAttribute("value", "1");
+        workoutTime.setAttribute("value", "0");
         workoutTime.setAttribute("class", "form-control");
         workoutTime.setAttribute("min", "0");
         workoutSet.setAttribute("type", "number");
-        workoutSet.setAttribute("value", "1");
+        workoutSet.setAttribute("value", "0");
         workoutSet.setAttribute("class", "form-control");
         workoutSet.setAttribute("min", "0");
 
@@ -272,6 +277,8 @@
                 var workoutSet = Number(divList[selectListIndex].getElementsByTagName("input")[2].value);
                 var workoutTime = Number(divList[selectListIndex].getElementsByTagName("input")[3].value);
 
+                console.log("aa");
+
                 if (workoutWeight < 0) {
                     alert(currentChallengeProgressWeek + "주차 " + routineOrder + "번째 루틴 중 " + workoutOrder + "번째 운동의 중량이 음수로 입력되었습니다.");
                     return;
@@ -310,6 +317,7 @@
             success: function (data) {
                 console.log("success", data);
                 alert("챌린지 등록 완료");
+                window.location.href="";
             },
             error: function (data) {
                 console.log("fail", data);
