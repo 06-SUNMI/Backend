@@ -44,7 +44,7 @@
 
   <br>
 
-### 3D printing
+### 챌린지 참가
 
 <img src="https://img.shields.io/badge/Platform-Fusion360-blue?style=flat"/>
 
@@ -52,7 +52,7 @@
 
   <br>
 
-### Front-End
+### SNS
 
 <img src="https://img.shields.io/badge/Language-PHP-green?style=flat"/><img src="https://img.shields.io/badge/Platform-RaspberryPi-blue?style=flat"/><img src="https://img.shields.io/badge/DB-MySQL-yellow?style=flat"/>
 
@@ -65,17 +65,7 @@
 
   <br>
 
-### Back-End
 
-<img src="https://img.shields.io/badge/Language-C-green?style=flat"/><img src="https://img.shields.io/badge/DB-MySQL-yellow?style=flat"/>
-
-* 아두이노로부터 데이터를 수신하는 Socket Programming
-
-* MySQL 사용자 및 컨테이너 Table 생성
-
-* 컨테이너 정보 DB에 업로드
-
-  <br>
 
   <br>
 
