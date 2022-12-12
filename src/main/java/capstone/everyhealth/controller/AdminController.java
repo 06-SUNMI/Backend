@@ -212,7 +212,7 @@ public class AdminController {
         adminService.updateIsProcessedOnChallengeAuthPostReport(challengeAuthPostReportPunishRequest.getBlockDays(), challengeAuthPostReportId);
         adminService.savePunishChallengeAuthPostReport(challengeAuthPostReportPunishment);
 
-        return "redirect:http://localhost:8080/admins/report/challenges/auth";
+        return "redirect:http://15.164.168.230:8080/admins/report/challenges/auth";
     }
 
     // 챌린지 조회 페이지
