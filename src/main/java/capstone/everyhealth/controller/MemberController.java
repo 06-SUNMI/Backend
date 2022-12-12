@@ -101,22 +101,18 @@ public class MemberController {
     )
     @PutMapping(path = "/members/{memberId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public String updateMember(@ApiParam(value = "유저 id 값", example = "1") @PathVariable Long memberId,
-                               @ApiParam(value = "수정한 유저 프로필 정보") @RequestPart String memberName,
-                               @ApiParam(value = "수정한 유저 프로필 정보") @RequestPart int memberHeight,
-                               @ApiParam(value = "수정한 유저 프로필 정보") @RequestPart int memberWeight,
-                               @ApiParam(value = "수정한 유저 프로필 정보") @RequestPart String memberRegisteredGymName,
-                               @ApiParam(value = "수정한 유저 프로필 정보") @RequestPart String memberRegisteredGymId,
-                               @ApiParam(value = "프로필 이미지 파일") @RequestPart(required = false) MultipartFile memberProfileImageFile) throws MemberNotFound {
+                               @ApiParam(value = "수정한 유저 프로필 정보") @RequestBody MemberEditProfileRequest memberEditProfileRequest
+            /*@ApiParam(value = "프로필 이미지 파일") @RequestPart(required = false) MultipartFile memberProfileImageFile*/) throws MemberNotFound {
 
-        MemberEditProfileRequest memberEditProfileRequest = MemberEditProfileRequest.builder()
+        /*MemberEditProfileRequest memberEditProfileRequest = MemberEditProfileRequest.builder()
                 .memberWeight(memberWeight)
                 .memberRegisteredGymName(memberRegisteredGymName)
                 .memberRegisteredGymId(memberRegisteredGymId)
                 .memberName(memberName)
                 .memberHeight(memberHeight)
                 .build();
-
-        memberService.updateMemberProfile(memberId, memberEditProfileRequest, memberProfileImageFile);
+        */
+        memberService.updateMemberProfile(memberId, memberEditProfileRequest/*, memberProfileImageFile*/);
 
         return "수정 완료";
     }

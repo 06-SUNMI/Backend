@@ -48,11 +48,11 @@ public class MemberService {
     }
 
     @Transactional
-    public void updateMemberProfile(Long memberId, MemberEditProfileRequest memberEditProfileRequest, MultipartFile memberProfileImageFile) throws MemberNotFound {
+    public void updateMemberProfile(Long memberId, MemberEditProfileRequest memberEditProfileRequest/*, MultipartFile memberProfileImageFile*/) throws MemberNotFound {
 
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
 
-        updateMemberData(memberEditProfileRequest, member, memberProfileImageFile);
+        updateMemberData(memberEditProfileRequest, member/*, memberProfileImageFile*/);
     }
 
     public List<Member> findAllMember() {
@@ -60,24 +60,26 @@ public class MemberService {
     }
 
     public List<Member> findMemberByGymId(Long memberId) throws MemberNotFound {
-        Member member = memberRepository.findById(memberId).orElseThrow(()-> new MemberNotFound(memberId));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFound(memberId));
         String gymId = member.getGymId();
 
-        return memberRepository.findAllByGymIdAndIdNot(gymId,memberId);
+        return memberRepository.findAllByGymIdAndIdNot(gymId, memberId);
     }
 
-    private void updateMemberData(MemberEditProfileRequest memberEditProfileRequest, Member member, MultipartFile memberProfileImageFile) {
+    private void updateMemberData(MemberEditProfileRequest memberEditProfileRequest, Member member/*, MultipartFile memberProfileImageFile*/) {
 
-        String customProfileImageUrl;
-
+        //String customProfileImageUrl;
+        /*
         try {
             customProfileImageUrl = fileUploadService.uploadImage(memberProfileImageFile);
         } catch (NullPointerException e) {
             customProfileImageUrl = member.getCustomProfileImageUrl();
         }
+        */
+
 
         member.setName(memberEditProfileRequest.getMemberName());
-        member.setCustomProfileImageUrl(customProfileImageUrl);
+        //member.setCustomProfileImageUrl(customProfileImageUrl);
         member.setGymName(memberEditProfileRequest.getMemberRegisteredGymName());
         member.setGymId(memberEditProfileRequest.getMemberRegisteredGymId());
         member.setHeight(memberEditProfileRequest.getMemberHeight());
