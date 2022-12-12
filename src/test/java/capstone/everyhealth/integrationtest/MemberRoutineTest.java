@@ -26,6 +26,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
@@ -58,6 +60,9 @@ public class MemberRoutineTest {
     @Autowired
     private MemberRoutineService memberRoutineService;
 
+    @Autowired
+    private EntityManager em;
+
     @Test
     @DisplayName("루틴 등록 테스트")
     @Transactional
@@ -70,7 +75,7 @@ public class MemberRoutineTest {
         List<MemberRoutineWorkoutContent> memberRoutineWorkoutContentList = createMemberRoutineWorkoutContentList();
         MemberRoutineRegisterRequest memberRoutineRegisterRequest = createMemberRoutineRegisterRequest(routineRegisterdate, memberRoutineWorkoutContentList);
 
-        Member member = createMember();
+        Member member = createMember(em);
         Long memberId = memberService.saveMember(member);
 
         MemberRoutine memberRoutine = memberRoutineController.createMemberRoutine(memberId, memberRoutineRegisterRequest);
@@ -105,8 +110,9 @@ public class MemberRoutineTest {
         return memberRoutineWorkoutContentList;
     }
 
-    private Member createMember() {
-        return Member.builder()
+    @Transactional
+    Member createMember(EntityManager em) {
+        Member member = Member.builder()
                 .gymName("OO 헬스장")
                 .weight(111)
                 .height(199)
@@ -114,6 +120,10 @@ public class MemberRoutineTest {
                 .name("홍길동")
                 .socialAccountId("123312")
                 .build();
+
+        em.persist(member);
+
+        return member;
     }
 
     private MemberRoutineRegisterRequest createMemberRoutineRegisterRequest(String routineRegisterdate, List<MemberRoutineWorkoutContent> memberRoutineWorkoutContentList) {
