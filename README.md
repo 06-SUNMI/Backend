@@ -16,7 +16,6 @@
 
 ### Summary
 
-<img src=images/summary.png  width="50%"/>
 
 * 운동 루틴을 Todo List 형식으로 관리
 
@@ -42,14 +41,6 @@
 
 * 자신이 수행한 운동의 기록을 확인 가능
 
-|                        front                        |                        inside                        |
-| :-------------------------------------------------: | :--------------------------------------------------: |
-| <img src=images/1.jpg  width="100%"/> | <img src=images/container_inside.png  width="100%"/> |
-|                      **back**                       |                       **top**                        |
-| <img src=images/container_back.png  width="100%"/>  |  <img src=images/container_top.png  width="100%"/>   |
-
-
-
 
   <br>
 
@@ -63,11 +54,6 @@
 * 챌린지 수행 중 인증과 신고를 통해서 공정한 챌린지 진행 가능
 
 
-|                        front                        |                        inside                        |
-| :-------------------------------------------------: | :--------------------------------------------------: |
-| <img src=images/1.jpg  width="100%"/> | <img src=images/container_inside.png  width="100%"/> |
-|                      **back**                       |                       **top**                        |
-| <img src=images/container_back.png  width="100%"/>  |  <img src=images/container_top.png  width="100%"/>   |
 
   <br>
 
@@ -77,20 +63,9 @@
 * SNS의 피드 작성과 댓글 기능을 통해서 다른 사용자들과 소통 가능
 
 * 사용자의 이름 또는 등록한 헬스장이름을 검색해 다른 사용자를 검색 가능 
-* 
-
-|                        front                        |                        inside                        |
-| :-------------------------------------------------: | :--------------------------------------------------: |
-| <img src=images/1.jpg  width="100%"/> | <img src=images/container_inside.png  width="100%"/> |
-|                      **back**                       |                       **top**                        |
-| <img src=images/container_back.png  width="100%"/>  |  <img src=images/container_top.png  width="100%"/>   |
-
-  <br>
-
 
 
   <br>
-
 
 
 ### 관리자 페이지
@@ -99,24 +74,22 @@
 
 * 챌린지 인증의 신고목록 관리와 해당 사용자 제제 가능
 
-* SNS 글의 신고글과 해당 사용자 제제 가능
+* SNS 글의 신고글과 해당 사용자 제재 가능
 
 
-|                        front                        |                        inside                        |
-| :-------------------------------------------------: | :--------------------------------------------------: |
-| <img src=images/1.jpg  width="100%"/> | <img src=images/container_inside.png  width="100%"/> |
-|                      **back**                       |                       **top**                        |
-| <img src=images/container_back.png  width="100%"/>  |  <img src=images/container_top.png  width="100%"/>   |
 
   <br>
 
 
-<br>
+### 프로젝트 파일 구조
 
+* github/workflows : ci / cd를 위한 workflow를 정의
 
-<br>
+* scripts : 빌드된 파일을 복사 후 실행하는 과정을 정의
 
-<br>
+* appspec.yml : 빌드된 파일을 저장할 EC2 서버 내 경로를 정의 
 
-<br>
-
+* src : 
+    * src/main/java/capstone/everyhealth에 실제 프로그램의 동작에 필요한 config, controller, domain, service, repository, exception을 폴더화 한 후 각 폴더에 세부 내용들을 저장<br>
+   <pre> 1) config : AWS S3, KAKAO LOCAL API, SWAGGER 관련 config 정의 <br> 2) domain : db에 매핑될 entity 정의 <br> 3) controller : client 및 외부 API의 HTTP 메시지를 수신 및 응답하기 위한 controller 정의 <br> 4) service : 비즈니스 로직 정의 <br> 5) repository : db와의 데이터 전달 정의 <br> 6) exception : 예외 정의 </pre><br>
+    * src/main/resources에 관리자 페이지 렌더링에 필요한 html, css, js 파일을 저장
